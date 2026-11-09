@@ -36,5 +36,126 @@ footer{background:#f0f3f0;border-top:1px solid #e2e7e2;padding:48px 0 20px}.foot
 <section class="section" id="about"><div class="wrap section-top"><div><span class="eyebrow">Built with intention</span><h2>Less friction.<br>More visibility.</h2></div><p class="section-intro">A clean operations tool should make the work feel straightforward and the important numbers easy to find. That is the standard Fulfillment is working toward.</p></div></section>
 <section class="cta"><div class="wrap ctabox"><div class="ctacopy"><span class="eyebrow">Fulfillment is taking shape</span><h2>Be ready for a clearer workflow.</h2><p>Ask to join the early access list and follow the project as it develops.</p></div><a class="btn" href="mailto:access@fulfillment.site?subject=Fulfillment%20early%20access">Request early access <span class="arrow">↗</span></a></div></section>
 </main>
-<footer><div class="wrap"><div class="footmain"><div class="footabout"><a class="brand" href="#"><span class="mark">F</span>Fulfillment</a><p>A clear, structured workspace for orders, fulfillment, and business performance.</p></div><div class="footcol"><h4>Product</h4><div class="footlinks"><a href="#workflow">How it works</a><a href="#workspace">Workspace</a><a href="#about">About Fulfillment</a><a href="mailto:access@fulfillment.site">Request access</a></div></div><div class="footcol"><h4>Help & information</h4><div class="footlinks"><a href="mailto:support@fulfillment.site?subject=Fulfillment%20support">Support</a><a href="mailto:releases@fulfillment.site?subject=Release%20updates">Releases</a><a href="mailto:contact@fulfillment.site">Contact us</a></div></div><div class="footcol"><h4>Policies</h4><div class="footlinks"><a href="mailto:privacy@fulfillment.site?subject=Privacy%20Policy">Privacy</a><a href="mailto:legal@fulfillment.site?subject=Terms%20of%20Service">Terms of service</a><a href="mailto:legal@fulfillment.site?subject=Refund%20terms">Refund terms</a></div></div></div><div class="footbottom"><span>© 2026 Fulfillment. All rights reserved.</span><div class="footlegal"><a href="mailto:privacy@fulfillment.site?subject=Privacy%20Policy">Privacy</a><a href="mailto:legal@fulfillment.site?subject=Terms%20of%20Service">Terms</a><a href="mailto:support@fulfillment.site">Support</a></div><span>Order operations, in focus.</span></div></div></footer>
+<footer><div class="wrap"><div class="footmain"><div class="footabout"><a class="brand" href="#"><span class="mark">F</span>Fulfillment</a><p>A clear, structured workspace for orders, fulfillment, and business performance.</p></div><div class="footcol"><h4>Product</h4><div class="footlinks"><a href="#workflow">How it works</a><a href="#workspace">Workspace</a><a href="#about">About Fulfillment</a><a href="mailto:access@fulfillment.site">Request access</a></div></div><div class="footcol"><h4>Help & information</h4><div class="footlinks"><a href="mailto:support@fulfillment.site?subject=Fulfillment%20support">Support</a><a href="mailto:releases@fulfillment.site?subject=Release%20updates">Releases</a><a href="mailto:contact@fulfillment.site">Contact us</a></div></div><div class="footcol"><h4>Policies</h4><div class="footlinks"><a href="#privacy-policy">Privacy Policy</a><a href="#terms-of-service">Terms of Service</a><a href="#refund-terms">Refund Terms</a></div></div></div><div class="footbottom"><span>© 2026 Fulfillment. All rights reserved.</span><div class="footlegal"><a href="#privacy-policy">Privacy Policy</a><a href="mailto:legal@fulfillment.site?subject=Terms%20of%20Service">Terms</a><a href="mailto:support@fulfillment.site">Support</a></div><span>Order operations, in focus.</span></div></div></footer>
+
+<style>
+.policy-view{display:none;min-height:100vh;background:#fff;color:#202c34}
+body.policy-open>header,body.policy-open>main,body.policy-open>footer{display:none}
+body.policy-open .policy-view{display:block}
+.policy-top{border-bottom:1px solid #e8ece9;background:#fbfcfb}
+.policy-top-inner{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.policy-brand{font-weight:800;letter-spacing:-.04em;color:#172b3a;display:flex;align-items:center;gap:9px}
+.policy-back{color:#42675c;font-size:13px;font-weight:700;padding:10px 0}
+.policy-back:hover{color:#146b55}
+.policy-page{width:min(1100px,calc(100% - 48px));margin:0 auto;padding:48px 0 100px}
+.policy-crumb{font-size:12px;color:#84918b;margin:0 0 26px}
+.policy-crumb a{color:#28705b;font-weight:650}
+.policy-grid{display:grid;grid-template-columns:minmax(0,720px) 245px;gap:64px;align-items:start}
+.policy-article h1{font-size:42px;letter-spacing:-.055em;line-height:1.08;margin:0 0 12px;color:#172b3a}
+.policy-deck{font-size:15px;color:#67756f;line-height:1.7;margin:0 0 18px}
+.policy-meta{display:flex;gap:12px;align-items:center;color:#87928d;font-size:12px;border-bottom:1px solid #edf0ee;padding-bottom:25px;margin-bottom:24px}
+.policy-meta strong{color:#53645c}
+.policy-draft{border:1px solid #edd9a8;background:#fff9e9;color:#72551a;border-radius:10px;padding:13px 15px;font-size:12px;line-height:1.6;margin:0 0 28px}
+.policy-draft b{color:#5d4311}
+.policy-article h2{font-size:23px;letter-spacing:-.035em;color:#203c33;margin:36px 0 13px;scroll-margin-top:22px}
+.policy-article h3{font-size:16px;color:#314a40;margin:25px 0 9px}
+.policy-article p,.policy-article li{font-size:14px;line-height:1.82;color:#4f5f58}
+.policy-article p{margin:0 0 16px}
+.policy-article ul,.policy-article ol{padding-left:22px;margin:6px 0 18px}
+.policy-aside{position:sticky;top:25px;border-left:1px solid #e2e8e3;padding:2px 0 2px 20px}
+.policy-aside h4{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#87938c;margin:0 0 14px}
+.policy-toc{display:grid;gap:12px}
+.policy-toc a{font-size:12px;line-height:1.5;color:#74817b;transition:color .15s}
+.policy-toc a:hover{color:#146b55}
+.policy-end{border-top:1px solid #e9eeea;margin-top:44px;padding-top:18px;color:#85918b;font-size:12px}
+.policy-end a{color:#146b55;font-weight:700}
+@media(max-width:800px){.policy-grid{grid-template-columns:1fr;gap:28px}.policy-aside{position:static;order:-1;border-left:0;border-bottom:1px solid #e7ece8;padding:0 0 17px}.policy-toc{display:flex;flex-wrap:wrap;gap:8px 17px}.policy-aside h4{margin-bottom:9px}.policy-page{padding-top:32px}}
+@media(max-width:560px){.policy-page{width:calc(100% - 34px)}.policy-article h1{font-size:35px}.policy-article h2{font-size:21px}.policy-meta{flex-wrap:wrap}.policy-top-inner{min-height:62px}}
+</style>
+<section class="policy-view" id="policy-view" aria-live="polite">
+  <div class="policy-top"><div class="wrap policy-top-inner">
+    <a class="policy-brand" href="#" aria-label="Return to Fulfillment home"><span class="mark">F</span>Fulfillment</a>
+    <a class="policy-back" href="#" aria-label="Back to home">← Back to Fulfillment</a>
+  </div></div>
+  <div class="policy-page">
+    <p class="policy-crumb"><a href="#">Home</a> <span aria-hidden="true">/</span> <span id="policy-crumb-title">Privacy Policy</span></p>
+    <div class="policy-grid">
+      <article class="policy-article" id="policy-article"></article>
+      <aside class="policy-aside" aria-label="Article sections"><h4>On this page</h4><nav class="policy-toc" id="policy-toc"></nav></aside>
+    </div>
+  </div>
+</section>
+<script>
+(function(){
+  const articles={
+    "privacy-policy":{
+      title:"Privacy Policy",
+      deck:"How Fulfillment plans to collect, use, protect, and manage personal information.",
+      sections:[
+        ["information-collection","Information Collection, Use, and Sharing","<p>This draft describes intended privacy practices for Fulfillment. The service is being developed; these details must be checked against the final product before this notice becomes effective.</p><p>When registration or direct support is available, Fulfillment may ask for information such as a name and email address to provide access or respond to a request. The final notice will explain any optional information and its purpose.</p><p>Before launch, Fulfillment will identify what information it controls, which providers process it, how long it is kept, and whether product updates are sent.</p>"],
+        ["data-processing","Processing of Personal Data","<p>Information should be processed only for purposes explained to users, such as account access, order-workspace functionality, support, and service administration. The final policy must identify actual data categories and the responsible legal entity.</p><h3>Planned eBay API integration</h3><p>An eBay API connection is planned for a future product stage; it is not active in this website preview. Before it is enabled, this notice must specify what data Fulfillment requests, how it is used and stored, and how users can revoke access.</p><h3>Third-party services</h3><p>Before launch, the final policy will name the actual authentication, hosting, payment, analytics, or marketplace providers used and explain what information each receives.</p>"],
+        ["access-control","Your Access to and Control Over Information","<p>Users should be able to contact Fulfillment to ask what personal information is associated with an account, request correction or deletion, and raise concerns. The final policy must identify a working privacy contact and explain any legal or operational limits.</p>"],
+        ["security","Security","<p>Fulfillment will describe the safeguards actually in place when the service launches. This draft does not claim that particular encryption, storage, access-control, or payment-security measures have already been implemented.</p>"],
+        ["retention","Retention, Updating, and Deleting Personal Data","<p>The final notice must state retention periods, how deletion requests are handled, and any records that must be retained by law. These periods and response times are not finalized in this draft.</p><p>Privacy contact: <a href=\"mailto:privacy@fulfillment.site\">privacy@fulfillment.site</a> (configure this mailbox before launch).</p>"]
+      ]
+    },
+    "terms-of-service":{
+      title:"Terms of Service",
+      deck:"Proposed terms for access to and use of the Fulfillment service.",
+      sections:[
+        ["preamble","1. Preamble","<p>This draft agreement is intended to govern use of Fulfillment, an order-management workspace in development. The operating legal entity, address, effective date, and final service description must be added before these terms take effect.</p><p>When final terms are published, continued use of the service will be governed by those terms. Users who do not agree should not use the service.</p>"],
+        ["access","2. Access and Use","<p>Subject to final account rules, Fulfillment may grant users a limited, non-exclusive, non-transferable right to use the service for business operations. Account owners are responsible for assigning suitable access to invited users.</p><p>Users must not misuse the service, interfere with its operation, or access data they are not authorized to view.</p>"],
+        ["ownership","3. Intellectual Property","<p>Fulfillment’s original software, interface, documentation, and brand elements will be owned or licensed by the applicable rights holder. These terms do not transfer ownership to users. Users retain rights to the business information they submit, subject to permissions needed to operate the service.</p>"],
+        ["fees","4. Fees and Payment","<p>Pricing, trials, billing dates, taxes, payment methods, failed-payment handling, and any account-balance rules have not been finalized. No subscription terms are active in this preview.</p>"],
+        ["availability","5. Availability and Performance","<p>Fulfillment will make reasonable efforts to keep the service available, but maintenance, third-party outages, network failures, and other events may interrupt access. The final terms will explain any service commitments.</p>"],
+        ["support","6. Maintenance and Support","<p>Support channels and the scope of maintenance will be listed when the service launches. Custom development, if offered, will be governed by a separate written agreement.</p>"],
+        ["term","7. Term and Renewal","<p>Account duration, renewal, cancellation, and termination must be specified before paid service begins. Users will be given a way to request account closure under the final terms.</p>"],
+        ["termination","8. Suspension and Termination","<p>Fulfillment may suspend access when reasonably necessary to protect the service, users, or data, or to address a material breach. Final terms will describe notice and remediation procedures.</p>"],
+        ["confidentiality","9. Confidentiality","<p>Users should protect non-public information they receive through the service. Any confidentiality obligations will be stated in the final terms or a separate agreement.</p>"],
+        ["liability","10. Warranty and Liability","<p>Service scope, warranties, liability limits, and exclusions must be reviewed and completed for the operating entity and applicable jurisdictions before these provisions take effect.</p>"],
+        ["returns","11. Returns and Refunds","<p>Proposed refund rules appear in the separate <a href=\"#refund-terms\">Refund Terms</a>. This section does not promise an active refund or stored-balance program.</p>"],
+        ["misc","12. Miscellaneous","<p>The final terms will identify governing law, notices, force majeure, and how changes are communicated. The complete agreement will take effect only when properly published and accepted.</p>"]
+      ]
+    },
+    "refund-terms":{
+      title:"Refund Terms",
+      deck:"Proposed refund rules for future Fulfillment subscriptions and paid services.",
+      sections:[
+        ["preamble","1. Preamble","<p>This draft outlines a proposed refund process for paid Fulfillment services. The payment model, legal operator, and final refund rules have not been confirmed. This page is a design preview, not an active refund promise.</p>"],
+        ["agreement","2. Agreement to Terms","<p>If paid services are introduced, users will be asked to review the applicable refund terms before purchase. The final policy will identify the contracting entity and payment processors.</p>"],
+        ["renewal","3. Automatic Payment Renewal","<p>If subscriptions with automatic renewal are offered, checkout and final terms will show the amount, billing interval, renewal date, and cancellation method before payment. No renewal schedule is active in this preview.</p>"],
+        ["balances","4. Service Balances","<p>Fulfillment does not currently describe an active stored-value or fulfillment-balance service. If a prepaid balance is introduced, its use, expiration, refundability, and fees will be explained before users add funds.</p>"],
+        ["eligibility","5. Refund Eligibility and Procedure","<p>The proposed policy is to allow a subscriber to submit a refund request within fourteen (14) days of the most recent charge. The final policy must confirm whether that period applies, which purchases qualify, and any exceptions.</p><p>A request should include the account email, charge date and amount, and a short explanation. The final page will provide a working support contact and processing-time estimate.</p>"],
+        ["determination","6. Refund Determination","<p>Requests will be reviewed under the final published policy and applicable law. Decision criteria, processor timelines, and escalation options must be confirmed before launch.</p>"]
+      ]
+    }
+  };
+  const titleEl=document.getElementById("policy-crumb-title");
+  const articleEl=document.getElementById("policy-article");
+  const tocEl=document.getElementById("policy-toc");
+  let rendered="";
+  function render(){
+    const bits=location.hash.slice(1).split("/");
+    const key=bits[0],entry=articles[key],target=bits[1];
+    document.body.classList.toggle("policy-open",!!entry);
+    if(!entry){document.title="Fulfillment — Order operations, in focus";return;}
+    document.title=entry.title+" | Fulfillment";
+    if(rendered!==key){
+      rendered=key;titleEl.textContent=entry.title;
+      const sectionHTML=entry.sections.map(function(s){return '<section><h2 id="'+s[0]+'">'+s[1]+'</h2>'+s[2]+'</section>';}).join("");
+      articleEl.innerHTML='<h1>'+entry.title+'</h1><p class="policy-deck">'+entry.deck+'</p><div class="policy-meta"><strong>Fulfillment</strong><span>Draft for review</span><span>November 9, 2026</span></div><div class="policy-draft"><b>Draft — not an effective policy.</b> This page is a design preview. Confirm the operating entity, product features, data practices, security controls, billing rules, and refund commitments before relying on or publishing it as a final policy.</div><p>This draft is written for Fulfillment and uses the requested section structure. It must be reviewed against the service that is actually launched.</p>'+sectionHTML+'<div class="policy-end">Questions about this draft? <a href="mailto:contact@fulfillment.site">Contact Fulfillment</a>.</div>';
+      tocEl.innerHTML=entry.sections.map(function(s){return '<a href="#'+key+'/'+s[0]+'">'+s[1].replace(/^\\d+\\.\\s*/,"")+'</a>';}).join("");
+    }
+    requestAnimationFrame(function(){if(target){document.getElementById(target)?.scrollIntoView({behavior:"smooth",block:"start"});}else{window.scrollTo({top:0,behavior:"instant"});}});
+  }
+  window.addEventListener("hashchange",render);
+  window.addEventListener("popstate",render);
+  document.addEventListener("click",function(e){
+    const link=e.target.closest('a[href="#"]');
+    if(!link||!document.body.classList.contains("policy-open"))return;
+    e.preventDefault();history.pushState({},"",location.pathname+location.search);render();window.scrollTo({top:0,behavior:"smooth"});
+  });
+  render();
+})();
+</script>
 </body></html>
