@@ -468,8 +468,8 @@ body.info-open .info-view{display:block}
           if(emailInput.value.trim().toLowerCase()!==activeEmail){clearInterval(countdown);countdown=null;showState(emailInput.value.trim().toLowerCase());return;}
           const state=readResetState(email),until=state.lockUntil||state.retryAt,remaining=Math.max(0,Math.ceil((until-Date.now())/1000));
           if(!remaining){clearInterval(countdown);countdown=null;button.disabled=false;setAuthStatus(status,state.attempts===0?"The 24-hour lock ended. Your reset attempts have restarted.":"You can request another reset email now. Check your inbox and spam folder first.");return;}
-          const waitText=state.lockUntil?"Reset requests are locked for 24 hours. Unlocks in "+formatWait(remaining)+".":"Resend available in "+formatWait(remaining)+".";
-          setAuthStatus(status,(message?message+" ":"")+waitText+" Attempt "+state.attempts+" of "+maxAttempts+".",kind||(state.lockUntil?"error":"success"));
+          const waitText="You can request another password reset in "+formatWait(remaining)+".";
+          setAuthStatus(status,(message?message+" ":"")+waitText,kind||"success");
         };
         tick();countdown=setInterval(tick,1000);
       }
