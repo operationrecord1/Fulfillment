@@ -432,71 +432,67 @@ body.info-open .info-view{display:block}
     if(form&&!form.dataset.bound){
       form.dataset.bound="1";
       const button=form.querySelector("button"),status=form.querySelector(".auth-status");
-      const maxAttempts=20,lockSeconds=24*60*60,emailInput=form.querySelector('input[type="email"]');
-      let countdown=null,activeEmail="";
-      function stateKey(email){let hash=2166136261;for(const char of email){hash^=char.charCodeAt(0);hash=Math.imul(hash,16777619);}return "fulfillment-reset-state-"+(hash>>>0).toString(16);}
-      function writeResetState(email,state){writeStorage("localStorage",stateKey(email),JSON.stringify(state));}
-      function readResetState(email){
-        let state={attempts:0,retryAt:0,lockUntil:0};
-        try{state={...state,...JSON.parse(readStorage("localStorage",stateKey(email))||"{}")};}catch{}
-        state.attempts=Math.max(0,Math.min(maxAttempts,Number(state.attempts)||0));state.retryAt=Number(state.retryAt)||0;state.lockUntil=Number(state.lockUntil)||0;
-        let changed=false;
-        if(state.lockUntil&&state.lockUntil<=Date.now()){state={attempts:0,retryAt:0,lockUntil:0};changed=true;}
-        if(state.retryAt&&state.retryAt<=Date.now()){state.retryAt=0;changed=true;}
-        if(changed)writeResetState(email,state);
-        return state;
-      }
-      function waitForAttempt(attempt){return attempt<=5?60:attempt<=10?120:300;}
-      function stateAfterAttempt(attempt,now,lockDuration,waitFunction){
-        return attempt===20?{attempts:20,retryAt:0,lockUntil:now+lockDuration*1000}:{attempts:attempt,retryAt:now+waitFunction(attempt)*1000,lockUntil:0};
-      }
+      const emailInput=form.querySelector('input[type="email"]');
+      let countdown=null,activeEmail="",retryAt=0,lookupSequence=0,lookupTimer=null;
       function formatWait(seconds){
         const h=Math.floor(seconds/3600),m=Math.floor(seconds%3600/60),sec=seconds%60;
-        if(seconds>=3600)return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");
-        return String(Math.floor(seconds/60)).padStart(2,"0")+":"+String(seconds%60).padStart(2,"0");
+        return h?String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0"):String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");
       }
-      function showState(email,message="",kind){
-        if(!email){button.disabled=false;return;}
-        const state=readResetState(email),until=state.lockUntil||state.retryAt;
-        if(!until){button.disabled=false;setAuthStatus(status,message,kind);return;}
-        startCountdown(email,message,kind);
-      }
-      function startCountdown(email,message="",kind){
-        if(countdown)clearInterval(countdown);activeEmail=email;button.disabled=true;
+      function paint(message="",kind="success"){
+        if(countdown)clearInterval(countdown);
         const tick=()=>{
-          if(!form.isConnected){clearInterval(countdown);countdown=null;return;}
-          if(emailInput.value.trim().toLowerCase()!==activeEmail){clearInterval(countdown);countdown=null;showState(emailInput.value.trim().toLowerCase());return;}
-          const state=readResetState(email),until=state.lockUntil||state.retryAt,remaining=Math.max(0,Math.ceil((until-Date.now())/1000));
-          if(!remaining){clearInterval(countdown);countdown=null;button.disabled=false;setAuthStatus(status,state.attempts===0?"The 24-hour lock ended. Your reset attempts have restarted.":"You can request another reset email now. Check your inbox and spam folder first.");return;}
-          const waitText="You can request another password reset in "+formatWait(remaining)+".";
-          setAuthStatus(status,(message?message+" ":"")+waitText,kind||"success");
+          if(!form.isConnected){clearInterval(countdown);return;}
+          const remaining=Math.max(0,Math.ceil((retryAt-Date.now())/1000));
+          button.disabled=remaining>0;
+          setAuthStatus(status,remaining?(message?message+" ":"")+"You can request another reset link in "+formatWait(remaining)+".":message||"You can request a reset link now.",kind);
+          if(!remaining&&countdown){clearInterval(countdown);countdown=null;}
         };
-        tick();countdown=setInterval(tick,1000);
+        tick();if(retryAt>Date.now())countdown=setInterval(tick,1000);
+      }
+      async function serverDeadline(email){
+        const client=getSupabaseClient();if(!client||!email)return 0;
+        const {data,error}=await client.rpc("password_reset_retry_at",{account_email:email});
+        if(error)throw error;
+        return data?Date.parse(data)||0:0;
+      }
+      async function refreshStatus(email,message="",kind="success"){
+        const sequence=++lookupSequence;
+        try{
+          const deadline=await serverDeadline(email);
+          if(sequence!==lookupSequence||email!==activeEmail)return;
+          retryAt=deadline;paint(message,kind);
+        }catch{
+          if(sequence===lookupSequence&&email===activeEmail)paint(message||"Unable to check when you can retry. Please try again shortly.","error");
+        }
       }
       emailInput.addEventListener("input",()=>{
-        if(countdown){clearInterval(countdown);countdown=null;}
-        activeEmail=emailInput.value.trim().toLowerCase();showState(activeEmail);
+        if(lookupTimer)clearTimeout(lookupTimer);
+        if(countdown)clearInterval(countdown);
+        activeEmail=emailInput.value.trim().toLowerCase();retryAt=0;lookupSequence++;
+        button.disabled=false;setAuthStatus(status,"");
+        if(emailInput.validity.valid&&activeEmail)lookupTimer=setTimeout(()=>refreshStatus(activeEmail),300);
       });
-      window.addEventListener("storage",event=>{if(activeEmail&&event.key===stateKey(activeEmail))showState(activeEmail);});
-      form.addEventListener("submit",async e=>{
-        e.preventDefault();if(!form.reportValidity())return;
-        const email=emailInput.value.trim().toLowerCase(),state=readResetState(email),until=state.lockUntil||state.retryAt;
-        if(button.disabled||until>Date.now()){showState(email);return;}
+      form.addEventListener("submit",async event=>{
+        event.preventDefault();if(!form.reportValidity()||button.disabled)return;
+        const email=emailInput.value.trim().toLowerCase();activeEmail=email;
         const client=getSupabaseClient();
         if(!client){setAuthStatus(status,"Unable to connect. Please reload and try again.","error");return;}
-        const attempt=state.attempts+1,nextState=stateAfterAttempt(attempt,Date.now(),lockSeconds,waitForAttempt);
-        state.attempts=nextState.attempts;state.retryAt=nextState.retryAt;state.lockUntil=nextState.lockUntil;
-        writeResetState(email,state);button.disabled=true;setAuthStatus(status,"Sending…");
-        let message="If this email has an account, a reset link will arrive shortly.",kind="success";
+        button.disabled=true;setAuthStatus(status,"Sending…");
         try{
-          const {error}=await client.auth.resetPasswordForEmail(emailInput.value.trim(),{redirectTo:location.origin+location.pathname});
+          const deadline=await serverDeadline(email);
+          if(deadline>Date.now()){retryAt=deadline;paint();return;}
+          const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+          const serverTime=await serverDeadline(email);
+          retryAt=serverTime||(!error?Date.now()+60000:0);
           if(error){
-            const code=error.code||error.error_code||"";
-            message=code==="over_email_send_rate_limit"?"Supabase Auth's email quota is reached; its server limit may require a longer wait.":code==="over_request_rate_limit"?"Supabase Auth temporarily rate-limited requests from this network.":error.status===429?"The server rate-limited this reset request.":"Unable to send a reset link right now. Please try again later.";kind="error";
-          }
-        }catch{message="The request may not have completed. Check your inbox before retrying.";kind="error";}
-        finally{showState(email,message,kind);}
+            paint(retryAt?"We couldn't send a link right now.":"We couldn't send a link right now. Please try again shortly.","error");
+          }else paint("If this email has an account, a reset link will arrive shortly.","success");
+        }catch{
+          retryAt=0;paint("The request may not have completed. Check your inbox before retrying.","error");
+        }finally{if(!retryAt||retryAt<=Date.now())button.disabled=false;}
       });
+      if(emailInput.value){activeEmail=emailInput.value.trim().toLowerCase();refreshStatus(activeEmail);}
+
     }
   }
 
