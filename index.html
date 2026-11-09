@@ -41,7 +41,30 @@ body.focused-auth .auth-submit:disabled{opacity:.6;cursor:wait}
 .password-wrap{position:relative}.password-wrap input{width:100%;padding-right:68px!important}.password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#146b55;font-size:12px;font-weight:700;padding:8px;cursor:pointer}
 body.focused-auth .auth-links{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;margin-top:22px}
 @media(max-width:520px){body.focused-auth .auth-card{padding:28px 22px}.auth-grid{grid-template-columns:1fr}}
-</style><style>body.focused-auth #info-view>.policy-top,body.focused-auth #info-view .info-footer{display:none!important}body.focused-auth #info-view>.policy-page{width:100%;max-width:460px;margin:0;padding:0}body.focused-auth #info-article{width:100%}</style></head>
+</style><style>body.focused-auth #info-view>.policy-top,body.focused-auth #info-view .info-footer{display:none!important}body.focused-auth #info-view>.policy-page{width:100%;max-width:460px;margin:0;padding:0}body.focused-auth #info-article{width:100%}</style><style>
+body.focused-auth #info-view{padding:0;background:white;display:block}
+body.focused-auth #info-view>.policy-page{max-width:none;min-height:100vh}
+body.focused-auth #info-article{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+body.focused-auth .auth-wrap{max-width:none;margin:0;display:flex;align-items:center;justify-content:center;padding:64px 48px}
+body.focused-auth .auth-card{max-width:440px;margin:auto;border:0;box-shadow:none;padding:0;border-radius:0}
+body.focused-auth #info-article>.auth-card{width:calc(100% - 96px);margin:auto}
+body.focused-auth h1{text-align:center;font-weight:650;font-size:30px;margin-bottom:20px}
+.auth-logo{display:flex;align-items:center;justify-content:center;gap:10px;font-size:22px;font-weight:750;margin-bottom:30px;letter-spacing:-.04em}
+.auth-logo .mark{width:40px;height:40px;background:linear-gradient(140deg,#146b55,#71b69b)}
+body.focused-auth .auth-subtitle{text-align:center;margin-bottom:30px}
+body.focused-auth .auth-field input,body.focused-auth .auth-field select,body.focused-auth .auth-field textarea{background:#f5f7f6;border:1px solid #e7ece8;min-height:54px;padding:15px}
+body.focused-auth .auth-field label{font-size:13px;font-weight:600}
+body.focused-auth .auth-submit{background:linear-gradient(100deg,#146b55,#23866c);border:0;min-height:54px;transition:transform .2s,box-shadow .2s}
+body.focused-auth .auth-submit:hover{transform:translateY(-1px);box-shadow:0 8px 20px #146b5524}
+.auth-options{display:flex;justify-content:space-between;align-items:center;gap:14px;font-size:13px;margin:2px 0 10px}.auth-options label{display:flex;align-items:center;gap:8px;color:#63727c}.auth-options input{width:17px!important;height:17px!important;min-height:0!important;accent-color:#146b55}
+.auth-options a,body.focused-auth .auth-links a{color:#146b55;font-weight:600}
+body.focused-auth .auth-links{justify-content:center;border:0;padding-top:0}
+.auth-art{position:relative;overflow:hidden;min-height:100vh;background:#f8fbf9;display:flex;align-items:center;justify-content:center}
+.art-copy{position:relative;z-index:1;padding:45px;max-width:620px}.art-copy>span{font-size:10px;font-weight:700;letter-spacing:.2em;color:#648477}.art-copy h2{font-size:clamp(38px,4.2vw,66px);letter-spacing:-.065em;line-height:1.12;font-weight:550;margin:22px 0}.art-copy p{font-size:17px;line-height:1.7;color:#70847a}
+.shape{position:absolute;display:block;opacity:.8}.shape-one{width:260px;height:260px;border-radius:50%;background:linear-gradient(145deg,#bcb8f1,#dde5f8);top:-95px;left:-100px}.shape-two{width:240px;height:240px;border-radius:50%;background:linear-gradient(145deg,#ffc8a2,#fa9d97);right:13%;top:-145px}.shape-three{width:170px;height:230px;border-radius:100px 40px 100px 40px;background:linear-gradient(140deg,#a6d8b1,#61b39d);bottom:-70px;left:6%;transform:rotate(28deg)}.shape-four{width:180px;height:180px;background:linear-gradient(140deg,#c2b5eb,#e4d9f9);border-radius:50px 50px 110px 50px;right:-40px;bottom:12%;transform:rotate(-25deg)}
+.art-dots{position:absolute;width:180px;height:150px;right:15%;top:22%;background-image:radial-gradient(#9fb5ab 1px,transparent 1px);background-size:18px 18px;opacity:.5}
+@media(max-width:800px){body.focused-auth #info-article{grid-template-columns:1fr}.auth-art{display:none}body.focused-auth .auth-wrap{padding:48px 24px;min-height:100vh}body.focused-auth #info-article>.auth-card{width:calc(100% - 48px);padding:48px 0}.auth-options{font-size:12px}}
+</style></head>
 <body>
 <header><div class="wrap nav"><a class="brand" href="#" aria-label="Fulfillment home"><span class="mark">F</span>Fulfillment</a><nav class="links" aria-label="Main navigation"><a href="#workflow">How it works</a><a href="#workspace">Workspace</a><a href="#about">About</a></nav><div class="actions"><a class="btn" href="#sign-in">Sign In <span class="arrow">↗</span></a><a class="btn btn-secondary" href="#request-access">Request Access</a></div></div></header>
 <main>
@@ -199,7 +222,8 @@ body.info-open .info-view{display:block}
   function getSupabaseClient(){
     if(supabaseClient)return supabaseClient;
     if(!SUPABASE_CONFIG.url||!SUPABASE_CONFIG.anonKey||!window.supabase||!window.supabase.createClient)return null;
-    supabaseClient=window.supabase.createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.anonKey);
+    const storage={getItem:k=>sessionStorage.getItem(k)||localStorage.getItem(k),setItem:(k,v)=>{const keep=localStorage.getItem("fulfillment-remember")==="true";(keep?sessionStorage:localStorage).removeItem(k);(keep?localStorage:sessionStorage).setItem(k,v);},removeItem:k=>{sessionStorage.removeItem(k);localStorage.removeItem(k);}};
+    supabaseClient=window.supabase.createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.anonKey,{auth:{storage,persistSession:true}});
     return supabaseClient;
   }
   function setAuthStatus(node,message,kind){
@@ -222,6 +246,7 @@ body.info-open .info-view{display:block}
       button.disabled=true;setAuthStatus(status,"Signing in…");
       const values=new FormData(form);
       try{
+      localStorage.setItem("fulfillment-remember",String(!!form.querySelector("#remember-me")?.checked));
       const {data,error}=await client.auth.signInWithPassword({email:String(values.get("email")).trim(),password:String(values.get("password"))});
       if(error){button.disabled=false;setAuthStatus(status,error.message||"Sign-in failed. Check your email and password.","error");return;}
       const {data:profile,error:profileError}=await client.from("profiles").select("display_name,role,is_active").eq("user_id",data.user.id).maybeSingle();
@@ -267,6 +292,8 @@ body.info-open .info-view{display:block}
       if(!client){setAuthStatus(status,"The request page is ready, but Supabase has not been connected yet.","error");return;}
       button.disabled=true;setAuthStatus(status,"Sending your request…");
       const values=new FormData(form);
+      if(!String(values.get("full_name")||"").trim()){button.disabled=false;setAuthStatus(status,"Enter your full name.","error");return;}
+      try{
       const {error}=await client.from("access_requests").insert({
         full_name:String(values.get("full_name")).trim(),
         email:String(values.get("email")).trim().toLowerCase(),
@@ -276,7 +303,8 @@ body.info-open .info-view{display:block}
       });
       button.disabled=false;
       if(error){setAuthStatus(status,"Could not submit the request. Please try again or email contact@fulfillment.site.","error");return;}
-      form.reset();setAuthStatus(status,"Request recorded. No account was created. Email alerts to the owner are not configured yet.","success");
+      form.reset();setAuthStatus(status,"Request received. The owner will review your requested access. You can sign in after your account is approved and activated.","success");
+      }catch{setAuthStatus(status,"Connection interrupted. Please try again.","error");}finally{button.disabled=false;}
     });
   }
   async function bindWorkspace(){
@@ -317,7 +345,7 @@ body.info-open .info-view{display:block}
     root.querySelectorAll(".auth-note").forEach(n=>n.remove());
     const card=root.querySelector(".auth-card");
     if(card&&!card.querySelector("h1")){
-      const h=document.createElement("h1");h.textContent=key==="sign-in"?"Welcome back":key==="request-access"?"Request access":"Set your password";
+      const h=document.createElement("h1");h.textContent=key==="sign-in"?"Sign in":key==="request-access"?"Request access":"Set your password";
       const p=document.createElement("p");p.className="auth-subtitle";p.textContent=key==="sign-in"?"Sign in to Fulfillment.":key==="request-access"?"Tell us who you are and which access you need.":"Choose a new password for your account.";
       card.prepend(p);card.prepend(h);
     }
@@ -328,8 +356,19 @@ body.info-open .info-view{display:block}
       const b=document.createElement("button");b.type="button";b.className="password-toggle";b.textContent="Show";b.setAttribute("aria-label","Show password");b.setAttribute("aria-pressed","false");
       b.onclick=()=>{const show=input.type==="password";input.type=show?"text":"password";b.textContent=show?"Hide":"Show";b.setAttribute("aria-label",show?"Hide password":"Show password");b.setAttribute("aria-pressed",String(show));};wrap.append(b);
     });
+    if(card&&!card.querySelector(".auth-logo")){
+      const logo=document.createElement("a");logo.href="#";logo.className="auth-logo";logo.innerHTML='<span class="mark">F</span><span>Fulfillment</span>';card.querySelector("h1").after(logo);
+    }
+    if(!root.querySelector(".auth-art")){
+      const art=document.createElement("aside");art.className="auth-art";art.setAttribute("aria-label","Fulfillment — every order in focus");art.innerHTML='<i class="shape shape-one"></i><i class="shape shape-two"></i><i class="shape shape-three"></i><i class="shape shape-four"></i><div class="art-dots"></div><div class="art-copy"><span>YOUR WORK. IN FOCUS.</span><h2>Every order.<br>One clear picture.</h2><p>A little more clarity.<br>A lot more possibility.</p></div>';root.append(art);
+    }
     if(key==="sign-in"){
-      const links=root.querySelector(".auth-links");if(links)links.innerHTML='<a href="#forgot-password">Forgot password?</a><a href="#request-access">Request access</a>';
+      const form=root.querySelector("form");
+      if(!form.querySelector("#remember-me")){
+        const row=document.createElement("div");row.className="auth-options";row.innerHTML='<label><input type="checkbox" id="remember-me">Keep me logged in</label><a href="#forgot-password">Forgot password?</a>';form.querySelector(".auth-submit").before(row);
+        row.querySelector("input").checked=localStorage.getItem("fulfillment-remember")==="true";
+      }
+      const links=root.querySelector(".auth-links");if(links)links.innerHTML='<span>New to Fulfillment?</span><a href="#request-access">Request access</a>';
     }
     const form=root.querySelector("#recovery-form");
     if(form&&!form.dataset.bound){
