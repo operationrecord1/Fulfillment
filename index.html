@@ -57,16 +57,16 @@ body.policy-open .policy-view{display:block}
 .policy-meta strong{color:#53645c}
 .policy-draft{border:1px solid #edd9a8;background:#fff9e9;color:#72551a;border-radius:10px;padding:13px 15px;font-size:12px;line-height:1.6;margin:0 0 28px}
 .policy-draft b{color:#5d4311}
-.policy-article h2{font-size:23px;letter-spacing:-.035em;color:#203c33;margin:36px 0 13px;scroll-margin-top:22px}
+.policy-article h2{font-size:21px;letter-spacing:-.025em;color:#292929;margin:36px 0 13px;scroll-margin-top:22px}
 .policy-article h3{font-size:16px;color:#314a40;margin:25px 0 9px}
-.policy-article p,.policy-article li{font-size:14px;line-height:1.82;color:#4f5f58}
+.policy-article p,.policy-article li{font-size:16px;line-height:1.72;color:#454b48}
 .policy-article p{margin:0 0 16px}
 .policy-article ul,.policy-article ol{padding-left:22px;margin:6px 0 18px}
 .policy-aside{position:sticky;top:25px;border-left:1px solid #e2e8e3;padding:2px 0 2px 20px}
 .policy-aside h4{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#87938c;margin:0 0 14px}
 .policy-toc{display:grid;gap:12px}
-.policy-toc a{font-size:12px;line-height:1.5;color:#74817b;transition:color .15s}
-.policy-toc a:hover{color:#146b55}
+.policy-toc a{font-size:14px;line-height:1.5;color:#747b77;transition:color .15s;position:relative;padding:3px 0}
+.policy-toc a:hover{color:#146b55}.policy-toc a.active{color:#171a18;font-weight:700}.policy-toc a.active:before{content:"";position:absolute;left:-22px;top:0;bottom:0;width:3px;border-radius:3px;background:#171a18}.author-row{display:flex;align-items:center;gap:12px}.author-row img{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#e8ece9}.author-copy{display:grid;gap:4px}.author-copy strong{color:#434b46;font-weight:650}.author-copy span{color:#87928d;font-size:12px}
 .policy-end{border-top:1px solid #e9eeea;margin-top:44px;padding-top:18px;color:#85918b;font-size:12px}
 .policy-end a{color:#146b55;font-weight:700}
 @media(max-width:800px){.policy-grid{grid-template-columns:1fr;gap:28px}.policy-aside{position:static;order:-1;border-left:0;border-bottom:1px solid #e7ece8;padding:0 0 17px}.policy-toc{display:flex;flex-wrap:wrap;gap:8px 17px}.policy-aside h4{margin-bottom:9px}.policy-page{padding-top:32px}}
@@ -143,7 +143,7 @@ body.policy-open .policy-view{display:block}
     if(rendered!==key){
       rendered=key;titleEl.textContent=entry.title;
       const sectionHTML=entry.sections.map(function(s){return '<section><h2 id="'+s[0]+'">'+s[1]+'</h2>'+s[2]+'</section>';}).join("");
-      articleEl.innerHTML='<h1>'+entry.title+'</h1><p class="policy-deck">'+entry.deck+'</p><div class="policy-meta"><strong>Fulfillment</strong><span>Draft for review</span><span>November 9, 2026</span></div><div class="policy-draft"><b>Draft — not an effective policy.</b> This page is a design preview. Confirm the operating entity, product features, data practices, security controls, billing rules, and refund commitments before relying on or publishing it as a final policy.</div><p>This draft is written for Fulfillment and uses the requested section structure. It must be reviewed against the service that is actually launched.</p>'+sectionHTML+'<div class="policy-end">Questions about this draft? <a href="mailto:contact@fulfillment.site">Contact Fulfillment</a>.</div>';
+      articleEl.innerHTML='<h1>'+entry.title+'</h1><p class="policy-deck">'+entry.deck+'</p><div class="policy-meta"><div class="author-row"><img src="https://images.unsplash.com/photo-1625241152315-4a698f74ceb7?auto=format&amp;fit=crop&amp;w=96&amp;h=96&amp;q=80" alt="" aria-hidden="true"><div class="author-copy"><strong>Written by Tamim</strong><span>November 9, 2026</span></div></div></div><div class="policy-draft"><b>Draft — not an effective policy.</b> This page is a design preview. Confirm the operating entity, product features, data practices, security controls, billing rules, and refund commitments before relying on or publishing it as a final policy.</div><p>This draft is written for Fulfillment and uses the requested section structure. It must be reviewed against the service that is actually launched.</p>'+sectionHTML+'<div class="policy-end">Questions about this draft? <a href="mailto:contact@fulfillment.site">Contact Fulfillment</a>.</div>';
       tocEl.innerHTML=entry.sections.map(function(s){return '<a href="#'+key+'/'+s[0]+'">'+s[1].replace(/^\\d+\\.\\s*/,"")+'</a>';}).join("");
     }
     requestAnimationFrame(function(){if(target){document.getElementById(target)?.scrollIntoView({behavior:"smooth",block:"start"});}else{window.scrollTo({top:0,behavior:"instant"});}});
@@ -156,6 +156,33 @@ body.policy-open .policy-view{display:block}
     e.preventDefault();history.pushState({},"",location.pathname+location.search);render();window.scrollTo({top:0,behavior:"smooth"});
   });
   render();
+})();
+</script>
+
+<script>
+(function(){
+  const article=document.getElementById("policy-article");
+  const toc=document.getElementById("policy-toc");
+  if(!article||!toc)return;
+  function updateActive(){
+    if(!document.body.classList.contains("policy-open"))return;
+    const headings=Array.from(article.querySelectorAll("h2"));
+    if(!headings.length)return;
+    let active=headings[0];
+    for(const heading of headings){if(heading.getBoundingClientRect().top<=210)active=heading;else break;}
+    const activeId=active.id;
+    toc.querySelectorAll("a").forEach(function(link){
+      const isActive=link.getAttribute("href").endsWith("/"+activeId);
+      link.classList.toggle("active",isActive);
+      if(isActive)link.setAttribute("aria-current","location");else link.removeAttribute("aria-current");
+    });
+  }
+  const observer=new MutationObserver(function(){requestAnimationFrame(updateActive);});
+  observer.observe(article,{childList:true,subtree:true});
+  window.addEventListener("scroll",updateActive,{passive:true});
+  window.addEventListener("resize",updateActive);
+  window.addEventListener("hashchange",function(){setTimeout(updateActive,40);});
+  requestAnimationFrame(updateActive);
 })();
 </script>
 </body></html>
