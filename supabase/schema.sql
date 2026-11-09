@@ -34,7 +34,7 @@ create table if not exists public.access_requests (
   full_name text not null,
   email text not null,
   requested_role public.requested_fulfillment_role not null,
-  message text not null default '',
+  message text not null default '' check (char_length(message) <= 250),
   status public.access_request_status not null default 'pending',
   created_at timestamptz not null default now()
 );
