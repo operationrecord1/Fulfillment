@@ -432,57 +432,70 @@ body.info-open .info-view{display:block}
     if(form&&!form.dataset.bound){
       form.dataset.bound="1";
       const button=form.querySelector("button"),status=form.querySelector(".auth-status");
-      const cooldownKey="fulfillment-reset-retry-at";
-      const attemptsKey="fulfillment-reset-attempts";
-      const cooldownSeconds=60;
-      const maxAttempts=3;
-      let countdown=null;
-      function attempts(){return Number(readStorage("sessionStorage",attemptsKey)||0);}
-      function showFallback(){
-        button.disabled=true;
-        setAuthStatus(status,"Three reset requests have been used in this tab. Stop retrying and ask the account owner to verify the account and reset it from Supabase Auth.","error");
+      const maxAttempts=20,lockSeconds=24*60*60,emailInput=form.querySelector('input[type="email"]');
+      let countdown=null,activeEmail="";
+      function stateKey(email){let hash=2166136261;for(const char of email){hash^=char.charCodeAt(0);hash=Math.imul(hash,16777619);}return "fulfillment-reset-state-"+(hash>>>0).toString(16);}
+      function writeResetState(email,state){writeStorage("localStorage",stateKey(email),JSON.stringify(state));}
+      function readResetState(email){
+        let state={attempts:0,retryAt:0,lockUntil:0};
+        try{state={...state,...JSON.parse(readStorage("localStorage",stateKey(email))||"{}")};}catch{}
+        state.attempts=Math.max(0,Math.min(maxAttempts,Number(state.attempts)||0));state.retryAt=Number(state.retryAt)||0;state.lockUntil=Number(state.lockUntil)||0;
+        let changed=false;
+        if(state.lockUntil&&state.lockUntil<=Date.now()){state={attempts:0,retryAt:0,lockUntil:0};changed=true;}
+        if(state.retryAt&&state.retryAt<=Date.now()){state.retryAt=0;changed=true;}
+        if(changed)writeResetState(email,state);
+        return state;
       }
-      function startCooldown(until,message,kind){
-        if(countdown)clearInterval(countdown);
-        writeStorage("sessionStorage",cooldownKey,String(until));
-        button.disabled=true;
+      function waitForAttempt(attempt){return attempt<=5?60:attempt<=10?120:300;}
+      function stateAfterAttempt(attempt,now,lockDuration,waitFunction){
+        return attempt===20?{attempts:20,retryAt:0,lockUntil:now+lockDuration*1000}:{attempts:attempt,retryAt:now+waitFunction(attempt)*1000,lockUntil:0};
+      }
+      function formatWait(seconds){
+        const h=Math.floor(seconds/3600),m=Math.floor(seconds%3600/60),sec=seconds%60;
+        if(seconds>=3600)return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");
+        return String(Math.floor(seconds/60)).padStart(2,"0")+":"+String(seconds%60).padStart(2,"0");
+      }
+      function showState(email,message="",kind){
+        if(!email){button.disabled=false;return;}
+        const state=readResetState(email),until=state.lockUntil||state.retryAt;
+        if(!until){button.disabled=false;setAuthStatus(status,message,kind);return;}
+        startCountdown(email,message,kind);
+      }
+      function startCountdown(email,message="",kind){
+        if(countdown)clearInterval(countdown);activeEmail=email;button.disabled=true;
         const tick=()=>{
           if(!form.isConnected){clearInterval(countdown);countdown=null;return;}
-          const remaining=Math.max(0,Math.ceil((until-Date.now())/1000));
-          if(remaining===0){
-            clearInterval(countdown);countdown=null;removeStorage("sessionStorage",cooldownKey);
-            if(attempts()>=maxAttempts){showFallback();return;}
-            button.disabled=false;
-            setAuthStatus(status,"You can request another reset email now. Check your inbox and spam folder first.");
-            return;
-          }
-          const clock=`${String(Math.floor(remaining/60)).padStart(2,"0")}:${String(remaining%60).padStart(2,"0")}`;
-          const fallback=attempts()>=maxAttempts?" Three tries used: ask the account owner to reset the account directly.":"";
-          setAuthStatus(status,`${message} Try again in ${clock}. Attempt ${attempts()} of ${maxAttempts}.${fallback}`,kind);
+          if(emailInput.value.trim().toLowerCase()!==activeEmail){clearInterval(countdown);countdown=null;showState(emailInput.value.trim().toLowerCase());return;}
+          const state=readResetState(email),until=state.lockUntil||state.retryAt,remaining=Math.max(0,Math.ceil((until-Date.now())/1000));
+          if(!remaining){clearInterval(countdown);countdown=null;button.disabled=false;setAuthStatus(status,state.attempts===0?"The 24-hour lock ended. Your reset attempts have restarted.":"You can request another reset email now. Check your inbox and spam folder first.");return;}
+          const waitText=state.lockUntil?"Reset requests are locked for 24 hours. Unlocks in "+formatWait(remaining)+".":"Resend available in "+formatWait(remaining)+".";
+          setAuthStatus(status,(message?message+" ":"")+waitText+" Attempt "+state.attempts+" of "+maxAttempts+".",kind||(state.lockUntil?"error":"success"));
         };
         tick();countdown=setInterval(tick,1000);
       }
-      const storedUntil=Number(readStorage("sessionStorage",cooldownKey)||0);
-      if(attempts()>=maxAttempts)showFallback();
-      else if(storedUntil>Date.now())startCooldown(storedUntil,"A reset request was recently sent.");
+      emailInput.addEventListener("input",()=>{
+        if(countdown){clearInterval(countdown);countdown=null;}
+        activeEmail=emailInput.value.trim().toLowerCase();showState(activeEmail);
+      });
+      window.addEventListener("storage",event=>{if(activeEmail&&event.key===stateKey(activeEmail))showState(activeEmail);});
       form.addEventListener("submit",async e=>{
         e.preventDefault();if(!form.reportValidity())return;
-        if(button.disabled||attempts()>=maxAttempts){if(attempts()>=maxAttempts)showFallback();return;}
+        const email=emailInput.value.trim().toLowerCase(),state=readResetState(email),until=state.lockUntil||state.retryAt;
+        if(button.disabled||until>Date.now()){showState(email);return;}
         const client=getSupabaseClient();
         if(!client){setAuthStatus(status,"Unable to connect. Please reload and try again.","error");return;}
-        const count=attempts()+1;writeStorage("sessionStorage",attemptsKey,String(count));
-        button.disabled=true;setAuthStatus(status,"Sending…");
-        let message="Reset request sent. Check your inbox and spam folder.";
-        let kind="success";
+        const attempt=state.attempts+1,nextState=stateAfterAttempt(attempt,Date.now(),lockSeconds,waitForAttempt);
+        state.attempts=nextState.attempts;state.retryAt=nextState.retryAt;state.lockUntil=nextState.lockUntil;
+        writeResetState(email,state);button.disabled=true;setAuthStatus(status,"Sending…");
+        let message="If this email has an account, a reset link will arrive shortly.",kind="success";
         try{
-          const {error}=await client.auth.resetPasswordForEmail(form.querySelector("input").value.trim(),{redirectTo:location.origin+location.pathname});
+          const {error}=await client.auth.resetPasswordForEmail(emailInput.value.trim(),{redirectTo:location.origin+location.pathname});
           if(error){
             const code=error.code||error.error_code||"";
-            message=code==="over_email_send_rate_limit"?"Supabase Auth's email quota is reached; a short timer may not clear the hourly quota.":code==="over_request_rate_limit"?"Supabase Auth temporarily rate-limited requests from this network.":error.status===429?"The server rate-limited this reset request.":"Unable to send a reset link right now. Please try again later.";
-            kind="error";
-          }else{message="If this email has an account, a reset link will arrive shortly.";}
+            message=code==="over_email_send_rate_limit"?"Supabase Auth's email quota is reached; its server limit may require a longer wait.":code==="over_request_rate_limit"?"Supabase Auth temporarily rate-limited requests from this network.":error.status===429?"The server rate-limited this reset request.":"Unable to send a reset link right now. Please try again later.";kind="error";
+          }
         }catch{message="The request may not have completed. Check your inbox before retrying.";kind="error";}
-        finally{startCooldown(Date.now()+cooldownSeconds*1000,message,kind);}
+        finally{showState(email,message,kind);}
       });
     }
   }
