@@ -396,13 +396,37 @@ body.info-open .info-view{display:block}
   let rendered="";
   let infoRendered="";
   function render(){
-    const bits=location.hash.slice(1).split("/");
-    const key=bits[0],entry=articles[key],info=infoPages[key],target=bits[1];
-    const authFlow=new URLSearchParams(location.hash.slice(1)).get("type");
-    if(authFlow==="invite"||authFlow==="recovery"){
+    const rawHash=location.hash.slice(1);
+    const callbackParams=new URLSearchParams(rawHash);
+    const authFlow=callbackParams.get("type");
+    const hasAuthTokens=callbackParams.has("access_token")||callbackParams.has("error")||callbackParams.has("error_description");
+    if((authFlow==="invite"||authFlow==="recovery"||hasAuthTokens)&&!window.__fulfillmentAuthCallback){
+      window.__fulfillmentAuthCallback=true;
       const client=getSupabaseClient();
-      if(client)client.auth.getSession().then(function(result){if(result.data&&result.data.session&&location.hash!=="#set-password")location.hash="set-password";});
+      if(client)client.auth.getSession().then(function(result){
+        const params=new URLSearchParams(location.hash.slice(1));
+        if(result.data&&result.data.session){
+          history.replaceState(null,"",location.pathname+location.search+"#set-password");
+        }else if(params.has("error")||params.has("error_description")){
+          const message=(params.get("error_description")||"This password link is invalid or expired. Request a new one.").replace(/\\+/g," ");
+          history.replaceState(null,"",location.pathname+location.search+"#forgot-password");
+          render();
+          const recoveryStatus=document.querySelector("#recovery-form .auth-status");
+          if(recoveryStatus)setAuthStatus(recoveryStatus,message,"error");
+          return;
+        }else{
+          history.replaceState(null,"",location.pathname+location.search+"#set-password");
+        }
+        render();
+      }).catch(function(){
+        history.replaceState(null,"",location.pathname+location.search+"#forgot-password");
+        render();
+      });
+      document.title="Verifying account link | Fulfillment";
+      return;
     }
+    const bits=rawHash.split("/");
+    const key=bits[0],entry=articles[key],info=infoPages[key],target=bits[1];
     document.body.classList.toggle("policy-open",!!entry);
     document.body.classList.toggle("info-open",!!info);
     if(!info)document.body.classList.remove("focused-auth");
