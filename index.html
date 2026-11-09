@@ -105,7 +105,7 @@ body.info-open .info-view{display:block}
 .info-callout a{white-space:nowrap;border-radius:999px;background:#146b55;color:#fff;padding:11px 16px;font-size:12px;font-weight:750}
 
 
-.auth-wrap{width:min(760px,100%);margin:0 auto}
+.auth-wrap{width:min(760px,100%);margin:0 auto}.auth-wrap.auth-signin{max-width:500px}.auth-wrap.auth-request{max-width:680px}
 .auth-card{border:1px solid #e2e9e3;border-radius:18px;background:#fff;padding:30px;box-shadow:0 18px 42px #172b3a0a}
 .auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .auth-form{display:grid;gap:15px;margin-top:20px}
@@ -214,6 +214,28 @@ body.info-open .info-view{display:block}
       location.hash="workspace";
     });
   }
+  async function bindSetPassword(){
+    const form=document.getElementById("set-password-form");
+    if(!form||form.dataset.bound)return;
+    form.dataset.bound="1";
+    const status=document.getElementById("set-password-status");
+    const button=document.getElementById("set-password-submit");
+    const client=getSupabaseClient();
+    if(!client){setAuthStatus(status,"Supabase is not configured.","error");return;}
+    const {data:{session}}=await client.auth.getSession();
+    if(!session){setAuthStatus(status,"This setup link is invalid or expired. Ask the owner to send a new invitation.","error");return;}
+    form.addEventListener("submit",async function(event){
+      event.preventDefault();
+      const values=new FormData(form);
+      const password=String(values.get("password")||"");
+      if(password!==String(values.get("confirm_password")||"")){setAuthStatus(status,"The passwords do not match.","error");return;}
+      button.disabled=true;setAuthStatus(status,"Saving your password…");
+      const {error}=await client.auth.updateUser({password});
+      if(error){button.disabled=false;setAuthStatus(status,error.message||"Could not save the password.","error");return;}
+      setAuthStatus(status,"Password saved. Opening your workspace…","success");
+      location.hash="workspace";
+    });
+  }
   async function bindAccessRequest(){
     const form=document.getElementById("access-request-form");
     if(!form||form.dataset.bound)return;
@@ -235,7 +257,7 @@ body.info-open .info-view{display:block}
       });
       button.disabled=false;
       if(error){setAuthStatus(status,"Could not submit the request. Please try again or email contact@fulfillment.site.","error");return;}
-      form.reset();setAuthStatus(status,"Request sent. The owner will review it; no account was created yet.","success");
+      form.reset();setAuthStatus(status,"Request recorded. No account was created. Email alerts to the owner are not configured yet.","success");
     });
   }
   async function bindWorkspace(){
@@ -259,8 +281,9 @@ body.info-open .info-view{display:block}
   const infoPages={
     "contact-us":{title:"Contact Us",deck:"Reach the right Fulfillment team for general questions, account help, or privacy requests.",html:'<div class="info-hero"><span class="info-kicker">Get in touch</span><h1>Contact Us</h1><p>Choose the team that best fits your question. Your email app will open with the right address ready.</p></div><div class="info-cards"><article class="info-card"><div class="info-icon" aria-hidden="true">✉</div><h2>General inquiries</h2><p>Questions about Fulfillment, the service, or working with our team.</p><a href="mailto:contact@fulfillment.site?subject=Fulfillment%20inquiry">Email contact team ↗</a></article><article class="info-card"><div class="info-icon" aria-hidden="true">⌁</div><h2>Customer support</h2><p>Get help with access, account questions, or using Fulfillment.</p><a href="mailto:support@fulfillment.site?subject=Fulfillment%20support">Email support ↗</a></article><article class="info-card"><div class="info-icon" aria-hidden="true">◎</div><h2>Privacy requests</h2><p>Ask about the personal information associated with your account.</p><a href="mailto:privacy@fulfillment.site?subject=Privacy%20request">Email privacy team ↗</a></article></div><div class="info-callout"><p>Prefer to write directly? Contact us at <strong>contact@fulfillment.site</strong>.</p><a href="mailto:contact@fulfillment.site">Start an email ↗</a></div>'},
     "faq":{title:"FAQ",deck:"Quick answers about access, contacting Fulfillment, product updates, and policies.",html:'<div class="info-hero"><span class="info-kicker">Help & information</span><h1>Frequently Asked Questions</h1><p>Choose a question to expand the answer. For anything not covered here, contact the Fulfillment team.</p></div><div class="faq-list"><details><summary>How do I request access to Fulfillment?</summary><p>Use the Request access option on the main page to email the Fulfillment team.</p></details><details><summary>How can I contact Fulfillment?</summary><p>Visit the <a href=\"#contact-us\">Contact Us page</a> and choose the relevant email option.</p></details><details><summary>Where can I find privacy, service, and refund terms?</summary><p>Use the policy links on this page to open the <a href=\"#privacy-policy\">Privacy Policy</a>, <a href=\"#terms-of-service\">Terms of Service</a>, or <a href=\"#refund-terms\">Refund Terms</a>.</p></details><details><summary>Where are product updates posted?</summary><p>Published updates are listed on the <a href=\"#releases\">Releases page</a>.</p></details><details><summary>What should I include when I email the team?</summary><p>Include the email associated with your request and a short description of what you need help with. Do not send passwords or payment-card details by email.</p></details></div><div class="info-callout"><p>Still need help? Send a message to Fulfillment.</p><a href=\"#contact-us\">Contact Us ↗</a></div>'},
-    "sign-in":{title:"Sign in",deck:"Sign in to your Fulfillment account.",html:'<div class="info-hero"><span class="info-kicker">Your workspace</span><h1>Sign in to Fulfillment</h1><p>Use the email and password provided by the Fulfillment owner.</p></div><div class="auth-wrap"><div class="auth-card"><form class="auth-form" id="sign-in-form"><div class="auth-field"><label for="signin-email">Email</label><input id="signin-email" name="email" type="email" autocomplete="username" required></div><div class="auth-field"><label for="signin-password">Password</label><input id="signin-password" name="password" type="password" autocomplete="current-password" required></div><button class="auth-submit" id="signin-submit" type="submit">Sign in</button><p class="auth-status" id="signin-status" role="status" aria-live="polite"></p></form><div class="auth-links"><span>Need an account? <a href="#request-access">Request access</a></span><a href="#request-access">Access help</a></div><div class="auth-note">Accounts are created by the Fulfillment owner after a request is reviewed. This page does not allow self-registration.</div></div></div>'},
-    "request-access":{title:"Request Access",deck:"Request a Fulfillment account. Submitting this form does not create an account.",html:'<div class="info-hero"><span class="info-kicker">Account request</span><h1>Request Access</h1><p>Choose the access level you are requesting. The owner reviews requests and creates accounts manually.</p></div><div class="auth-wrap"><div class="auth-card"><form class="auth-form" id="access-request-form"><div class="auth-grid"><div class="auth-field"><label for="request-name">Full name</label><input id="request-name" name="full_name" autocomplete="name" required></div><div class="auth-field"><label for="request-email">Email</label><input id="request-email" name="email" type="email" autocomplete="email" required></div></div><div class="auth-field"><label for="request-role">Requested access level</label><select id="request-role" name="requested_role" required><option value="" selected disabled>Choose a role</option><option value="staff">Staff / Employee</option><option value="investor">Investor (view only)</option></select></div><div class="auth-field"><label for="request-message">Message (optional)</label><textarea id="request-message" name="message" maxlength="2000" placeholder="Tell us briefly why you need access."></textarea></div><button class="auth-submit" id="request-submit" type="submit">Send access request</button><p class="auth-status" id="request-status" role="status" aria-live="polite"></p></form><div class="auth-links"><span>Already have an account?</span><a href="#sign-in">Sign in</a></div><div class="auth-note">Requesting access does not grant access or create login credentials. Admin access is assigned only by the owner.</div></div></div>'},
+    "sign-in":{title:"Sign in",deck:"Sign in to your Fulfillment account.",html:'<div class="info-hero"><span class="info-kicker">YOUR WORKSPACE</span><h1>Sign in to Fulfillment</h1><p>Use the email and password provided by the Fulfillment owner.</p></div><div class="auth-wrap auth-signin"><div class="auth-card"><form class="auth-form" id="sign-in-form"><div class="auth-field"><label for="signin-email">Email</label><input id="signin-email" name="email" type="email" autocomplete="username" required></div><div class="auth-field"><label for="signin-password">Password</label><input id="signin-password" name="password" type="password" autocomplete="current-password" required></div><button class="auth-submit" id="signin-submit" type="submit">Sign in</button><p class="auth-status" id="signin-status" role="status" aria-live="polite"></p></form><div class="auth-links"><span>Need an account? <a href="#request-access">Request access</a></span><a href="#request-access">Access help</a></div><div class="auth-note">Accounts are created by the Fulfillment owner after a request is reviewed. This page does not allow self-registration.</div></div></div>'},
+    "set-password":{title:"Set password",deck:"Finish activating your Fulfillment account.",html:'<div class="info-hero"><span class="info-kicker">ACCOUNT ACTIVATION</span><h1>Set your password</h1><p>Create a password to finish setting up your Fulfillment account.</p></div><div class="auth-wrap auth-signin"><div class="auth-card"><form class="auth-form" id="set-password-form"><div class="auth-field"><label for="new-password">New password</label><input id="new-password" name="password" type="password" autocomplete="new-password" minlength="8" required></div><div class="auth-field"><label for="confirm-password">Confirm password</label><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required></div><button class="auth-submit" id="set-password-submit" type="submit">Save password</button><p class="auth-status" id="set-password-status" role="status" aria-live="polite"></p></form><div class="auth-note">Use at least 8 characters. Your password is saved securely by Supabase and is never displayed on this site.</div></div></div>'},
+    "request-access":{title:"Request Access",deck:"Request a Fulfillment account. Submitting this form does not create an account.",html:'<div class="info-hero"><span class="info-kicker">Account request</span><h1>Request Access</h1><p>Choose the access level you are requesting. The owner reviews requests and creates accounts manually.</p></div><div class="auth-wrap auth-request"><div class="auth-card"><form class="auth-form" id="access-request-form"><div class="auth-grid"><div class="auth-field"><label for="request-name">Full name</label><input id="request-name" name="full_name" autocomplete="name" required></div><div class="auth-field"><label for="request-email">Email</label><input id="request-email" name="email" type="email" autocomplete="email" required></div></div><div class="auth-field"><label for="request-role">Requested access level</label><select id="request-role" name="requested_role" required><option value="" selected disabled>Choose a role</option><option value="staff">Staff / Employee</option><option value="investor">Investor (view only)</option></select></div><div class="auth-field"><label for="request-message">Message (optional)</label><textarea id="request-message" name="message" maxlength="2000" placeholder="Tell us briefly why you need access."></textarea></div><button class="auth-submit" id="request-submit" type="submit">Send access request</button><p class="auth-status" id="request-status" role="status" aria-live="polite"></p></form><div class="auth-links"><span>Already have an account?</span><a href="#sign-in">Sign in</a></div><div class="auth-note">Requesting access does not grant access or create login credentials. Admin access is assigned only by the owner.</div></div></div>'},
     "workspace":{title:"Fulfillment Workspace",deck:"Your signed-in Fulfillment workspace.",html:'<div class="info-hero"><span class="info-kicker">Account workspace</span><h1>Welcome to Fulfillment</h1><p>Your available tools depend on the role assigned to your account.</p></div><div class="auth-wrap"><div class="auth-card workspace-card"><div><h2 id="workspace-name">Checking your account…</h2><p id="workspace-detail">Loading your assigned access.</p><div style="margin-top:16px"><span class="role-chip" id="workspace-role">Checking role</span></div></div><button class="workspace-logout" id="logout-button" type="button">Log out</button></div><p class="auth-status" id="workspace-status" role="status" aria-live="polite"></p></div>'},
     "releases":{title:"Releases",deck:"Product updates and service changes from Fulfillment.",html:'<div class="info-hero"><span class="info-kicker">Product updates</span><h1>Releases</h1><p>Release notes will be listed here as updates are published.</p></div><div class="release-empty"><div class="info-icon" aria-hidden="true">↗</div><h2>No release notes published yet</h2><p>For questions about an update or to request release announcements, contact the Fulfillment team.</p><a class="public-signin" href="mailto:releases@fulfillment.site?subject=Fulfillment%20release%20updates">Contact the release team <span aria-hidden="true">↗</span></a></div><div class="info-callout"><p>Need help with something currently available?</p><a href="#faq">Visit FAQ ↗</a></div>'}
   };
@@ -274,6 +297,11 @@ body.info-open .info-view{display:block}
   function render(){
     const bits=location.hash.slice(1).split("/");
     const key=bits[0],entry=articles[key],info=infoPages[key],target=bits[1];
+    const authFlow=new URLSearchParams(location.hash.slice(1)).get("type");
+    if(authFlow==="invite"||authFlow==="recovery"){
+      const client=getSupabaseClient();
+      if(client)client.auth.getSession().then(function(result){if(result.data&&result.data.session&&location.hash!=="#set-password")location.hash="set-password";});
+    }
     document.body.classList.toggle("policy-open",!!entry);
     document.body.classList.toggle("info-open",!!info);
     if(!entry&&!info){document.title="Fulfillment — Order operations, in focus";return;}
@@ -282,6 +310,7 @@ body.info-open .info-view{display:block}
     if(info){
       if(infoRendered!==key){infoRendered=key;infoTitleEl.textContent=info.title;infoEl.innerHTML=info.html;}
       if(key==="sign-in")bindSignIn();
+      if(key==="set-password")bindSetPassword();
       if(key==="request-access")bindAccessRequest();
       if(key==="workspace")bindWorkspace();
       requestAnimationFrame(function(){window.scrollTo({top:0,behavior:"instant"});});
