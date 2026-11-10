@@ -104,10 +104,10 @@ async function handleDeletionStatus(rec:any,old:any){
   if(r.user_id){const {error:de}=await admin.auth.admin.deleteUser(r.user_id);if(de){await revertStatus("account_deletion_requests",rec.id);throw de;}}
   try{await sendMail(r.email,"Your Fulfillment account was deleted",shell("Account deleted",'<p style="font-size:15px;line-height:1.7">Your request was approved and your Fulfillment account has been deleted.</p>'));}catch(e){console.error("deletion confirmation email failed",e);}
 }
-async function notifyRequest(r:any,setupLink:string){
+async function notifyRequest(r:any,verificationLink:string){
   const label=r.requested_role==="staff"?"Employee":"Investor";
   const store=r.store_name?' for <strong>'+esc(r.store_name)+'</strong>':"";
-  const applicant=shell("We received your access request",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+',</p><p style="font-size:15px;line-height:1.7">Your request for <strong>'+label+'</strong> access'+store+' is pending owner review. We’ll email you when a decision is made.</p><p style="font-size:15px;line-height:1.7">Before approval, set your password using this secure one-time link. Your password is never sent by email. After the owner approves your request, you can sign in with this email and password.</p>'+button("Set your password",setupLink)+'<p style="margin:18px 0 0;padding:15px 17px;background:#faf8f3;border:1px solid #f1e9da;border-radius:8px;color:#665844;font-size:12px;line-height:1.6">Your request remains pending until the owner reviews it. This secure link expires; if it expires, contact the owner to restart setup.</p>');
+  const applicant=shell("We received your access request",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+',</p><p style="font-size:15px;line-height:1.7">Your request for <strong>'+label+'</strong> access'+store+' is pending owner review. We’ll email you when a decision is made.</p><p style="font-size:15px;line-height:1.7">Confirm your email using this secure one-time link. Your password is never sent by email. After the owner approves your request, sign in with the password you chose on the request form.</p>'+button("Verify email & request",verificationLink)+'<p style="margin:18px 0 0;padding:15px 17px;background:#faf8f3;border:1px solid #f1e9da;border-radius:8px;color:#665844;font-size:12px;line-height:1.6">Your request remains pending until the owner reviews it. This secure link expires; if it expires, contact the owner for a new verification link.</p>');
   const owner=shell("New access request",'<p style="font-size:15px;line-height:1.7"><strong>'+esc(r.full_name)+'</strong> ('+esc(r.email)+') requested <strong>'+label+'</strong>'+ (r.store_name?' access to '+esc(r.store_name):'')+'.</p><p style="font-size:13px;color:#63727c">Request ID: '+r.id+'. Review in Supabase Table Editor.</p>');
   const a=await sendMail(r.email,"We received your Fulfillment access request",applicant);
   if(!a)return {email_sent:false,owner_notified:false};
@@ -141,8 +141,9 @@ Deno.serve(async(req:Request)=>{
     }
     if(action==="submit_request"){
       const full_name=String(body.full_name||"").trim();const email=String(body.email||"").trim().toLowerCase();
+      const password=String(body.password||"");
       const role=String(body.requested_role||"");const message=String(body.message||"").trim();
-      if(!full_name||full_name.length>120||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254||!["staff","investor"].includes(role)||message.length>200)
+      if(!full_name||full_name.length>120||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254||password.length<8||password.length>72||!["staff","investor"].includes(role)||message.length>200)
         return json({error:"Please check the request details."},400);
       let storeName=null;
       if(role==="investor"){
@@ -154,21 +155,21 @@ Deno.serve(async(req:Request)=>{
       const {data:slot,error:slotError}=await admin.rpc("reserve_access_request_slot",{request_email:email});if(slotError)throw slotError;
       if(!slot)return json({error:"Please wait before submitting another request."},429);
       const {data:r,error}=await admin.from("access_requests").insert({full_name,email,requested_role:role,store_name:storeName,message,status:"pending"}).select("*").single();if(error)throw error;
-      let account=await findUser(email);let created=false;let linkType:"invite"|"recovery"=account?"recovery":"invite";
+      let account=await findUser(email);let created=false;let linkType:"signup"|"magiclink"=account?"magiclink":"signup";
       if(account){
         const {data:p,error:profileError}=await admin.from("profiles").select("role,is_active").eq("user_id",account.id).maybeSingle();if(profileError)throw profileError;
         if(p?.is_active){await admin.from("access_requests").delete().eq("id",r.id);return json({error:"This email already has active access. Please sign in instead."},409);}
       }
-      const linkOptions:any={redirectTo:appUrl+"/#set-password"};
-      if(linkType==="invite")linkOptions.data={full_name};
-      const {data:linkData,error:linkError}=await admin.auth.admin.generateLink({type:linkType,email,options:linkOptions});
+      const linkOptions:any={redirectTo:appUrl+"/#activate"};
+      if(linkType==="signup")linkOptions.data={full_name};
+      const {data:linkData,error:linkError}=await admin.auth.admin.generateLink({type:linkType,email,...(linkType==="signup"?{password}:{}),options:linkOptions});
       if(linkError){await admin.from("access_requests").delete().eq("id",r.id);throw linkError;}
-      account=linkData.user;created=linkType==="invite";
+      account=linkData.user;created=linkType==="signup";
       const tokenHash=linkData.properties?.hashed_token;
       if(!account||!tokenHash){if(created&&account)await admin.auth.admin.deleteUser(account.id);await admin.from("access_requests").delete().eq("id",r.id);throw new Error("Password setup link was not generated.");}
-      const setupLink=appUrl+"/#activate?token_hash="+encodeURIComponent(tokenHash)+"&type="+linkType;
+      const verificationLink=appUrl+"/#activate?token_hash="+encodeURIComponent(tokenHash)+"&type="+linkType;
       let mail={email_sent:false,owner_notified:false};
-      try{mail=await notifyRequest(r,setupLink);}catch(e){console.error("request email failed",e);}
+      try{mail=await notifyRequest(r,verificationLink);}catch(e){console.error("request email failed",e);}
       if(!mail.email_sent){if(created)await admin.auth.admin.deleteUser(account.id);await admin.from("access_requests").delete().eq("id",r.id);return json({error:"We couldn't send the secure setup email. Please try again shortly."},503);}
       return json({ok:true,request_id:r.id,...mail});
     }
