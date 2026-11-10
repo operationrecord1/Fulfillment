@@ -55,7 +55,7 @@ create table if not exists public.stores (
 
 create table if not exists public.account_deletion_requests (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete set null,
   email text not null,
   reason text not null default '' check (char_length(reason) <= 500),
   status text not null default 'pending' check (status in ('pending','approved','rejected')),
@@ -177,6 +177,62 @@ create policy "admins can review deletion requests"
 on public.account_deletion_requests for update to authenticated
 using (public.is_active_admin())
 with check (public.is_active_admin());
+
+
+-- Securely dispatch owner status changes from Table Editor to the Edge Function.
+create extension if not exists pg_net;
+
+do $
+begin
+  if not exists (select 1 from vault.decrypted_secrets where name = 'fulfillment_webhook_secret') then
+    perform vault.create_secret(
+      encode(extensions.gen_random_bytes(32), 'hex'),
+      'fulfillment_webhook_secret',
+      'Authenticates private Fulfillment status automation calls'
+    );
+  end if;
+end
+$;
+
+create or replace function public.verify_fulfillment_webhook(candidate text)
+returns boolean language sql stable security definer set search_path = ''
+as $
+  select coalesce(candidate is not null and exists (
+    select 1 from vault.decrypted_secrets
+    where name = 'fulfillment_webhook_secret' and decrypted_secret = candidate
+  ), false);
+$;
+revoke all on function public.verify_fulfillment_webhook(text) from public, anon, authenticated;
+grant execute on function public.verify_fulfillment_webhook(text) to service_role;
+
+create or replace function public.dispatch_fulfillment_status_event()
+returns trigger language plpgsql security definer set search_path = public, pg_temp
+as $
+declare webhook_secret text;
+begin
+  if old.status = new.status or new.status = 'pending' then return new; end if;
+  select decrypted_secret into webhook_secret
+  from vault.decrypted_secrets where name = 'fulfillment_webhook_secret' limit 1;
+  if webhook_secret is null then
+    raise warning 'Fulfillment workflow webhook secret is not configured';
+    return new;
+  end if;
+  perform net.http_post(
+    url := 'https://glsuoigdjvoojlfyfznq.supabase.co/functions/v1/fulfillment-access',
+    headers := jsonb_build_object('Content-Type','application/json','x-fulfillment-webhook-secret',webhook_secret),
+    body := jsonb_build_object('action','process_database_event','table',tg_table_name,'record',to_jsonb(new),'old_record',to_jsonb(old)),
+    timeout_milliseconds := 5000
+  );
+  return new;
+end;
+$;
+revoke all on function public.dispatch_fulfillment_status_event() from public, anon, authenticated;
+drop trigger if exists access_request_status_dispatch on public.access_requests;
+create trigger access_request_status_dispatch after update of status on public.access_requests
+for each row execute function public.dispatch_fulfillment_status_event();
+drop trigger if exists account_deletion_status_dispatch on public.account_deletion_requests;
+create trigger account_deletion_status_dispatch after update of status on public.account_deletion_requests
+for each row execute function public.dispatch_fulfillment_status_event();
 
 -- Owner bootstrap (run only after creating the owner's Auth user):
 -- Replace the UUID, email, and display name, then run this separately in SQL Editor:
