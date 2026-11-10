@@ -7,4 +7,5 @@ assert.equal(S.normalize('earning','$1,234.50',2026,11,[]),1234.5);assert.equal(
 assert.throws(()=>S.normalize('date','2026-12-01',2026,11,[]));assert.throws(()=>S.normalize('date','2026-11-31',2026,11,[]));assert.throws(()=>S.normalize('quantity','1.5',2026,11,[]));assert.throws(()=>S.normalize('gross','5',2026,11,[]));assert.throws(()=>S.normalize('status','Unknown',2026,11,[]));
 assert.equal(C.groups(rows).length,2);assert.equal(C.duplicates(rows).size,2);assert.equal(C.aggregate(rows,[]).count,1);assert.equal(C.aggregate(rows,[]).gross,3500);
 assert.equal(C.groups(rows.map((r,i)=>({...r,position:i+1}))).length,1);
+assert.equal(C.duplicates(rows,['purchase_id']).size,0);assert.equal(C.duplicates(rows,['order_id']).size,2);
 console.log('PASS: sparse rows, insert/delete, blank tail, TSV roundtrip, validation, duplicate groups and protected fields');
