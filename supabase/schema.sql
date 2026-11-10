@@ -26,7 +26,8 @@ create table if not exists public.profiles (
   role public.fulfillment_role not null default 'staff',
   is_active boolean not null default false,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  store_id uuid references public.stores(id) on delete set null
 );
 
 create table if not exists public.access_requests (
@@ -36,11 +37,33 @@ create table if not exists public.access_requests (
   requested_role public.requested_fulfillment_role not null,
   message text not null default '' check (char_length(message) <= 200),
   status public.access_request_status not null default 'pending',
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  store_name text,
+  constraint access_requests_investor_store_required check (requested_role <> 'investor' or nullif(btrim(store_name),'') is not null)
 );
 
 create index if not exists access_requests_status_created_idx
   on public.access_requests (status, created_at desc);
+
+create table if not exists public.stores (
+  id uuid primary key default gen_random_uuid(),
+  name text not null check (char_length(btrim(name)) between 2 and 120),
+  name_normalized text generated always as (lower(regexp_replace(btrim(name), '\s+', ' ', 'g'))) stored unique,
+  created_at timestamptz not null default now()
+);
+
+
+create table if not exists public.account_deletion_requests (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  email text not null,
+  reason text not null default '' check (char_length(reason) <= 500),
+  status text not null default 'pending' check (status in ('pending','approved','rejected')),
+  created_at timestamptz not null default now(),
+  reviewed_at timestamptz
+);
+create index if not exists account_deletion_requests_pending_idx
+  on public.account_deletion_requests(status, created_at desc);
 
 create or replace function public.is_active_admin()
 returns boolean
@@ -86,14 +109,21 @@ for each row execute procedure public.provision_fulfillment_profile();
 
 alter table public.profiles enable row level security;
 alter table public.access_requests enable row level security;
+alter table public.stores enable row level security;
+alter table public.account_deletion_requests enable row level security;
 
 revoke all on table public.profiles from anon, authenticated;
 grant select on table public.profiles to authenticated;
-grant update (display_name, role, is_active) on table public.profiles to authenticated;
+grant update (display_name) on table public.profiles to authenticated;
 
 revoke all on table public.access_requests from anon, authenticated;
-grant insert on table public.access_requests to anon, authenticated;
+revoke all on table public.access_requests from anon, authenticated;
 grant select, update (status) on table public.access_requests to authenticated;
+revoke all on table public.stores from anon, authenticated;
+grant select on table public.stores to authenticated;
+revoke all on table public.account_deletion_requests from anon, authenticated;
+grant select, insert on table public.account_deletion_requests to authenticated;
+grant update (status, reviewed_at) on table public.account_deletion_requests to authenticated;
 
 drop policy if exists "profile owner or admin can read" on public.profiles;
 create policy "profile owner or admin can read"
@@ -119,6 +149,32 @@ using (public.is_active_admin());
 drop policy if exists "admin can update access request status" on public.access_requests;
 create policy "admin can update access request status"
 on public.access_requests for update to authenticated
+using (public.is_active_admin())
+with check (public.is_active_admin());
+
+
+drop policy if exists "members can read their assigned store" on public.stores;
+create policy "members can read their assigned store"
+on public.stores for select to authenticated
+using (
+  public.is_active_admin()
+  or exists (select 1 from public.profiles p
+             where p.user_id = auth.uid() and p.store_id = stores.id and p.is_active)
+);
+
+drop policy if exists "users can submit their own deletion request" on public.account_deletion_requests;
+create policy "users can submit their own deletion request"
+on public.account_deletion_requests for insert to authenticated
+with check (user_id = auth.uid() and status = 'pending');
+
+drop policy if exists "users and admins can read deletion requests" on public.account_deletion_requests;
+create policy "users and admins can read deletion requests"
+on public.account_deletion_requests for select to authenticated
+using (user_id = auth.uid() or public.is_active_admin());
+
+drop policy if exists "admins can review deletion requests" on public.account_deletion_requests;
+create policy "admins can review deletion requests"
+on public.account_deletion_requests for update to authenticated
 using (public.is_active_admin())
 with check (public.is_active_admin());
 
