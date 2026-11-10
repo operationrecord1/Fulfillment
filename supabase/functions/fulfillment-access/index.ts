@@ -64,12 +64,15 @@ async function handleAccessStatus(rec:any,old:any){
   let account=await findUser(r.email);let actionLink="";let created=false;let existingStoreId:string|null=null;
   if(!account){
     const {data,error}=await admin.auth.admin.generateLink({type:"invite",email:r.email,options:{data:{full_name:r.full_name},redirectTo:appUrl+"/#set-password"}});
-    if(error)throw error;account=data.user;actionLink=data.properties?.action_link||"";created=true;
+    if(error)throw error;account=data.user;created=true;
+    const tokenHash=data.properties?.hashed_token;
+    if(!tokenHash){if(account)await admin.auth.admin.deleteUser(account.id);throw new Error("Invitation token was not generated.");}
+    actionLink=appUrl+"/#activate?token_hash="+encodeURIComponent(tokenHash)+"&type=invite";
   }else{
     const {data:p,error}=await admin.from("profiles").select("role,is_active,store_id").eq("user_id",account.id).maybeSingle();if(error)throw error;
     existingStoreId=p?.store_id??null;
     if(p?.is_active&&(p.role==="admin"||p.role!==role)){await revertStatus("access_requests",rec.id);return;}
-    if(!p?.is_active){const {data,error:le}=await admin.auth.admin.generateLink({type:"recovery",email:r.email,options:{redirectTo:appUrl+"/#set-password"}});if(le)throw le;actionLink=data.properties?.action_link||"";}
+    if(!p?.is_active){const {data,error:le}=await admin.auth.admin.generateLink({type:"recovery",email:r.email,options:{redirectTo:appUrl+"/#set-password"}});if(le)throw le;const tokenHash=data.properties?.hashed_token;if(!tokenHash)throw new Error("Recovery token was not generated.");actionLink=appUrl+"/#activate?token_hash="+encodeURIComponent(tokenHash)+"&type=recovery";}
   }
   if(!account)throw new Error("Account provisioning failed.");
   const roleLabel=role==="staff"?"Employee":"Investor";
