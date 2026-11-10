@@ -166,7 +166,13 @@ Deno.serve(async(req:Request)=>{
       const existing=await findUser(email);
       if(existing){
         const {data:p,error:profileError}=await admin.from("profiles").select("role,is_active").eq("user_id",existing.id).maybeSingle();if(profileError)throw profileError;
-        if(p?.is_active)return json({error:"This email already has active access. Please sign in instead."},409);
+        if(p?.is_active){
+          const roleLabel=p.role==="staff"?"Employee":p.role==="investor"?"Investor":null;
+          const message=roleLabel
+            ?"An "+roleLabel+" account already exists with this email. Please sign in."
+            :"This email already has active access. Please sign in or contact the owner.";
+          return json({error:message,code:"active_account"});
+        }
       }
       const {data:slot,error:slotError}=await admin.rpc("reserve_access_request_slot",{request_email:email});if(slotError)throw slotError;
       if(!slot)return json({error:"Please wait before submitting another request."},429);
