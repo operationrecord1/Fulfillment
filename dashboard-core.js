@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 const statuses=['Pending','Processed','Delivered','Label Created','Buyer Cancelled','Refunded','OOS','Alert'];
-const columns=[['order_id','Order ID'],['quantity','Quantity','number'],['earning','Order Earning','money'],['purchase_id','Purchase ID'],['supplier','Supplier Reference'],['note','Note'],['platform','Platform','select'],['tracking','Tracking'],['secondary_tracking','Secondary Tracking'],['status','Order Status','select'],['product_cost','Product Cost','money'],['shipping_cost','Shipping Cost','money'],['additional_cost','Additional Cost','money'],['gross','Gross Profit','computed'],['margin','Profit Margin','computed'],['id','Unique ID','computed'],['date','Order Date','date']];
+const columns=[['order_id','Order ID'],['quantity','Quantity','number'],['earning','Order Earning','money'],['purchase_id','Purchase ID'],['supplier','Supplier Reference'],['note','Note'],['platform','Platform','select'],['tracking','Tracking'],['secondary_tracking','Secondary Tracking'],['status','Order Status','select'],['product_cost','Product Cost','money'],['shipping_cost','Shipping Cost','money'],['additional_cost','Additional Cost','money'],['gross','Gross Profit','computed'],['margin','Profit Margin','computed'],['id','Order Unique ID','computed'],['date','Order Date','date']];
 const investorFields=new Set(['order_id','quantity','earning','status','product_cost','shipping_cost','additional_cost','gross','margin','date']);
 const present=v=>v!==''&&v!==null&&v!==undefined;
 const cents=v=>Math.round(Number(v||0)*100);
@@ -16,7 +16,7 @@ function link(value,kind){
 function groups(rows,investor=false){
  const out=[];let prev=null;
  for(const r of rows){const a=r.data,b=prev?.data;
-  const connected=prev&&r.month===prev.month&&(investor?r.group_key===prev.group_key:((a.order_id&&a.order_id===b.order_id)||(a.purchase_id&&a.purchase_id===b.purchase_id)));
+  const connected=prev&&r.month===prev.month&&(r.position===undefined||prev.position===undefined||(r.sourcePosition??r.position)===(prev.sourcePosition??prev.position)+1)&&(investor?r.group_key===prev.group_key:((a.order_id&&a.order_id===b.order_id)||(a.purchase_id&&a.purchase_id===b.purchase_id)));
   if(!connected)out.push({rows:[],revenue:0,cost:0,other:0,hasRevenue:false,hasCost:false});
   const g=out[out.length-1];g.rows.push(r);g.revenue+=cents(a.earning);g.cost+=cents(a.product_cost);g.other+=cents(a.shipping_cost)+cents(a.additional_cost);g.hasRevenue||=present(a.earning);g.hasCost||=present(a.product_cost);prev=r;
  }
@@ -33,6 +33,6 @@ function aggregate(rows,expenses,investor=false){
  const expense=expenses.reduce((s,e)=>s+cents(e.amount),0),tax=Math.round(Math.max(0,gross-expense)*.15),count=orders.size;
  return {groups:gs,count,revenue,cost,gross,expense,tax,net:gross-expense-tax,margin:margins.length?margins.reduce((a,b)=>a+b,0)/margins.length:0,avgOrder:count?Math.round(revenue/count):0,avgProfit:count?Math.round(gross/count):0,avgDaily:daily.size?Math.round(count/daily.size):0,sizes,points:[...daily].sort(([a],[b])=>a.localeCompare(b))};
 }
-function duplicates(rows){const marks=new Set();for(const key of ['order_id','purchase_id']){const runs=new Map();let prev='',month=null;for(const r of rows){const value=r.data[key]||'';if(value){if(!runs.has(value))runs.set(value,[]);if(value!==prev||month!==r.month)runs.get(value).push([]);runs.get(value).at(-1).push(r);}prev=value;month=r.month;}for(const run of runs.values())if(run.length>1)run.flat().forEach(r=>marks.add(r.id||r._key));}return marks;}
+function duplicates(rows){const marks=new Set();for(const key of ['order_id','purchase_id']){const runs=new Map();let prev='',month=null,position=null;for(const r of rows){const value=r.data[key]||'';if(value){if(!runs.has(value))runs.set(value,[]);if(value!==prev||month!==r.month||(r.position!==undefined&&position!==null&&r.position!==position+1))runs.get(value).push([]);runs.get(value).at(-1).push(r);}prev=value;month=r.month;position=r.position??null;}for(const run of runs.values())if(run.length>1)run.flat().forEach(r=>marks.add(r.id||r._key));}return marks;}
 const api={statuses,columns,investorFields,present,cents,link,groups,aggregate,duplicates};root.OrderCore=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
