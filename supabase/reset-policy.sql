@@ -50,8 +50,8 @@ begin
         lock_until = v_now + interval '24 hours', updated_at = v_now
     where user_id = new.id;
   else
-    delay_seconds := case when next_attempt <= 5 then 60
-                          when next_attempt <= 10 then 120 else 300 end;
+    delay_seconds := case when next_attempt <= 5 then 59
+                          when next_attempt <= 10 then 110 else 299 end;
     update public.password_reset_attempts
     set attempts = next_attempt,
         next_allowed_at = v_now + make_interval(secs => delay_seconds),
