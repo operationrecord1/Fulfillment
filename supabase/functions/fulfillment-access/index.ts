@@ -116,10 +116,7 @@ async function handleDeletionStatus(rec:any,old:any){
   if(r.user_id){const {error:de}=await admin.auth.admin.deleteUser(r.user_id);if(de){await revertStatus("account_deletion_requests",rec.id);throw de;}}
   try{await sendMail(r.email,"Your Fulfillment account was deleted",shell("Account deleted",'<p style="font-size:15px;line-height:1.7">Your request was approved and your Fulfillment account has been deleted.</p>'));}catch(e){console.error("deletion confirmation email failed",e);}
 }
-async function notifyRequest(r:any,verificationLink:string){
-  const label=r.requested_role==="staff"?"Employee":"Investor";
-  const store=r.store_name?' for <strong>'+esc(r.store_name)+'</strong>':"";
-  const applicant=shell("We reasync function notifyRequest(r:any){
+async function notifyRequest(r:any){
   const label=r.requested_role==="staff"?"Employee":"Investor";
   const store=r.store_name?' for <strong>'+esc(r.store_name)+'</strong>':"";
   const applicant=shell("We received your access request",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+',</p><p style="font-size:15px;line-height:1.7">Your request for <strong>'+label+'</strong> access'+store+' is pending owner review. We’ll email you when the owner makes a decision.</p><p style="font-size:15px;line-height:1.7">No password is needed to apply. If approved, your approval email will include a secure link to set one.</p>');
@@ -128,7 +125,12 @@ async function notifyRequest(r:any,verificationLink:string){
   if(!a)return {email_sent:false,owner_notified:false};
   const b=await sendMail(ownerEmail,"New Fulfillment access request",owner);
   return {email_sent:true,owner_notified:b};
-}is not configured."},503);
+}
+
+Deno.serve(async(req:Request)=>{
+  if(req.method==="OPTIONS")return new Response("ok",{headers:cors});
+  if(req.method!=="POST")return json({error:"Method not allowed."},405);
+  if(!serviceKey)return json({error:"Server admin key is not configured."},503);
   try{
     const body=await req.json();const action=String(body.action||"");
     if(action==="process_database_event"){
