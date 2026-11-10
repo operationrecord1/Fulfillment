@@ -26,3 +26,17 @@
 .om .sheet-cell-value,.om .sheet-table td{cursor:default}.sheet-tooltip{position:fixed;z-index:5000;background:#3c4043;color:white;border-radius:4px;padding:7px 9px;font:12px Arial,sans-serif;pointer-events:none}.om .sheet-link-preview{display:flex;align-items:center;gap:8px;padding:8px 12px;max-width:340px;min-width:260px;overflow:hidden}.sheet-link-preview a{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none;font-weight:500}.om .sheet-link-preview button{width:28px;height:28px;padding:5px;flex:none;border-radius:50%}.sheet-link-preview svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7}.om .sheet-link-editor{width:300px;padding:16px}.sheet-link-editor label{display:block;color:#5f6368;font:12px Arial;margin:0 0 12px}.om .sheet-link-editor input{margin:6px 0 0;width:100%;height:36px;border:1px solid #dadce0;padding:8px}.om .sheet-link-editor button{width:auto;margin-left:auto;color:#1a73e8;font-weight:500}.om .sheet-rownum:hover{background:#e8eaed}.om .sheet-dialog input{font:14px Arial}.om .sheet-dialog button{font:500 14px Arial}
 
 .om .sheet-table td.sheet-copied:before{display:none}.sheet-copy-outline{position:absolute;border:1px dashed #1a73e8;box-sizing:border-box;pointer-events:none;z-index:3}
+
+/* Icons and dimensions verified against the live reference on 2026-11-11. */
+.sheet-reference-icon{display:inline-block;flex:none;width:20px;height:20px;background-image:url("https://ssl.gstatic.com/docs/common/material_common_sprite1063_gm3_grey_medium.svg");background-repeat:no-repeat}
+.om .sheet-tools [data-format=left]{width:40px;gap:0;padding:4px}
+.om .sheet-tools [data-format=left] .sheet-reference-icon:last-child{width:12px}
+.om .sheet-menu{min-width:320px;padding:8px 0;border-radius:4px}
+.om .sheet-menu button{font-size:14px;padding-left:12px;padding-right:20px;gap:8px}
+.om .sheet-menu kbd{font-size:14px;color:#9aa0a6}
+.om .sheet-link-preview{box-sizing:border-box;width:324px;min-width:0;max-width:calc(100vw - 16px);height:52px;padding:10px 12px;gap:4px;border:0;border-radius:12px;box-shadow:0 2px 6px #0005}
+.om .sheet-link-preview .sheet-link-globe{width:20px;height:20px;margin:0 8px 0 4px;flex:none}
+.om .sheet-link-preview a{font:500 14px Arial,sans-serif;color:#1a73e8;min-width:0;margin-right:8px;text-decoration:none}
+.om .sheet-link-preview button{width:32px;height:32px;padding:6px;color:#444746;justify-content:center;border-radius:50%}
+.om .sheet-link-preview svg{width:20px;height:20px;fill:currentColor;stroke:none}
+.om .sheet-link-preview button:hover{background:#e8eaed}
