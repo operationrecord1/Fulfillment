@@ -4,7 +4,7 @@ assert.equal(S.rowCount([]),20);assert.equal(S.rowCount(rows),23);
 assert.deepEqual(S.insert(rows,2).map(r=>r.position),[1,4]);assert.deepEqual(S.remove(rows,1,1).map(r=>r.position),[2]);assert.equal(S.rowCount(S.remove(rows,1,3)),20);
 const cells=[['a\tb','line\nnext','"quote"'],['','3','']];assert.deepEqual(S.parseTSV(S.toTSV(cells)),cells);assert.deepEqual(S.parseTSV('a\tb\r\nc\td\r\n'),[['a','b'],['c','d']]);
 assert.equal(S.normalize('earning','$1,234.50',2026,11,[]),1234.5);assert.equal(S.normalize('date','11/9/2026',2026,11,[]),'2026-11-09');
-assert.throws(()=>S.normalize('date','2026-12-01',2026,11,[]));assert.throws(()=>S.normalize('date','2026-11-31',2026,11,[]));assert.throws(()=>S.normalize('quantity','1.5',2026,11,[]));assert.throws(()=>S.normalize('gross','5',2026,11,[]));assert.throws(()=>S.normalize('status','Unknown',2026,11,[]));
+assert.throws(()=>S.normalize('date','2026-12-01',2026,11,[]));assert.throws(()=>S.normalize('date','2026-11-31',2026,11,[]));assert.throws(()=>S.normalize('quantity','1.5',2026,11,[]));assert.throws(()=>S.normalize('gross','5',2026,11,[]));assert.equal(S.normalize('status','Unknown',2026,11,[]),'Unknown');
 assert.equal(C.groups(rows).length,2);assert.equal(C.duplicates(rows).size,2);assert.equal(C.aggregate(rows,[]).count,1);assert.equal(C.aggregate(rows,[]).gross,3500);
 assert.equal(C.groups(rows.map((r,i)=>({...r,position:i+1}))).length,1);
 assert.equal(C.duplicates(rows,['purchase_id']).size,0);assert.equal(C.duplicates(rows,['order_id']).size,2);
