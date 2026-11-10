@@ -7,3 +7,7 @@ body.order-workspace{background:#f3f6f5;color:#1b302d}body.order-workspace .poli
 .om-chart-tooltip{width:max-content}
 
 @media(min-width:1100px){.om-charts{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.8fr)}.om-charts>.om-panel:last-child{grid-column:auto}}
+
+/* Keep compact category charts beside the primary daily analytics. */
+.om-charts{gap:5px}.om-charts>.om-panel{padding:15px 5px}.om-charts>.om-panel:last-child{padding:15px 8px}.om-charts .om-chart svg{max-height:225px}.om-charts .om-legend{padding:0 4px}.om-charts h2,.om-charts p{margin-left:4px;margin-right:4px}
+@media(min-width:1100px){.om-charts{grid-template-columns:minmax(185px,.65fr) minmax(185px,.65fr) minmax(0,2.7fr)}}

@@ -23,3 +23,5 @@ const undated=C.calendarPoints([], [{month:11,year:2026,position:1,data:{order_i
 
 for(const cents of [-97,-10000,-1000000]){const svg=C.profitChart([{index:0,label:'1',full:'1 November 2026',count:1,value:cents}],false);assert.ok(svg.includes('class="om-loss-marker"'));assert.ok(svg.includes('height="3"'));assert.ok(!svg.includes('min-width'));assert.ok(!svg.includes('NaN'));}
 assert.deepEqual(C.sliceShares([1,999]),[.001,.999]);
+
+const dense=Array.from({length:31},(_,index)=>({index,label:String(index+1),full:'Day '+(index+1),count:1,value:index%3===0?-97:125}));const denseSVG=C.profitChart(dense,false);assert.equal((denseSVG.match(/class="om-profit-value"/g)||[]).length,20);assert.equal((denseSVG.match(/class="om-loss-value"/g)||[]).length,11);assert.ok(!denseSVG.includes('rotate('));assert.ok(!C.roundChart(a,false).includes('stroke="'+ '#53ae9b' +'" fill="none"'));
