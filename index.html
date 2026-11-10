@@ -587,7 +587,7 @@ body.info-open .info-view{display:block}
     const card=root.querySelector(".auth-card");
     if(card&&!card.querySelector("h1")){
       const h=document.createElement("h1");h.textContent=key==="sign-in"?"Sign in":key==="request-access"?"Request access":"Set your password";
-      const p=document.createElement("p");p.className="auth-subtitle";p.textContent=key==="sign-in"?"Sign in to Fulfillment.":key==="request-access"?"Tell us who you are and which access you need.":"Choose a new password for your account.";
+      const p=document.createElement("p");p.className="auth-subtitle";p.textContent=key==="sign-in"?"Use the email on your approved request and the password you set from your approval email.":key==="request-access"?"Tell us who you are and which access you need.":"Choose a new password for your account.";
       card.prepend(p);card.prepend(h);
     }
     root.querySelectorAll('input[type="email"]').forEach(n=>{n.maxLength=254;n.spellcheck=false;n.autocapitalize="none";});
