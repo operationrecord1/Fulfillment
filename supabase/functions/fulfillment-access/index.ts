@@ -57,31 +57,42 @@ async function handleAccessStatus(rec:any,old:any){
   const {data:r,error}=await admin.from("access_requests").select("*").eq("id",rec.id).maybeSingle();if(error)throw error;if(!r)return;
   if(rec.status==="rejected"){
     const sent=await sendMail(r.email,"Update on your Fulfillment access request",shell("Request update",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+', your Fulfillment access request was not approved. If you believe this is a mistake, contact the Fulfillment owner.</p>'));
-    if(!sent)await revertStatus("access_requests",rec.id);return;
+    if(!sent){await revertStatus("access_requests",rec.id);return;}
+    const rejectedAccount=await findUser(r.email);
+    if(rejectedAccount){
+      const {data:rejectedProfile}=await admin.from("profiles").select("role,is_active").eq("user_id",rejectedAccount.id).maybeSingle();
+      if(rejectedProfile&&!rejectedProfile.is_active&&rejectedProfile.role!=="admin"){
+        const {error:deleteError}=await admin.auth.admin.deleteUser(rejectedAccount.id);
+        if(deleteError)console.error("Could not remove rejected pending account",deleteError);
+      }
+    }
+    return;
   }
   const role=r.requested_role;if(!["staff","investor"].includes(role)){await revertStatus("access_requests",rec.id);return;}
   let store=null;if(role==="investor"){store=await storeByName(r.store_name||"");if(!store){await revertStatus("access_requests",rec.id);return;}}
-  let account=await findUser(r.email);let actionLink="";let created=false;let existingStoreId:string|null=null;
+  const account=await findUser(r.email);let existingStoreId:string|null=null;
   if(!account){
-    const {data,error}=await admin.auth.admin.generateLink({type:"invite",email:r.email,options:{data:{full_name:r.full_name},redirectTo:appUrl+"/#set-password"}});
-    if(error)throw error;account=data.user;created=true;
-    const tokenHash=data.properties?.hashed_token;
-    if(!tokenHash){if(account)await admin.auth.admin.deleteUser(account.id);throw new Error("Invitation token was not generated.");}
-    actionLink=appUrl+"/#activate?token_hash="+encodeURIComponent(tokenHash)+"&type=invite";
-  }else{
-    const {data:p,error}=await admin.from("profiles").select("role,is_active,store_id").eq("user_id",account.id).maybeSingle();if(error)throw error;
-    existingStoreId=p?.store_id??null;
-    if(p?.is_active&&(p.role==="admin"||p.role!==role)){await revertStatus("access_requests",rec.id);return;}
-    if(!p?.is_active){const {data,error:le}=await admin.auth.admin.generateLink({type:"recovery",email:r.email,options:{redirectTo:appUrl+"/#set-password"}});if(le)throw le;const tokenHash=data.properties?.hashed_token;if(!tokenHash)throw new Error("Recovery token was not generated.");actionLink=appUrl+"/#activate?token_hash="+encodeURIComponent(tokenHash)+"&type=recovery";}
+    await revertStatus("access_requests",rec.id);
+    await sendMail(r.email,"Finish setting up your Fulfillment access",shell("One more step before approval",'<p style="font-size:15px;line-height:1.7">Please return to your access request and use the password setup link in the request confirmation email before the owner approves it. Your request is still pending.</p>'+button("Visit Fulfillment",appUrl+"/#sign-in")));
+    await sendMail(ownerEmail,"Fulfillment request needs password setup",shell("Password setup is incomplete",'<p style="font-size:15px;line-height:1.7">The request for '+esc(r.email)+' was returned to pending because no account was provisioned during request submission. Ask the applicant to submit again and finish the secure password setup first.</p>'));
+    return;
   }
-  if(!account)throw new Error("Account provisioning failed.");
+  if(!account.email_confirmed_at){
+    await revertStatus("access_requests",rec.id);
+    await sendMail(r.email,"Finish setting up your Fulfillment access",shell("One more step before approval",'<p style="font-size:15px;line-height:1.7">Your request is still pending. Please finish setting your password using the secure link in your request confirmation email. We’ll email you again after the owner approves your access.</p>'+button("Visit Fulfillment",appUrl+"/#sign-in")));
+    await sendMail(ownerEmail,"Fulfillment request needs password setup",shell("Password setup is incomplete",'<p style="font-size:15px;line-height:1.7">The request for '+esc(r.email)+' was returned to pending because the applicant has not completed the secure password setup yet.</p>'));
+    return;
+  }
+  const {data:p,error:profileLookupError}=await admin.from("profiles").select("role,is_active,store_id").eq("user_id",account.id).maybeSingle();
+  if(profileLookupError)throw profileLookupError;
+  existingStoreId=p?.store_id??null;
+  if(p?.is_active){await revertStatus("access_requests",rec.id);return;}
   const roleLabel=role==="staff"?"Employee":"Investor";
   const storeText=store?'<p style="font-size:15px;line-height:1.7">Your approved store is <strong>'+esc(store.name)+'</strong>. Your access is view-only.</p>':"";
-  const action=actionLink?button("Set your password",actionLink)+'<p style="margin:22px 0 0;padding:15px 17px;background:#faf8f3;border:1px solid #f1e9da;border-radius:8px;color:#665844;font-size:12px;line-height:1.6">For your security, this one-time link expires. If it expires, request a password reset from the sign-in page.</p>':button("Sign in to Fulfillment",appUrl+"/#sign-in");
-  const sent=await sendMail(r.email,"Your Fulfillment access is approved",shell("Your access is approved",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+', your <strong>'+roleLabel+'</strong> account has been approved and created.</p>'+storeText+'<p style="font-size:15px;line-height:1.7">'+(role==="investor"?"Your account has view-only access to the approved store.":"On your first sign-in, enter your store name to connect your workspace.")+'</p>'+action));
-  if(!sent){if(created)await admin.auth.admin.deleteUser(account.id);await revertStatus("access_requests",rec.id);return;}
   const {error:pe}=await admin.from("profiles").upsert({user_id:account.id,email:r.email,display_name:r.full_name,role,is_active:true,store_id:store?.id??existingStoreId,updated_at:new Date().toISOString()},{onConflict:"user_id"});
-  if(pe){if(created)await admin.auth.admin.deleteUser(account.id);await revertStatus("access_requests",rec.id);throw pe;}
+  if(pe){await revertStatus("access_requests",rec.id);throw pe;}
+  const sent=await sendMail(r.email,"Your Fulfillment access is approved",shell("Your access is approved",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+', your <strong>'+roleLabel+'</strong> account is approved and active.</p>'+storeText+'<p style="font-size:15px;line-height:1.7">'+(role==="investor"?"Your account has view-only access to the approved store.":"On your first sign-in, enter your store name to connect your workspace.")+'</p>'+button("Sign in to Fulfillment",appUrl+"/#sign-in")));
+  if(!sent){await admin.from("profiles").update({is_active:false,updated_at:new Date().toISOString()}).eq("user_id",account.id);await revertStatus("access_requests",rec.id);return;}
 }
 async function handleDeletionStatus(rec:any,old:any){
   if(!rec?.id||old?.status!=="pending"||!["approved","rejected"].includes(rec.status))return;
@@ -93,13 +104,15 @@ async function handleDeletionStatus(rec:any,old:any){
   if(r.user_id){const {error:de}=await admin.auth.admin.deleteUser(r.user_id);if(de){await revertStatus("account_deletion_requests",rec.id);throw de;}}
   try{await sendMail(r.email,"Your Fulfillment account was deleted",shell("Account deleted",'<p style="font-size:15px;line-height:1.7">Your request was approved and your Fulfillment account has been deleted.</p>'));}catch(e){console.error("deletion confirmation email failed",e);}
 }
-async function notifyRequest(r:any){
+async function notifyRequest(r:any,setupLink:string){
   const label=r.requested_role==="staff"?"Employee":"Investor";
   const store=r.store_name?' for <strong>'+esc(r.store_name)+'</strong>':"";
-  const applicant=shell("We received your access request",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+',</p><p style="font-size:15px;line-height:1.7">Your request for <strong>'+label+'</strong> access'+store+' is pending owner review. We’ll email you when a decision is made.</p><table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top:22px;background:#faf8f3;border:1px solid #f1e9da;border-radius:8px"><tr><td style="padding:15px 17px;color:#665844;font-size:12px;line-height:1.6">Your account will only be created after the owner approves your request.</td></tr></table>'+button("Visit Fulfillment",appUrl+"/#sign-in"));
+  const applicant=shell("We received your access request",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+',</p><p style="font-size:15px;line-height:1.7">Your request for <strong>'+label+'</strong> access'+store+' is pending owner review. We’ll email you when a decision is made.</p><p style="font-size:15px;line-height:1.7">Before approval, set your password using this secure one-time link. Your password is never sent by email. After the owner approves your request, you can sign in with this email and password.</p>'+button("Set your password",setupLink)+'<p style="margin:18px 0 0;padding:15px 17px;background:#faf8f3;border:1px solid #f1e9da;border-radius:8px;color:#665844;font-size:12px;line-height:1.6">Your request remains pending until the owner reviews it. This secure link expires; if it expires, contact the owner to restart setup.</p>');
   const owner=shell("New access request",'<p style="font-size:15px;line-height:1.7"><strong>'+esc(r.full_name)+'</strong> ('+esc(r.email)+') requested <strong>'+label+'</strong>'+ (r.store_name?' access to '+esc(r.store_name):'')+'.</p><p style="font-size:13px;color:#63727c">Request ID: '+r.id+'. Review in Supabase Table Editor.</p>');
-  const [a,b]=await Promise.all([sendMail(r.email,"We received your Fulfillment access request",applicant),sendMail(ownerEmail,"New Fulfillment access request",owner)]);
-  return {email_sent:a,owner_notified:b};
+  const a=await sendMail(r.email,"We received your Fulfillment access request",applicant);
+  if(!a)return {email_sent:false,owner_notified:false};
+  const b=await sendMail(ownerEmail,"New Fulfillment access request",owner);
+  return {email_sent:true,owner_notified:b};
 }
 
 Deno.serve(async(req:Request)=>{
@@ -141,7 +154,22 @@ Deno.serve(async(req:Request)=>{
       const {data:slot,error:slotError}=await admin.rpc("reserve_access_request_slot",{request_email:email});if(slotError)throw slotError;
       if(!slot)return json({error:"Please wait before submitting another request."},429);
       const {data:r,error}=await admin.from("access_requests").insert({full_name,email,requested_role:role,store_name:storeName,message,status:"pending"}).select("*").single();if(error)throw error;
-      let mail={email_sent:false,owner_notified:false};try{mail=await notifyRequest(r);}catch(e){console.error("request email failed",e);}
+      let account=await findUser(email);let created=false;let linkType:"invite"|"recovery"=account?"recovery":"invite";
+      if(account){
+        const {data:p,error:profileError}=await admin.from("profiles").select("role,is_active").eq("user_id",account.id).maybeSingle();if(profileError)throw profileError;
+        if(p?.is_active){await admin.from("access_requests").delete().eq("id",r.id);return json({error:"This email already has active access. Please sign in instead."},409);}
+      }
+      const linkOptions:any={redirectTo:appUrl+"/#set-password"};
+      if(linkType==="invite")linkOptions.data={full_name};
+      const {data:linkData,error:linkError}=await admin.auth.admin.generateLink({type:linkType,email,options:linkOptions});
+      if(linkError){await admin.from("access_requests").delete().eq("id",r.id);throw linkError;}
+      account=linkData.user;created=linkType==="invite";
+      const tokenHash=linkData.properties?.hashed_token;
+      if(!account||!tokenHash){if(created&&account)await admin.auth.admin.deleteUser(account.id);await admin.from("access_requests").delete().eq("id",r.id);throw new Error("Password setup link was not generated.");}
+      const setupLink=appUrl+"/#activate?token_hash="+encodeURIComponent(tokenHash)+"&type="+linkType;
+      let mail={email_sent:false,owner_notified:false};
+      try{mail=await notifyRequest(r,setupLink);}catch(e){console.error("request email failed",e);}
+      if(!mail.email_sent){if(created)await admin.auth.admin.deleteUser(account.id);await admin.from("access_requests").delete().eq("id",r.id);return json({error:"We couldn't send the secure setup email. Please try again shortly."},503);}
       return json({ok:true,request_id:r.id,...mail});
     }
     if(action==="attach_store"){
