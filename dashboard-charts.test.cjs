@@ -12,9 +12,11 @@ for(const values of [[1,9999,0],[1,1,999999],[0,0,0],[10,20,30]]){const shares=C
 const a={count:10000,sizes:[{name:'Small',count:1,profit:1},{name:'Medium',count:9999,profit:9999},{name:'Large',count:0,profit:0}]};
 assert.ok(C.roundChart(a,true).includes('>0.01%</text>'));
 assert.ok(C.roundChart(a,false).includes('>$0.01</text>'));
-const rows=[{data:{date:'2026-01-01',order_id:'A'}},{data:{date:'2026-01-02',order_id:'A'}},{data:{date:'2026-02-01',order_id:'B'}}];
+const rows=[{data:{date:'2026-01-01',order_id:'A',earning:1.23,product_cost:0}},{data:{date:'2026-01-02',order_id:'A',earning:0,product_cost:.23}},{data:{date:'2026-02-01',order_id:'B',earning:0,product_cost:.5}}];
 const pts=[['2026-01-01',123],['2026-01-02',-23],['2026-02-01',-50]];
 const year=C.calendarPoints(pts,rows,2026,'all');assert.equal(year.length,12);assert.equal(year[0].value,100);assert.equal(year[0].count,1);assert.equal(year[1].value,-50);assert.equal(year.reduce((s,p)=>s+p.value,0),50);
 assert.equal(C.calendarPoints(pts,rows,2026,2).length,28);assert.equal(C.calendarPoints([],[],2028,2).length,29);
 for(const p of [year,C.calendarPoints([],[],2026,11)]){const svg=C.profitChart(p,true);assert.ok(!/NaN|Infinity/.test(svg));assert.equal((svg.match(/class="om-chart-hit om-profit-point"/g)||[]).length,p.length);}
 console.log('PASS: readable IDs, date/leap-year rules, tiny exact labels, monthly totals, unique counts and empty charts');
+
+const undated=C.calendarPoints([], [{month:11,year:2026,position:1,data:{order_id:'UNDATED',earning:20,product_cost:3}}],2026,'all');assert.equal(undated[10].value,1700);assert.equal(undated[10].count,1);

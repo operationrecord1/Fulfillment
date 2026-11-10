@@ -1,5 +1,6 @@
 (function(root){
 'use strict';
+const Core=root.OrderCore||(typeof require==='function'?require('./dashboard-core.js'):null);
 const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=c=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(c/100);
@@ -18,7 +19,8 @@ for(const s of seg){const angle=(s.start+s.end)/2,r=donut?.76:.66,tip=a.sizes[s.
 if(donut)svg+='<text x="170" y="104" text-anchor="middle" fill="#1b302d" font-size="24" font-weight="600">'+a.count+'</text><text x="170" y="120" text-anchor="middle" fill="#72817d" font-size="8">ORDERS</text>';
 if(values.some((v,i)=>v>0&&Math.abs(shares[i]-v/total)>1e-8))svg+='<text x="170" y="220" text-anchor="middle" fill="#72817d" font-size="9">Tiny slices expanded for labels · values exact</text>';
 return svg+'</svg>';}
-function calendarPoints(points,rows,year,month){const yearly=month==='all',length=yearly?12:new Date(Date.UTC(year,month,0)).getUTCDate(),out=Array.from({length},(_,i)=>({index:i,label:yearly?months[i].slice(0,3):String(i+1),full:yearly?months[i]+' '+year:(i+1)+' '+months[month-1]+' '+year,value:0,orders:new Set()}));
+function calendarPoints(points,rows,year,month,investor=false){const yearly=month==='all',length=yearly?12:new Date(Date.UTC(year,month,0)).getUTCDate(),out=Array.from({length},(_,i)=>({index:i,label:yearly?months[i].slice(0,3):String(i+1),full:yearly?months[i]+' '+year:(i+1)+' '+months[month-1]+' '+year,value:0,orders:new Set()}));
+if(yearly)return out.map(({orders,...p},i)=>{const subset=rows.filter(r=>(r.year??Number(r.data.date?.slice(0,4)))===year&&(r.month??Number(r.data.date?.slice(5,7)))===i+1),a=Core.aggregate(subset,[],investor);return {...p,value:a.gross,count:a.count};});
 for(const [date,value]of points){if(Number(date.slice(0,4))!==year)continue;const m=Number(date.slice(5,7)),i=yearly?m-1:Number(date.slice(8,10))-1;if(!yearly&&m!==month)continue;if(out[i])out[i].value+=value;}
 for(const row of rows){const d=row.data;if(!d.date||!d.order_id||Number(d.date.slice(0,4))!==year)continue;const m=Number(d.date.slice(5,7)),i=yearly?m-1:Number(d.date.slice(8,10))-1;if(!yearly&&m!==month)continue;out[i]?.orders.add(d.order_id);}
 return out.map(({orders,...p})=>({...p,count:orders.size}));}
@@ -35,7 +37,7 @@ s+='<text x="'+cx+'" y="234" text-anchor="middle" fill="#72817d" font-size="10">
 return s+'</svg>';}
 function bindTooltips(host){const tip=document.createElement('div');tip.className='om-chart-tooltip';tip.role='tooltip';tip.hidden=true;host.append(tip);let active=null;
 const hide=()=>{tip.hidden=true;active=null;};const show=e=>{const point=e.target.closest?.('[data-chart-tip]');if(!point)return;active=point;tip.textContent=point.dataset.chartTip;tip.hidden=false;position(e);};
-const position=e=>{if(!active)return;const r=active.getBoundingClientRect(),x=e.clientX??r.left+r.width/2,y=e.clientY??r.top;tip.style.left=Math.max(8,Math.min(x+14,innerWidth-tip.offsetWidth-8))+'px';tip.style.top=Math.max(8,Math.min(y+14,innerHeight-tip.offsetHeight-8))+'px';};
+const position=e=>{if(!active)return;const r=active.getBoundingClientRect(),x=e.clientX??r.left+r.width/2,y=e.clientY??r.top;tip.style.left=Math.max(8,Math.min(x+14,document.documentElement.clientWidth-tip.offsetWidth-8))+'px';tip.style.top=Math.max(8,Math.min(y+14,document.documentElement.clientHeight-tip.offsetHeight-8))+'px';};
 const leave=e=>{if(active&&!active.contains(e.relatedTarget))hide();};const key=e=>{if(e.key==='Escape')hide();};
 host.addEventListener('pointerover',show);host.addEventListener('pointermove',position);host.addEventListener('pointerout',leave);host.addEventListener('focusin',show);host.addEventListener('focusout',hide);host.addEventListener('click',show);host.addEventListener('keydown',key);host.addEventListener('scroll',hide,true);
 return()=>{host.removeEventListener('pointerover',show);host.removeEventListener('pointermove',position);host.removeEventListener('pointerout',leave);host.removeEventListener('focusin',show);host.removeEventListener('focusout',hide);host.removeEventListener('click',show);host.removeEventListener('keydown',key);host.removeEventListener('scroll',hide,true);tip.remove();};}
