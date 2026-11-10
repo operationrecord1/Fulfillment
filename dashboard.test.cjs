@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict');const C=require('./dashboard-core.js');
+const row=(id,data,month=11)=>({id,month,year:2026,data});
+const rows=[row('a',{order_id:'A',earning:10,product_cost:6,date:'2026-11-01'}),row('b',{order_id:'A',earning:2,product_cost:1,date:'2026-11-01'}),row('c',{order_id:'B',earning:30,product_cost:40,date:'2026-11-02'}),row('d',{order_id:'C',earning:11.99,product_cost:1,date:'2026-11-03'})];
+const a=C.aggregate(rows,[{amount:2}]);assert.equal(a.count,3);assert.equal(a.revenue,5399);assert.equal(a.gross,599);assert.equal(a.tax,60);assert.equal(a.net,339);assert.deepEqual(a.sizes.map(s=>s.count),[1,1,1]);assert.equal(a.points[1][1],-1000);assert.equal(C.groups(rows).length,3);assert.equal(C.duplicates(rows).size,0);
+assert.equal(C.duplicates([...rows,row('e',{order_id:'A'})]).size,3);
+assert.equal(C.aggregate([row('a',{earning:50})],[]).gross,0);
+assert.equal(C.aggregate([],[]).avgDaily,0);
+assert.equal(C.link('https://www.ebay.com/ord/details?orderid=12-34567-89012','order_id').text,'12-34567-89012');
+assert.equal(C.link('https://www.amazon.com/gp/your-account/order-details?orderID=123-1234567-1234567','purchase_id').text,'123-1234567-1234567');
+assert.equal(C.link('https://example.com/order/1','order_id').text,'https://example.com/order/1');
+assert.equal(C.link('javascript:alert(1)','order_id').url,'');
+assert.equal(C.columns.length,17);assert.equal(C.columns[15][0],'id');assert.equal(C.columns[16][0],'date');
+console.log('PASS: aggregation, grouped orders, duplicate runs, loss, category boundaries, tax, safe links and 17 columns');
