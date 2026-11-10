@@ -136,10 +136,9 @@ on public.profiles for update to authenticated
 using (public.is_active_admin())
 with check (public.is_active_admin());
 
+-- Public access requests must use the Edge Function for validation, throttling, and email.
 drop policy if exists "public can submit pending access request" on public.access_requests;
-create policy "public can submit pending access request"
-on public.access_requests for insert to anon, authenticated
-with check (status = 'pending');
+revoke insert on table public.access_requests from anon, authenticated;
 
 drop policy if exists "admin can read access requests" on public.access_requests;
 create policy "admin can read access requests"
@@ -246,5 +245,8 @@ for each row execute function public.dispatch_fulfillment_status_event();
 --   is_active = true,
 --   updated_at = now();
 --
--- New Auth users are provisioned as inactive staff by default. After approving
--- a request, set the profile role to 'staff' or 'investor' and is_active=true.
+-- New Auth users are provisioned as inactive staff by default. When an owner
+-- changes an access request from pending to approved, the database webhook calls
+-- the fulfillment-access Edge Function to provision Auth and the active profile.
+-- Configure BREVO_API_KEY, FULFILLMENT_ADMIN_EMAIL, and FULFILLMENT_FROM_EMAIL
+-- as Edge Function secrets for pending, approval, and rejection email delivery.
