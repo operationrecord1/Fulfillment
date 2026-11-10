@@ -63,36 +63,48 @@ async function handleAccessStatus(rec:any,old:any){
       const {data:rejectedProfile}=await admin.from("profiles").select("role,is_active").eq("user_id",rejectedAccount.id).maybeSingle();
       if(rejectedProfile&&!rejectedProfile.is_active&&rejectedProfile.role!=="admin"){
         const {error:deleteError}=await admin.auth.admin.deleteUser(rejectedAccount.id);
-        if(deleteError)console.error("Could not remove rejected pending account",deleteError);
+        if(deleteError)console.error("Could not remove rejected inactive account",deleteError);
       }
     }
     return;
   }
   const role=r.requested_role;if(!["staff","investor"].includes(role)){await revertStatus("access_requests",rec.id);return;}
   let store=null;if(role==="investor"){store=await storeByName(r.store_name||"");if(!store){await revertStatus("access_requests",rec.id);return;}}
-  const account=await findUser(r.email);let existingStoreId:string|null=null;
-  if(!account){
-    await revertStatus("access_requests",rec.id);
-    await sendMail(r.email,"Finish setting up your Fulfillment access",shell("One more step before approval",'<p style="font-size:15px;line-height:1.7">Please return to your access request and use the password setup link in the request confirmation email before the owner approves it. Your request is still pending.</p>'+button("Visit Fulfillment",appUrl+"/#sign-in")));
-    await sendMail(ownerEmail,"Fulfillment request needs password setup",shell("Password setup is incomplete",'<p style="font-size:15px;line-height:1.7">The request for '+esc(r.email)+' was returned to pending because no account was provisioned during request submission. Ask the applicant to submit again and finish the secure password setup first.</p>'));
-    return;
+  const existing=await findUser(r.email);
+  let profile:any=null;
+  if(existing){
+    const {data:p,error:profileLookupError}=await admin.from("profiles").select("role,is_active,store_id").eq("user_id",existing.id).maybeSingle();
+    if(profileLookupError)throw profileLookupError;
+    profile=p;
+    if(profile?.is_active){await revertStatus("access_requests",rec.id);return;}
   }
-  if(!account.email_confirmed_at){
-    await revertStatus("access_requests",rec.id);
-    await sendMail(r.email,"Finish setting up your Fulfillment access",shell("One more step before approval",'<p style="font-size:15px;line-height:1.7">Your request is still pending. Please finish setting your password using the secure link in your request confirmation email. We’ll email you again after the owner approves your access.</p>'+button("Visit Fulfillment",appUrl+"/#sign-in")));
-    await sendMail(ownerEmail,"Fulfillment request needs password setup",shell("Password setup is incomplete",'<p style="font-size:15px;line-height:1.7">The request for '+esc(r.email)+' was returned to pending because the applicant has not completed the secure password setup yet.</p>'));
-    return;
+  const linkType:"invite"|"recovery"|"magiclink"=!existing?"invite":existing.email_confirmed_at?"recovery":"magiclink";
+  const linkOptions:any={redirectTo:appUrl+"/#activate"};
+  if(linkType==="invite")linkOptions.data={full_name:r.full_name};
+  const {data:linkData,error:linkError}=await admin.auth.admin.generateLink({type:linkType,email:r.email,options:linkOptions});
+  if(linkError)throw linkError;
+  const account=linkData.user??existing;
+  const created=!existing;
+  const tokenHash=linkData.properties?.hashed_token;
+  if(!account?.id||!tokenHash){
+    if(created&&account?.id)await admin.auth.admin.deleteUser(account.id);
+    throw new Error("Secure password setup link was not generated.");
   }
-  const {data:p,error:profileLookupError}=await admin.from("profiles").select("role,is_active,store_id").eq("user_id",account.id).maybeSingle();
-  if(profileLookupError)throw profileLookupError;
-  existingStoreId=p?.store_id??null;
-  if(p?.is_active){await revertStatus("access_requests",rec.id);return;}
+  const passwordLink=appUrl+"/#activate?token_hash="+encodeURIComponent(tokenHash)+"&type="+linkType;
   const roleLabel=role==="staff"?"Employee":"Investor";
   const storeText=store?'<p style="font-size:15px;line-height:1.7">Your approved store is <strong>'+esc(store.name)+'</strong>. Your access is view-only.</p>':"";
-  const {error:pe}=await admin.from("profiles").upsert({user_id:account.id,email:r.email,display_name:r.full_name,role,is_active:true,store_id:store?.id??existingStoreId,updated_at:new Date().toISOString()},{onConflict:"user_id"});
-  if(pe){await revertStatus("access_requests",rec.id);throw pe;}
-  const sent=await sendMail(r.email,"Your Fulfillment access is approved",shell("Your access is approved",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+', your <strong>'+roleLabel+'</strong> account is approved and active.</p>'+storeText+'<p style="font-size:15px;line-height:1.7">'+(role==="investor"?"Your account has view-only access to the approved store.":"On your first sign-in, enter your store name to connect your workspace.")+'</p>'+button("Sign in to Fulfillment",appUrl+"/#sign-in")));
-  if(!sent){await admin.from("profiles").update({is_active:false,updated_at:new Date().toISOString()}).eq("user_id",account.id);await revertStatus("access_requests",rec.id);return;}
+  const {error:profileError}=await admin.from("profiles").upsert({user_id:account.id,email:r.email,display_name:r.full_name,role,is_active:true,store_id:store?.id??profile?.store_id??null,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+  const rollback=async()=>{
+    await admin.from("profiles").update({is_active:false,updated_at:new Date().toISOString()}).eq("user_id",account.id);
+    if(created)await admin.auth.admin.deleteUser(account.id);
+    await revertStatus("access_requests",rec.id);
+  };
+  if(profileError){if(created)await admin.auth.admin.deleteUser(account.id);await revertStatus("access_requests",rec.id);throw profileError;}
+  let sent=false;
+  try{
+    sent=await sendMail(r.email,"Your Fulfillment access is approved",shell("Your access is approved",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+', your <strong>'+roleLabel+'</strong> account is approved.</p>'+storeText+'<p style="font-size:15px;line-height:1.7">'+(role==="investor"?"Your account has view-only access to the approved store.":"On your first sign-in, enter your store name to connect your workspace.")+'</p><p style="font-size:15px;line-height:1.7">Use the secure link below to set your password. After setting it, sign in with this email and password. If the link expires, use <a href="'+esc(appUrl+"/#forgot-password")+'" style="color:#146b55;font-weight:700">Forgot Password</a> to request another one.</p>'+button("Set password",passwordLink)));
+  }catch(e){await rollback();throw e;}
+  if(!sent){await rollback();return;}
 }
 async function handleDeletionStatus(rec:any,old:any){
   if(!rec?.id||old?.status!=="pending"||!["approved","rejected"].includes(rec.status))return;
@@ -107,18 +119,16 @@ async function handleDeletionStatus(rec:any,old:any){
 async function notifyRequest(r:any,verificationLink:string){
   const label=r.requested_role==="staff"?"Employee":"Investor";
   const store=r.store_name?' for <strong>'+esc(r.store_name)+'</strong>':"";
-  const applicant=shell("We received your access request",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+',</p><p style="font-size:15px;line-height:1.7">Your request for <strong>'+label+'</strong> access'+store+' is pending owner review. We’ll email you when a decision is made.</p><p style="font-size:15px;line-height:1.7">Confirm your email using this secure one-time link. Your password is never sent by email. After the owner approves your request, sign in with the password you chose on the request form.</p>'+button("Verify email & request",verificationLink)+'<p style="margin:18px 0 0;padding:15px 17px;background:#faf8f3;border:1px solid #f1e9da;border-radius:8px;color:#665844;font-size:12px;line-height:1.6">Your request remains pending until the owner reviews it. This secure link expires; if it expires, contact the owner for a new verification link.</p>');
+  const applicant=shell("We reasync function notifyRequest(r:any){
+  const label=r.requested_role==="staff"?"Employee":"Investor";
+  const store=r.store_name?' for <strong>'+esc(r.store_name)+'</strong>':"";
+  const applicant=shell("We received your access request",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+',</p><p style="font-size:15px;line-height:1.7">Your request for <strong>'+label+'</strong> access'+store+' is pending owner review. We’ll email you when the owner makes a decision.</p><p style="font-size:15px;line-height:1.7">No password is needed to apply. If approved, your approval email will include a secure link to set one.</p>');
   const owner=shell("New access request",'<p style="font-size:15px;line-height:1.7"><strong>'+esc(r.full_name)+'</strong> ('+esc(r.email)+') requested <strong>'+label+'</strong>'+ (r.store_name?' access to '+esc(r.store_name):'')+'.</p><p style="font-size:13px;color:#63727c">Request ID: '+r.id+'. Review in Supabase Table Editor.</p>');
   const a=await sendMail(r.email,"We received your Fulfillment access request",applicant);
   if(!a)return {email_sent:false,owner_notified:false};
   const b=await sendMail(ownerEmail,"New Fulfillment access request",owner);
   return {email_sent:true,owner_notified:b};
-}
-
-Deno.serve(async(req:Request)=>{
-  if(req.method==="OPTIONS")return new Response("ok",{headers:cors});
-  if(req.method!=="POST")return json({error:"Method not allowed."},405);
-  if(!serviceKey)return json({error:"Server admin key is not configured."},503);
+}is not configured."},503);
   try{
     const body=await req.json();const action=String(body.action||"");
     if(action==="process_database_event"){
@@ -141,9 +151,8 @@ Deno.serve(async(req:Request)=>{
     }
     if(action==="submit_request"){
       const full_name=String(body.full_name||"").trim();const email=String(body.email||"").trim().toLowerCase();
-      const password=String(body.password||"");
       const role=String(body.requested_role||"");const message=String(body.message||"").trim();
-      if(!full_name||full_name.length>120||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254||password.length<8||password.length>72||!["staff","investor"].includes(role)||message.length>200)
+      if(!full_name||full_name.length>120||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254||!["staff","investor"].includes(role)||message.length>200)
         return json({error:"Please check the request details."},400);
       let storeName=null;
       if(role==="investor"){
@@ -152,25 +161,17 @@ Deno.serve(async(req:Request)=>{
       }
       const {data:pending,error:lookupError}=await admin.from("access_requests").select("id").eq("email",email).eq("status","pending").limit(1).maybeSingle();if(lookupError)throw lookupError;
       if(pending)return json({ok:true,already_pending:true,email_sent:false});
+      const existing=await findUser(email);
+      if(existing){
+        const {data:p,error:profileError}=await admin.from("profiles").select("role,is_active").eq("user_id",existing.id).maybeSingle();if(profileError)throw profileError;
+        if(p?.is_active)return json({error:"This email already has active access. Please sign in instead."},409);
+      }
       const {data:slot,error:slotError}=await admin.rpc("reserve_access_request_slot",{request_email:email});if(slotError)throw slotError;
       if(!slot)return json({error:"Please wait before submitting another request."},429);
       const {data:r,error}=await admin.from("access_requests").insert({full_name,email,requested_role:role,store_name:storeName,message,status:"pending"}).select("*").single();if(error)throw error;
-      let account=await findUser(email);let created=false;let linkType:"signup"|"magiclink"=account?"magiclink":"signup";
-      if(account){
-        const {data:p,error:profileError}=await admin.from("profiles").select("role,is_active").eq("user_id",account.id).maybeSingle();if(profileError)throw profileError;
-        if(p?.is_active){await admin.from("access_requests").delete().eq("id",r.id);return json({error:"This email already has active access. Please sign in instead."},409);}
-      }
-      const linkOptions:any={redirectTo:appUrl+"/#activate"};
-      if(linkType==="signup")linkOptions.data={full_name};
-      const {data:linkData,error:linkError}=await admin.auth.admin.generateLink({type:linkType,email,...(linkType==="signup"?{password}:{}),options:linkOptions});
-      if(linkError){await admin.from("access_requests").delete().eq("id",r.id);throw linkError;}
-      account=linkData.user;created=linkType==="signup";
-      const tokenHash=linkData.properties?.hashed_token;
-      if(!account||!tokenHash){if(created&&account)await admin.auth.admin.deleteUser(account.id);await admin.from("access_requests").delete().eq("id",r.id);throw new Error("Password setup link was not generated.");}
-      const verificationLink=appUrl+"/#activate?token_hash="+encodeURIComponent(tokenHash)+"&type="+linkType;
       let mail={email_sent:false,owner_notified:false};
-      try{mail=await notifyRequest(r,verificationLink);}catch(e){console.error("request email failed",e);}
-      if(!mail.email_sent){if(created)await admin.auth.admin.deleteUser(account.id);await admin.from("access_requests").delete().eq("id",r.id);return json({error:"We couldn't send the secure setup email. Please try again shortly."},503);}
+      try{mail=await notifyRequest(r);}catch(e){console.error("request email failed",e);}
+      if(!mail.email_sent){await admin.from("access_requests").delete().eq("id",r.id);return json({error:"We couldn't send the request acknowledgement. Please try again shortly."},503);}
       return json({ok:true,request_id:r.id,...mail});
     }
     if(action==="attach_store"){
