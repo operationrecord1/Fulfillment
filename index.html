@@ -76,7 +76,6 @@ body.focused-auth .auth-submit:focus-visible,body.focused-auth .password-toggle:
 .role-picker{width:100%}
 .role-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .role-card{position:relative;min-width:0;min-height:164px;display:grid;grid-template-rows:22px auto 1fr auto;align-content:start;gap:9px;padding:15px;border:1px solid #dce5de;border-radius:14px;background:#fff;color:#213c31;text-align:left;font:inherit;cursor:pointer;box-shadow:0 2px 8px #17372f05;transition:background .18s,border-color .18s,box-shadow .18s,transform .18s}
-.role-card:hover{border-color:#9cb8a9;box-shadow:0 8px 20px #17372f10;transform:translateY(-1px)}
 .role-card:focus-visible{outline:3px solid #2484673b;outline-offset:2px}
 .role-card[aria-checked="true"]{border-color:#248467;background:#f2f8f4;box-shadow:0 0 0 2px #24846720,0 8px 20px #17372f0c}
 .role-card-top{display:flex;align-items:center;justify-content:space-between;color:#26745e}
@@ -473,7 +472,7 @@ body.info-open .info-view{display:block}
       const storeName=String(values.get("store_name")||"").trim().replace(/\s+/g," ");
       if(!fullName){button.disabled=false;setAuthStatus(status,"Enter your full name.","error");return;}
       if(!email){button.disabled=false;setAuthStatus(status,"Enter a valid email address.","error");return;}
-      if(!["staff","investor"].includes(requestedRole)){button.disabled=false;setAuthStatus(status,"Choose Employee or Investor. Admin accounts are created by the owner.","error");roleOptions[0].focus();return;}
+      if(!["staff","investor"].includes(requestedRole)){button.disabled=false;setAuthStatus(status,"Choose Employee or Investor to continue.","error");roleOptions[0].focus();return;}
       if(message.length>200){button.disabled=false;setAuthStatus(status,"Message must be 200 characters or fewer.","error");messageField.focus();return;}
       if(requestedRole==="investor"){
         if(!storeName){button.disabled=false;setAuthStatus(status,"Enter the store name you are requesting access to.","error");storeInput.focus();return;}
@@ -489,9 +488,10 @@ body.info-open .info-view{display:block}
           setAuthStatus(status,data?.error||"Could not submit the request. Please try again.","error");
           return;
         }
+        if(data?.already_pending){setAuthStatus(status,"Your request is already pending. Please wait for the owner’s decision.","error");return;}
         form.reset();clearTimeout(storeHideTimer);storeField.classList.remove("is-visible");storeField.hidden=true;storeField.inert=true;storeInput.disabled=true;storeCheck.textContent="";storeCheck.className="store-check";checkedStoreName="";checkedStoreExists=false;
         roleValue.value="";roleOptions.forEach(item=>item.setAttribute("aria-checked","false"));updateCount();
-        setAuthStatus(status,data?.already_pending?"Your request is already pending. The owner will email you after review.":data?.email_sent?"Your request is pending. A confirmation email has been sent.":"Your request is pending. Email confirmation is temporarily unavailable; please contact the owner if you need help.","success");
+        setAuthStatus(status,data?.email_sent?"Your request is pending. A confirmation email has been sent.":"Your request is pending. Email confirmation is temporarily unavailable; please contact the owner if you need help.","success");
       }catch{setAuthStatus(status,"Connection interrupted. Please try again.","error");}
       finally{button.disabled=false;}
     });
@@ -637,8 +637,13 @@ body.info-open .info-view{display:block}
       const emailInput=form.querySelector('input[type="email"]');
       let countdown=null,activeEmail="",retryAt=0,lookupSequence=0,lookupTimer=null;
       function formatWait(seconds){
-        const h=Math.floor(seconds/3600),m=Math.floor(seconds%3600/60),sec=seconds%60;
-        return h?String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0"):String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");
+        const total=Math.max(0,Math.floor(seconds));
+        const h=Math.floor(total/3600),m=Math.floor(total%3600/60),sec=total%60;
+        const parts=[];
+        if(h)parts.push(h+" hr");
+        if(m)parts.push(m+" mnt");
+        if(sec||!parts.length)parts.push(sec+" sec");
+        return parts.join(" ");
       }
       function paint(message="",kind="success"){
         if(countdown)clearInterval(countdown);
