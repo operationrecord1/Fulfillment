@@ -40,7 +40,7 @@ body.focused-auth .auth-submit{border-radius:9px;min-height:48px;width:100%;curs
 body.focused-auth .auth-submit:disabled{opacity:.6;cursor:wait}
 .password-wrap{position:relative}.password-wrap input{width:100%;padding-right:68px!important}.password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#146b55;font-size:12px;font-weight:700;padding:8px;cursor:pointer}
 body.focused-auth .auth-links{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;margin-top:22px}
-@media(max-width:520px){body.focused-auth .auth-card{padding:28px 22px}.auth-grid{grid-template-columns:1fr}}
+@media(max-width:520px){body.focused-auth .auth-card{padding:28px 22px}.auth-grid{grid-template-columns:1fr}.role-cards{gap:9px}.role-card{min-height:158px;padding:12px 11px;gap:8px}.role-card-copy{font-size:11px;line-height:17px}.role-pill{font-size:9px;padding:4px 8px}}
 </style><style>body.focused-auth #info-view>.policy-top,body.focused-auth #info-view .info-footer{display:none!important}body.focused-auth #info-view>.policy-page{width:100%;max-width:460px;margin:0;padding:0}body.focused-auth #info-article{width:100%}</style><style>
 body.focused-auth #info-view{padding:0;background:white;display:block}
 body.focused-auth #info-view>.policy-page{max-width:none;min-height:100vh}
@@ -72,19 +72,29 @@ body.focused-auth .auth-field input,body.focused-auth .auth-field textarea{backg
 body.focused-auth .auth-field input:hover,body.focused-auth .auth-field textarea:hover{border-color:#a9bbb0}
 body.focused-auth .auth-field input:focus,body.focused-auth .auth-field textarea:focus{outline:none;border-color:#248467;box-shadow:0 0 0 4px #24846719;background:#fff}
 body.focused-auth .auth-field:focus-within label{color:#176e54}
-body.focused-auth .auth-submit:focus-visible,body.focused-auth .password-toggle:focus-visible,body.focused-auth .role-trigger:focus-visible,body.focused-auth .role-option:focus-visible{outline:3px solid #24846766;outline-offset:3px}
-.role-picker{position:relative}
-body.focused-auth .role-trigger{width:100%;min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:13px 15px;border:1px solid #dce4df;border-radius:11px;background:#fff;color:#697872;font:inherit;font-size:15px;cursor:pointer;transition:border-color .18s,box-shadow .18s}
-body.focused-auth .role-trigger:hover{border-color:#a9bbb0}
-body.focused-auth .role-trigger[aria-expanded="true"]{border-color:#248467;box-shadow:0 0 0 4px #24846719}
-.role-trigger.has-value{color:#213c31!important}
-.role-chevron{width:9px;height:9px;flex:none;border-right:2px solid #62786c;border-bottom:2px solid #62786c;transform:rotate(45deg) translateY(-2px);transition:transform .2s}
-.role-trigger[aria-expanded="true"] .role-chevron{transform:rotate(225deg) translate(-2px,-2px)}
-.role-options{position:absolute;top:calc(100% + 7px);left:0;right:0;z-index:20;padding:6px;background:#fff;border:1px solid #dce4df;border-radius:12px;box-shadow:0 16px 36px #172b3a18}
-.role-options[hidden]{display:none}
-.role-option{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:0;border-radius:8px;background:transparent;color:#213c31;text-align:left;font:inherit;font-size:14px;cursor:pointer;transition:background .15s}
-.role-option small{color:#77887f;font-size:12px}
-.role-option:hover,.role-option:focus-visible,.role-option[aria-selected="true"]{background:#f0f7f3}
+body.focused-auth .auth-submit:focus-visible,body.focused-auth .password-toggle:focus-visible,body.focused-auth .role-card:focus-visible{outline:3px solid #24846766;outline-offset:3px}
+.role-picker{width:100%}
+.role-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.role-card{position:relative;min-width:0;min-height:164px;display:grid;grid-template-rows:22px auto 1fr auto;align-content:start;gap:9px;padding:15px;border:1px solid #dce5de;border-radius:14px;background:#fff;color:#213c31;text-align:left;font:inherit;cursor:pointer;box-shadow:0 2px 8px #17372f05;transition:background .18s,border-color .18s,box-shadow .18s,transform .18s}
+.role-card:hover{border-color:#9cb8a9;box-shadow:0 8px 20px #17372f10;transform:translateY(-1px)}
+.role-card:focus-visible{outline:3px solid #2484673b;outline-offset:2px}
+.role-card[aria-checked="true"]{border-color:#248467;background:#f2f8f4;box-shadow:0 0 0 2px #24846720,0 8px 20px #17372f0c}
+.role-card-top{display:flex;align-items:center;justify-content:space-between;color:#26745e}
+.role-card-icon{width:18px;height:18px;display:block}
+.role-radio{width:17px;height:17px;border:1.5px solid #aab8af;border-radius:50%;display:grid;place-items:center;background:#fff;transition:border-color .18s,box-shadow .18s}
+.role-radio::after{content:"";width:8px;height:8px;border-radius:50%;background:#248467;transform:scale(0);transition:transform .18s}
+.role-card[aria-checked="true"] .role-radio{border-color:#248467;box-shadow:0 0 0 3px #24846718}
+.role-card[aria-checked="true"] .role-radio::after{transform:scale(1)}
+.role-card strong{font-size:14px;line-height:1.25}
+.role-card-copy{min-height:36px;color:#63727c;font-size:12px;line-height:18px}
+.role-pill{justify-self:start;padding:4px 9px;border:1px solid #dce5de;border-radius:999px;background:#f7faf8;color:#4e675a;font-size:10px;font-weight:700;line-height:1.2}
+.request-store-field{overflow:hidden;max-height:0;opacity:0;transform:translateY(-6px);transition:max-height .24s ease,opacity .18s ease,transform .24s ease}
+.request-store-field.is-visible{max-height:150px;opacity:1;transform:translateY(0)}
+.request-store-field[hidden]{display:none!important}
+.request-store-field input{border-color:#d2e0d7;box-shadow:0 2px 8px #17372f05;transition:border-color .18s,box-shadow .18s}
+.request-store-field input:focus{border-color:#248467;box-shadow:0 0 0 4px #24846718}
+.store-check{display:block;min-height:18px;color:#63727c;font-size:12px;line-height:18px}
+.store-check.error{color:#a33b37}.store-check.success{color:#146b55}
 .message-box{position:relative;width:100%}.message-box textarea{display:block;width:100%;height:160px;min-height:160px!important;max-height:160px;resize:none;overflow-y:auto;line-height:1.55;padding:14px 14px 38px!important;overflow-wrap:anywhere}.message-count{position:absolute;right:10px;bottom:9px;padding:4px 7px;border-radius:999px;background:#f7f8f6;color:#63727c;font-size:11px;font-variant-numeric:tabular-nums;pointer-events:none}.message-count[hidden]{display:none}
 @media(max-width:800px){body.focused-auth #info-article{display:block;min-height:100svh}body.focused-auth #info-article .auth-art{display:none!important}body.focused-auth .auth-wrap{min-height:100svh;padding:32px 20px}body.focused-auth #info-article>.auth-card{width:min(100% - 40px,480px);padding:32px 0;min-height:100svh;display:flex;flex-direction:column;justify-content:center}}
 @media(max-width:520px){body.focused-auth .auth-wrap{padding:22px 20px}body.focused-auth #info-article>.auth-card{width:calc(100% - 40px);padding:25px 0}body.focused-auth h1{font-size:27px}body.focused-auth .auth-logo{margin-bottom:22px}body.focused-auth .auth-subtitle{margin-bottom:22px}}
@@ -183,7 +193,7 @@ body.info-open .info-view{display:block}
 .auth-submit:hover{background:#0e5845;transform:translateY(-1px)}
 .auth-submit:disabled{opacity:.6;cursor:wait;transform:none}
 .auth-status{min-height:20px;margin:0;color:#63736c;font-size:12px;line-height:1.6}
-.request-feedback{min-height:64px;display:flex;align-items:center;overflow-wrap:anywhere;contain:layout}.request-store-field{min-height:100px}.request-store-field[hidden]{display:grid!important;visibility:hidden;pointer-events:none}.store-check{display:block;height:18px;min-height:18px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#63727c;font-size:12px;line-height:18px}.store-check.error{color:#a33b37}.store-check.success{color:#146b55}
+.request-feedback{min-height:64px;display:flex;align-items:center;overflow-wrap:anywhere;contain:layout}
 .auth-status.error{color:#a33b37}.auth-status.success{color:#146b55}
 .auth-links{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:19px;padding-top:17px;border-top:1px solid #edf0ed;color:#69776f;font-size:12px}
 .auth-links a{color:#146b55;font-weight:750}
@@ -373,33 +383,41 @@ body.info-open .info-view{display:block}
     form.dataset.bound="1";
     const status=document.getElementById("request-status");
     const button=document.getElementById("request-submit");
-    const roleTrigger=form.querySelector(".role-trigger");
-    const roleMenu=form.querySelector(".role-options");
     const roleValue=form.querySelector("#request-role-value");
-    const roleOptions=[...form.querySelectorAll(".role-option")];
+    const roleOptions=[...form.querySelectorAll(".role-card")];
+    const roleGroup=form.querySelector(".role-cards");
     const storeField=form.querySelector("#request-store-field");
     const storeInput=form.querySelector("#request-store-name");
     const storeCheck=form.querySelector("#request-store-check");
     const messageField=form.querySelector("#request-message");
     const messageCount=form.querySelector("#request-message-count");
     let storeCheckTimer=null;
+    let storeHideTimer=null;
     let checkedStoreName="";
     let checkedStoreExists=false;
     function updateCount(){const hasMessage=messageField.value.length>0;messageCount.hidden=!hasMessage;messageCount.textContent=(200-messageField.value.length)+" characters remaining";}
     messageField.addEventListener("input",updateCount);updateCount();
-    function closeRoles(){roleMenu.hidden=true;roleTrigger.setAttribute("aria-expanded","false");}
-    function openRoles(){roleMenu.hidden=false;roleTrigger.setAttribute("aria-expanded","true");}
-    roleTrigger.addEventListener("click",()=>roleMenu.hidden?openRoles():closeRoles());
-    roleTrigger.addEventListener("keydown",e=>{
-      if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();openRoles();roleOptions[e.key==="ArrowDown"?0:roleOptions.length-1].focus();}
-      if(e.key==="Escape")closeRoles();
-    });
-    roleMenu.addEventListener("keydown",e=>{
-      if(e.key==="Escape"){closeRoles();roleTrigger.focus();}
-      if(e.key==="ArrowDown"||e.key==="ArrowUp"){
-        e.preventDefault();const index=roleOptions.indexOf(document.activeElement);
-        roleOptions[(index+(e.key==="ArrowDown"?1:-1)+roleOptions.length)%roleOptions.length].focus();
+    function selectRole(selected,{focus=false}={}){
+      roleValue.value=selected;
+      roleOptions.forEach(option=>option.setAttribute("aria-checked",String(option.dataset.value===selected)));
+      if(selected==="investor"){
+        clearTimeout(storeHideTimer);
+        storeField.hidden=false;storeField.inert=false;storeInput.disabled=false;
+        requestAnimationFrame(()=>{if(roleValue.value==="investor")storeField.classList.add("is-visible");});
+      }else{
+        storeField.classList.remove("is-visible");storeField.inert=true;storeInput.disabled=true;
+        storeHideTimer=setTimeout(()=>{if(roleValue.value!=="investor")storeField.hidden=true;},250);
+        storeInput.value="";storeCheck.textContent="";storeCheck.className="store-check";checkedStoreName="";checkedStoreExists=false;
       }
+      if(focus)roleOptions.find(option=>option.dataset.value===selected)?.focus();
+    }
+    roleGroup.addEventListener("keydown",event=>{
+      if(!["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(event.key))return;
+      event.preventDefault();
+      const current=roleOptions.findIndex(option=>option.dataset.value===roleValue.value);
+      const direction=["ArrowRight","ArrowDown"].includes(event.key)?1:-1;
+      const next=current<0?(direction>0?0:roleOptions.length-1):(current+direction+roleOptions.length)%roleOptions.length;
+      selectRole(roleOptions[next].dataset.value,{focus:true});
     });
     async function checkStore(name){
       const normalized=name.trim().replace(/\s+/g," ");
@@ -425,17 +443,8 @@ body.info-open .info-view{display:block}
       if(!name.trim()){storeCheck.textContent="";storeCheck.className="store-check";return;}
       storeCheckTimer=setTimeout(()=>checkStore(name),350);
     });
-    roleOptions.forEach(option=>option.addEventListener("click",()=>{
-      const selected=option.dataset.value;
-      roleValue.value=selected;
-      roleTrigger.querySelector(".role-selected").textContent=option.querySelector("span").textContent+(selected==="investor"?" (view only)":"");
-      roleTrigger.classList.add("has-value");
-      roleOptions.forEach(item=>item.setAttribute("aria-selected",String(item===option)));
-      storeField.hidden=selected!=="investor";storeField.inert=selected!=="investor";storeInput.disabled=selected!=="investor";
-      if(selected!=="investor"){storeInput.value="";storeCheck.textContent="";storeCheck.className="store-check";checkedStoreName="";checkedStoreExists=false;}
-      closeRoles();roleTrigger.focus();
-    }));
-    document.addEventListener("pointerdown",e=>{if(form.isConnected&&!form.querySelector(".role-picker").contains(e.target))closeRoles();});
+    roleOptions.forEach(option=>option.addEventListener("click",()=>selectRole(option.dataset.value)));
+
     form.addEventListener("submit",async function(event){
       event.preventDefault();
       const client=getSupabaseClient();
@@ -449,7 +458,7 @@ body.info-open .info-view{display:block}
       const storeName=String(values.get("store_name")||"").trim().replace(/\s+/g," ");
       if(!fullName){button.disabled=false;setAuthStatus(status,"Enter your full name.","error");return;}
       if(!email){button.disabled=false;setAuthStatus(status,"Enter a valid email address.","error");return;}
-      if(!["staff","investor"].includes(requestedRole)){button.disabled=false;setAuthStatus(status,"Choose Employee or Investor. Admin accounts are created by the owner.","error");roleTrigger.focus();return;}
+      if(!["staff","investor"].includes(requestedRole)){button.disabled=false;setAuthStatus(status,"Choose Employee or Investor. Admin accounts are created by the owner.","error");roleOptions[0].focus();return;}
       if(message.length>200){button.disabled=false;setAuthStatus(status,"Message must be 200 characters or fewer.","error");messageField.focus();return;}
       if(requestedRole==="investor"){
         if(!storeName){button.disabled=false;setAuthStatus(status,"Enter the store name you are requesting access to.","error");storeInput.focus();return;}
@@ -465,8 +474,8 @@ body.info-open .info-view{display:block}
           setAuthStatus(status,data?.error||"Could not submit the request. Please try again.","error");
           return;
         }
-        form.reset();storeField.hidden=true;storeCheck.textContent="";storeCheck.className="store-check";checkedStoreName="";checkedStoreExists=false;
-        roleTrigger.querySelector(".role-selected").textContent="Choose a role";roleTrigger.classList.remove("has-value");roleOptions.forEach(item=>item.setAttribute("aria-selected","false"));updateCount();
+        form.reset();clearTimeout(storeHideTimer);storeField.classList.remove("is-visible");storeField.hidden=true;storeField.inert=true;storeInput.disabled=true;storeCheck.textContent="";storeCheck.className="store-check";checkedStoreName="";checkedStoreExists=false;
+        roleValue.value="";roleOptions.forEach(item=>item.setAttribute("aria-checked","false"));updateCount();
         setAuthStatus(status,data?.already_pending?"Your request is already pending. The owner will email you after review.":data?.email_sent?"Your request is pending. A confirmation email has been sent.":"Your request is pending. Email confirmation is temporarily unavailable; please contact the owner if you need help.","success");
       }catch{setAuthStatus(status,"Connection interrupted. Please try again.","error");}
       finally{button.disabled=false;}
@@ -562,7 +571,7 @@ body.info-open .info-view{display:block}
     "sign-in":{title:"Sign in",deck:"Sign in to your Fulfillment account.",html:'<div class="info-hero"><span class="info-kicker">YOUR WORKSPACE</span><h1>Sign in to Fulfillment</h1><p>Use the email and password provided by the Fulfillment owner.</p></div><div class="auth-wrap auth-signin"><div class="auth-card"><form class="auth-form" id="sign-in-form"><div class="auth-field"><label for="signin-email">Email</label><input id="signin-email" name="email" type="email" autocomplete="username" required></div><div class="auth-field"><label for="signin-password">Password</label><input id="signin-password" name="password" type="password" autocomplete="current-password" required></div><button class="auth-submit" id="signin-submit" type="submit">Sign in</button><p class="auth-status" id="signin-status" role="status" aria-live="polite"></p></form><div class="auth-links"><span>Need an account? <a href="#request-access">Request access</a></span><a href="#request-access">Access help</a></div><div class="auth-note">Accounts are created by the Fulfillment owner after a request is reviewed. This page does not allow self-registration.</div></div></div>'},
     "set-password":{title:"Set password",deck:"Finish activating your Fulfillment account.",html:'<div class="info-hero"><span class="info-kicker">ACCOUNT ACTIVATION</span><h1>Set your password</h1><p>Create a password to finish setting up your Fulfillment account.</p></div><div class="auth-wrap auth-signin"><div class="auth-card"><form class="auth-form" id="set-password-form"><div class="auth-field"><label for="new-password">New password</label><input id="new-password" name="password" type="password" autocomplete="new-password" minlength="8" required></div><div class="auth-field"><label for="confirm-password">Confirm password</label><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required></div><button class="auth-submit" id="set-password-submit" type="submit">Save password</button><p class="auth-status" id="set-password-status" role="status" aria-live="polite"></p></form><div class="auth-note">Use at least 8 characters. Your password is saved securely by Supabase and is never displayed on this site.</div></div></div>'},
     "activate":{title:"Activate account",deck:"Confirm your Fulfillment account invitation.",html:'<div class="info-hero"><span class="info-kicker">ACCOUNT ACTIVATION</span><h1>Finish setting up your account</h1><p>Continue to verify your secure invitation, then choose a password.</p></div><div class="auth-wrap auth-signin"><div class="auth-card"><form class="auth-form" id="activation-form"><button class="auth-submit" id="activation-submit" type="submit">Continue to password setup</button><p class="auth-status" id="activation-status" role="status" aria-live="polite"></p></form><div class="auth-note">This secure link can only be used once. If it has expired, request a new password link.</div></div></div>'},
-    "request-access":{title:"Request Access",deck:"Request a Fulfillment account. Submitting this form does not create an account.",html:'<div class="info-hero"><span class="info-kicker">Account request</span><h1>Request Access</h1><p>Choose the access you need. The owner reviews each request; if approved, your account is set up and you’ll receive an email.</p></div><div class="auth-wrap auth-request"><div class="auth-card"><form class="auth-form" id="access-request-form"><div class="auth-grid"><div class="auth-field"><label for="request-name">Full name</label><input id="request-name" name="full_name" maxlength="120" autocomplete="name" required></div><div class="auth-field"><label for="request-email">Email</label><input id="request-email" name="email" type="email" autocomplete="email" required></div></div><div class="auth-field"><label for="request-role">Requested access level</label><div class="role-picker"><input type="hidden" name="requested_role" id="request-role-value"><button type="button" id="request-role" class="role-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="request-role-options"><span class="role-selected">Choose a role</span><span class="role-chevron" aria-hidden="true"></span></button><div id="request-role-options" class="role-options" role="listbox" aria-label="Requested access level" hidden><button type="button" class="role-option" role="option" aria-selected="false" data-value="staff"><span>Employee</span><small>Team access</small></button><button type="button" class="role-option" role="option" aria-selected="false" data-value="investor"><span>Investor</span><small>View only</small></button></div></div></div><div class="auth-field request-store-field" id="request-store-field" hidden inert><label for="request-store-name">Store Name</label><input id="request-store-name" name="store_name" disabled maxlength="120" autocomplete="organization" placeholder="Enter the existing store name"><small class="store-check" id="request-store-check" aria-live="polite"></small></div><div class="auth-field"><label for="request-message">Message (optional)</label><div class="message-box"><textarea id="request-message" name="message" maxlength="200" aria-describedby="request-message-count" placeholder="Tell us briefly why you need access."></textarea><span class="message-count" id="request-message-count" aria-live="polite" hidden></span></div></div><button class="auth-submit" id="request-submit" type="submit">Send access request</button><p class="auth-status request-feedback" id="request-status" role="status" aria-live="polite"></p></form><div class="auth-links"><span>Already have an account?</span><a href="#sign-in">Sign in</a></div><div class="auth-note">Requesting access does not grant access or create login credentials. Admin access is assigned only by the owner.</div></div></div>'},
+    "request-access":{title:"Request Access",deck:"Request a Fulfillment account. Submitting this form does not create an account.",html:'<div class="info-hero"><span class="info-kicker">Account request</span><h1>Request Access</h1><p>Choose the access you need. The owner reviews each request; if approved, your account is set up and you’ll receive an email.</p></div><div class="auth-wrap auth-request"><div class="auth-card"><form class="auth-form" id="access-request-form"><div class="auth-grid"><div class="auth-field"><label for="request-name">Full name</label><input id="request-name" name="full_name" maxlength="120" autocomplete="name" required></div><div class="auth-field"><label for="request-email">Email</label><input id="request-email" name="email" type="email" autocomplete="email" required></div></div><div class="auth-field"><label>Choose your access</label><div class="role-picker"><input type="hidden" name="requested_role" id="request-role-value"><div class="role-cards" role="radiogroup" aria-label="Choose your access"><button type="button" class="role-card" role="radio" aria-checked="false" data-value="staff"><span class="role-card-top"><svg class="role-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"></path></svg><span class="role-radio" aria-hidden="true"></span></span><strong>Employee</strong><span class="role-card-copy">Join your team.<br>Keep work moving.</span><span class="role-pill">Team access</span></button><button type="button" class="role-card" role="radio" aria-checked="false" data-value="investor"><span class="role-card-top"><svg class="role-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5M4 19h17M7 15l4-4 3 2 6-7"></path><path d="M16 6h4v4"></path></svg><span class="role-radio" aria-hidden="true"></span></span><strong>Investor</strong><span class="role-card-copy">Follow your store.<br>View progress.</span><span class="role-pill">View only</span></button></div></div></div><div class="auth-field request-store-field" id="request-store-field" hidden inert><label for="request-store-name">Store Name</label><input id="request-store-name" name="store_name" disabled maxlength="120" autocomplete="organization" placeholder="Enter the existing store name"><small class="store-check" id="request-store-check" aria-live="polite"></small></div><div class="auth-field"><label for="request-message">Message (optional)</label><div class="message-box"><textarea id="request-message" name="message" maxlength="200" aria-describedby="request-message-count" placeholder="Tell us briefly why you need access."></textarea><span class="message-count" id="request-message-count" aria-live="polite" hidden></span></div></div><button class="auth-submit" id="request-submit" type="submit">Send access request</button><p class="auth-status request-feedback" id="request-status" role="status" aria-live="polite"></p></form><div class="auth-links"><span>Already have an account?</span><a href="#sign-in">Sign in</a></div><div class="auth-note">Requesting access does not grant access or create login credentials. Admin access is assigned only by the owner.</div></div></div>'},
     "workspace":{title:"Fulfillment Workspace",deck:"Your signed-in Fulfillment workspace.",html:'<div class="info-hero"><span class="info-kicker">Account workspace</span><h1>Welcome to Fulfillment</h1><p>Your available tools depend on the role assigned to your account.</p></div><div class="auth-wrap"><div class="auth-card workspace-card"><div><h2 id="workspace-name">Checking your account…</h2><p id="workspace-detail">Loading your assigned access.</p><div style="margin-top:16px"><span class="role-chip" id="workspace-role">Checking role</span></div><section id="store-onboarding-panel" hidden style="margin-top:26px;padding-top:20px;border-top:1px solid #e4e9e5"><h3 style="margin:0 0 8px">Connect your store</h3><p style="font-size:13px;line-height:1.6;color:#63727c">Enter your store name. We’ll connect you to an existing store or create it if it isn’t listed yet.</p><form id="store-onboarding-form" class="auth-form"><div class="auth-field"><label for="onboarding-store-name">Store Name</label><input id="onboarding-store-name" name="store_name" maxlength="120" required autocomplete="organization"></div><button class="auth-submit" type="submit">Continue</button><p id="store-onboarding-status" class="auth-status request-feedback" role="status" aria-live="polite"></p></form></section><section id="account-deletion-panel" hidden style="margin-top:26px;padding-top:20px;border-top:1px solid #e4e9e5"><h3 style="margin:0 0 8px">Account</h3><p style="font-size:13px;line-height:1.6;color:#63727c">You can request account deletion here. The owner reviews the request; your account will not be deleted unless approved.</p><form id="account-deletion-form" class="auth-form"><div class="auth-field"><label for="deletion-reason">Reason (optional)</label><textarea id="deletion-reason" name="reason" maxlength="500"></textarea></div><button class="workspace-logout" type="submit">Request account deletion</button><p id="account-deletion-status" class="auth-status request-feedback" role="status" aria-live="polite"></p></form></section></div><button class="workspace-logout" id="logout-button" type="button">Log out</button></div><p class="auth-status" id="workspace-status" role="status" aria-live="polite"></p></div>'},
     "releases":{title:"Releases",deck:"Product updates and service changes from Fulfillment.",html:'<div class="info-hero"><span class="info-kicker">Product updates</span><h1>Releases</h1><p>Release notes will be listed here as updates are published.</p></div><div class="release-empty"><div class="info-icon" aria-hidden="true">↗</div><h2>No release notes published yet</h2><p>For questions about an update or to request release announcements, contact the Fulfillment team.</p><a class="public-signin" href="mailto:releases@fulfillment.site?subject=Fulfillment%20release%20updates">Contact the release team <span aria-hidden="true">↗</span></a></div><div class="info-callout"><p>Need help with something currently available?</p><a href="#faq">Visit FAQ ↗</a></div>'}
   };
