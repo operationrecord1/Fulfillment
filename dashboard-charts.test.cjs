@@ -10,7 +10,7 @@ assert.equal(C.orderLabel('99999999'),'FL-9999-9999');
 assert.equal(C.orderLabel(null),'');
 for(const values of [[1,9999,0],[1,1,999999],[0,0,0],[10,20,30]]){const shares=C.sliceShares(values);if(values.some(Boolean))assert.ok(Math.abs(shares.reduce((a,b)=>a+b,0)-1)<1e-10);shares.forEach((s,i)=>assert.ok(values[i]?s>0:s===0));}
 const a={count:10000,sizes:[{name:'Small',count:1,profit:1},{name:'Medium',count:9999,profit:9999},{name:'Large',count:0,profit:0}]};
-assert.ok(C.roundChart(a,true).includes('>0.01%</text>'));
+assert.ok(C.roundChart(a,true).includes('>1</text>'));
 assert.ok(C.roundChart(a,false).includes('>0.01</text>'));
 const rows=[{data:{date:'2026-01-01',order_id:'A',earning:1.23,product_cost:0}},{data:{date:'2026-01-02',order_id:'A',earning:0,product_cost:.23}},{data:{date:'2026-02-01',order_id:'B',earning:0,product_cost:.5}}];
 const pts=[['2026-01-01',123],['2026-01-02',-23],['2026-02-01',-50]];
@@ -25,3 +25,5 @@ for(const cents of [-97,-10000,-1000000]){const svg=C.profitChart([{index:0,labe
 assert.deepEqual(C.sliceShares([1,999]),[.001,.999]);
 
 const dense=Array.from({length:31},(_,index)=>({index,label:String(index+1),full:'Day '+(index+1),count:1,value:index%3===0?-97:125}));const denseSVG=C.profitChart(dense,false);assert.equal((denseSVG.match(/class="om-profit-value"/g)||[]).length,20);assert.equal((denseSVG.match(/class="om-loss-value"/g)||[]).length,11);assert.ok(!denseSVG.includes('rotate('));assert.ok(!C.roundChart(a,false).includes('stroke="'+ '#53ae9b' +'" fill="none"'));
+
+const Core=require('./dashboard-core.js');const boundary=[11.99,12,29.99,30].map((earning,i)=>({position:i+1,month:11,data:{order_id:String(i),earning,product_cost:1}}));assert.deepEqual(Core.aggregate(boundary,[]).sizes.map(s=>s.count),[1,2,1]);const duplicate=Core.aggregate([{position:1,data:{order_id:'A',earning:7,product_cost:2}},{position:2,data:{order_id:'B',earning:30,product_cost:40}},{position:3,data:{order_id:'A',earning:5,product_cost:3}}],[]);assert.equal(duplicate.count,2);assert.deepEqual(duplicate.sizes.map(s=>s.count),[0,1,1]);assert.deepEqual(duplicate.sizes.map(s=>s.profit),[0,700,-1000]);for(const donut of [true,false]){assert.ok(C.roundChart(Core.aggregate([],[]),donut).includes('No orders this period'));assert.ok(!C.roundChart(duplicate,donut).includes('%'));}assert.ok(!C.roundChart(Core.aggregate([{data:{order_id:'zero',earning:12,product_cost:12}}],[]),false).includes('No orders this period'));

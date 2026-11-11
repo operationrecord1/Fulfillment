@@ -12,3 +12,22 @@ body.order-workspace{background:#f3f6f5;color:#1b302d}body.order-workspace .poli
 .om-charts{gap:5px}.om-charts>.om-panel{padding:15px 5px}.om-charts>.om-panel:last-child{padding:15px 8px}.om-charts .om-chart svg{max-height:225px}.om-charts .om-legend{padding:0 4px}.om-charts h2,.om-charts p{margin-left:4px;margin-right:4px}
 @media(min-width:1100px){.om-charts{grid-template-columns:minmax(185px,.65fr) minmax(185px,.65fr) minmax(0,2.7fr)}}
 .om .om-month-trigger{position:static;width:100%;display:flex;align-items:center;justify-content:space-between;border:1px solid #dce8e1;border-radius:8px;background:#f5f9f6;color:#205d49;padding:9px 10px;font-size:14px;font-weight:600;transition:background .15s,border-color .15s}.om-month-trigger::after{content:'';width:6px;height:6px;border-right:1.5px solid;border-bottom:1.5px solid;transform:rotate(45deg);margin:0 2px 4px 10px}.om .om-month-trigger:hover,.om .om-month-trigger[aria-expanded=true]{background:#eaf4ee;border-color:#80ae98}.om .om-month-menu{position:fixed;inset:auto;margin:0;width:280px;padding:10px;border:1px solid #dce8e1;border-radius:12px;background:#fff;box-shadow:0 10px 35px #173f2726;color:#1b302d}.om-month-menu:popover-open{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.om .om-month-menu button{position:static;border:0;border-radius:7px;background:transparent;color:#42574d;padding:10px 3px;font-size:12px;font-weight:500;transition:background .12s}.om .om-month-menu button:hover{background:#edf5f0}.om .om-month-menu button[aria-checked=true]{background:#176650;color:white;font-weight:650}.om .om-month-menu .om-month-yearly{grid-column:1/-1;border-top:1px solid #e4ece7;margin-top:4px;padding:12px}.om .om-month-menu button:focus-visible{outline:2px solid #399c7f;outline-offset:1px}
+/* Coordinated analytics layout: two summaries above the daily chart until content fits. */
+.om .om-main{width:100%;max-width:1800px;margin-inline:auto;container-type:inline-size}
+.om .om-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:stretch}
+.om .om-charts>.om-panel{padding:14px 8px;min-width:0}
+.om .om-charts>.om-panel:last-child{grid-column:1/-1}
+.om .om-charts h2{font-size:clamp(12px,1.2vw,15px);line-height:1.35;overflow-wrap:break-word}
+.om .om-charts p{font-size:11px;line-height:1.45;overflow-wrap:anywhere}
+.om .om-charts .om-chart{max-width:300px;margin-inline:auto}
+.om .om-charts .om-chart svg{width:100%;height:auto;max-height:230px}
+.om .om-charts .om-legend{max-width:360px;width:100%;margin-inline:auto;gap:7px;padding:0 3px}
+.om .om-charts .om-legend div{font-size:12px;min-width:0;flex-wrap:wrap;gap:5px}
+.om .om-charts .om-legend b{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.om .om-chart-scroll{width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#b5c6bd #f0f4f1;-webkit-overflow-scrolling:touch}
+.om .om-chart-scroll .om-day-chart{min-width:900px;width:100%;display:block}
+.om .om-chart-scroll .om-year-chart{min-width:540px;width:100%;display:block}
+@container(min-width:1200px){.om .om-charts{grid-template-columns:minmax(0,.75fr) minmax(0,.75fr) minmax(0,2.5fr)}.om .om-charts>.om-panel:last-child{grid-column:auto}.om .om-chart-scroll .om-day-chart{min-width:700px}}
+@media(max-width:600px){.om .om-charts{gap:6px}.om .om-charts>.om-panel{padding:10px 4px;border-radius:11px}.om .om-charts h2{font-size:12px;min-height:33px;margin:0 3px}.om .om-charts p{font-size:10px;min-height:43px;margin:5px 3px}.om .om-charts .om-legend div{font-size:10px}.om .om-charts .om-legend i{width:6px;height:6px}.om .om-charts>.om-panel:last-child h2,.om .om-charts>.om-panel:last-child p{min-height:0}.om .om-charts .om-legend{padding:0 2px}.om .om-charts .om-chart svg{min-height:100px}}
+@media(max-width:380px){.om #om-pie-legend div{display:grid;grid-template-columns:6px minmax(0,1fr);gap:2px 4px}.om #om-pie-legend b{grid-column:2;margin-left:0}.om .om-charts p{font-size:9px}}
+.om-chart-empty{display:flex;align-items:center;justify-content:center;min-height:160px;text-align:center;padding:12px;color:#72817d;font-size:12px}@media(max-width:600px){.om-chart-empty{min-height:110px;font-size:11px;padding:4px}}
