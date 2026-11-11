@@ -24,11 +24,11 @@ shares.forEach((share,i)=>{if(!values[i])return;const end=angle+share*Math.PI*2,
 }
 function roundChart(a,donut){const values=a.sizes.map(s=>donut?s.count:Math.max(0,s.profit)),total=values.reduce((x,y)=>x+y,0),shares=fittedShares(values,values.map(v=>donut?String(v):(v/100).toFixed(2)),donut);let svg='<svg viewBox="39 -5 262 238" role="img" aria-label="'+(donut?'Unique orders by order size':'Positive gross profit by category')+'">';if(!total)return '<div class="om-chart-empty" role="status">'+(!a.count?'No orders this period':a.sizes.some(s=>s.profit<0)?'No positive gross profit':'Gross Profit: $0.00')+'</div>';
 const id=donut?'om-donut-gloss':'om-pie-gloss';
-svg+='<defs><linearGradient id="'+id+'" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="white" stop-opacity=".35"/><stop offset=".45" stop-color="white" stop-opacity=".08"/><stop offset="1" stop-color="#173d10" stop-opacity=".16"/></linearGradient><filter id="'+id+'-shadow" x="-25%" y="-100%" width="150%" height="300%"><feGaussianBlur stdDeviation="6"/></filter></defs><ellipse cx="170" cy="216" rx="112" ry="10" fill="#223921" opacity=".22" filter="url(#'+id+'-shadow)"/>';
+svg+='<defs><linearGradient id="'+id+'" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="white" stop-opacity=".35"/><stop offset=".45" stop-color="white" stop-opacity=".08"/><stop offset="1" stop-color="#173d10" stop-opacity=".16"/></linearGradient><radialGradient id="'+id+'-shine" gradientUnits="userSpaceOnUse" cx="112" cy="34" r="145" gradientTransform="translate(0 17) scale(1 .65)"><stop stop-color="white" stop-opacity=".72"/><stop offset=".24" stop-color="white" stop-opacity=".30"/><stop offset=".65" stop-color="white" stop-opacity="0"/></radialGradient><linearGradient id="'+id+'-rim" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="white" stop-opacity=".92"/><stop offset=".35" stop-color="white" stop-opacity=".50"/><stop offset=".65" stop-color="white" stop-opacity=".05"/><stop offset="1" stop-color="white" stop-opacity=".55"/></linearGradient><filter id="'+id+'-shadow" x="-25%" y="-100%" width="150%" height="300%"><feGaussianBlur stdDeviation="6"/></filter></defs><ellipse cx="170" cy="216" rx="112" ry="10" fill="#223921" opacity=".22" filter="url(#'+id+'-shadow)"/>';
 let angle=-Math.PI/2;const seg=values.map((v,i)=>{const s={start:angle,end:angle+shares[i]*Math.PI*2,v,i};angle=s.end;return s;}).filter(s=>s.v);
-for(let depth=22;depth>0;depth--)for(const s of seg)svg+='<path d="'+path(170,100+depth,125,96,s.start,s.end,donut?.49:0)+'" fill="'+colors[s.i]+'" style="filter:brightness(.68)"/>';
+for(let depth=22;depth>0;depth--)for(const s of seg)svg+='<path d="'+path(170,100+depth,125,96,s.start,s.end,donut?.49:0)+'" fill="'+colors[s.i]+'" style="filter:brightness('+(.61+(22-depth)*.012)+')"/>';
 const tinyLabels=seg.filter(s=>shares[s.i]<.08).map(s=>({i:s.i,x:170+155*Math.cos((s.start+s.end)/2)})).sort((a,b)=>a.x-b.x);for(let i=1;i<tinyLabels.length;i++)tinyLabels[i].x=Math.max(tinyLabels[i].x,tinyLabels[i-1].x+48);if(tinyLabels.length&&tinyLabels.at(-1).x>308){const shift=tinyLabels.at(-1).x-308;for(const p of tinyLabels)p.x-=shift;}
-for(const s of seg){const angle=(s.start+s.end)/2,tiny=false,r=.76,labelX=tiny?tinyLabels.find(p=>p.i===s.i).x:170+125*r*Math.cos(angle),tip=a.sizes[s.i].name+'\n'+(donut?s.v+(s.v===1?' order':' orders'):money(s.v)+' gross profit'),label=donut?String(s.v):(s.v/100).toFixed(2);svg+='<g class="om-chart-hit" tabindex="0" data-chart-tip="'+esc(tip)+'" aria-label="'+esc(tip.replace(/\n/g,', '))+'"><path d="'+path(170,100,125,96,s.start,s.end,donut?.49:0)+'" fill="'+colors[s.i]+'"/><path d="'+path(170,100,125,96,s.start,s.end,donut?.49:0)+'" fill="url(#'+id+')" pointer-events="none"/><path d="'+path(170,100,125,96,s.start,s.end,.987)+'" fill="white" opacity=".30" pointer-events="none"/>'+(tiny?'<path d="M'+(170+125*Math.cos(angle))+' '+(100+96*Math.sin(angle))+'L'+labelX+' '+(100+96*r*Math.sin(angle))+'" stroke="'+colors[s.i]+'" fill="none"/>':'')+'<text x="'+labelX+'" y="'+(104+96*r*Math.sin(angle))+'" text-anchor="middle" fill="'+(tiny?'#38534b':'white')+'" font-size="'+(label.length>9?13:17)+'" font-weight="650">'+esc(label)+'</text></g>';}
+for(const s of seg){const angle=(s.start+s.end)/2,tiny=false,r=.76,labelX=tiny?tinyLabels.find(p=>p.i===s.i).x:170+125*r*Math.cos(angle),tip=a.sizes[s.i].name+'\n'+(donut?s.v+(s.v===1?' order':' orders'):money(s.v)+' gross profit'),label=donut?String(s.v):(s.v/100).toFixed(2);svg+='<g class="om-chart-hit" tabindex="0" data-chart-tip="'+esc(tip)+'" aria-label="'+esc(tip.replace(/\n/g,', '))+'"><path d="'+path(170,100,125,96,s.start,s.end,donut?.49:0)+'" fill="'+colors[s.i]+'"/><path d="'+path(170,100,125,96,s.start,s.end,donut?.49:0)+'" fill="url(#'+id+')" pointer-events="none"/><path d="'+path(170,100,125,96,s.start,s.end,donut?.49:0)+'" fill="url(#'+id+'-shine)" pointer-events="none"/><path d="'+path(170,100,125,96,s.start,s.end,.968)+'" fill="url(#'+id+'-rim)" pointer-events="none"/>'+(tiny?'<path d="M'+(170+125*Math.cos(angle))+' '+(100+96*Math.sin(angle))+'L'+labelX+' '+(100+96*r*Math.sin(angle))+'" stroke="'+colors[s.i]+'" fill="none"/>':'')+'<text x="'+labelX+'" y="'+(104+96*r*Math.sin(angle))+'" text-anchor="middle" fill="'+(tiny?'#38534b':'white')+'" font-size="'+(label.length>9?13:17)+'" font-weight="650">'+esc(label)+'</text></g>';}
 if(donut)svg+='<text x="170" y="104" text-anchor="middle" fill="#1b302d" font-size="32" font-weight="600">'+a.count+'</text><text x="170" y="120" text-anchor="middle" fill="#72817d" font-size="11">ORDERS</text>';
 return svg+'</svg>';}
 function calendarPoints(points,rows,year,month,investor=false){const yearly=month==='all',length=yearly?12:new Date(Date.UTC(year,month,0)).getUTCDate(),out=Array.from({length},(_,i)=>({index:i,label:yearly?months[i].slice(0,3):String(i+1),full:yearly?months[i]+' '+year:(i+1)+' '+months[month-1]+' '+year,value:0,orders:new Set()}));
@@ -48,19 +48,18 @@ function profitLayout(points,width=900){
  
  label={text,x,y,half,vertical:rotated,font,negative:p.value<0,bottom:rotated?base+6+length:y+3};placed.push(label);}
  return {p,cx,yt,label};});
- // Keep profit labels at their true candle height, with modest horizontal separation.
- const profits=placed.filter(l=>!l.negative);
- if(slot<28)for(const l of profits){l.font=11;l.half=l.text.length*11*.59/2;}
- for(let pass=0;pass<4;pass++)for(let i=1;i<profits.length;i++){
- const a=profits[i-1],b=profits[i],need=a.half+b.half+2-(b.x-a.x);
- if(need>0&&Math.abs(a.y-b.y)<Math.max(a.font,b.font)+3){const move=Math.min(need/2,slot*.12);a.x=Math.max(a.half+3,a.x-move);b.x=Math.min(w-b.half-3,b.x+move);}
- }
- // Keep losses on one baseline; reduce font before separating labels horizontally.
+ // Profit labels stay anchored to their own candle, never to a neighbouring date.
+ const measureContext=typeof document!=='undefined'?document.createElement('canvas').getContext('2d'):null;
+ const textWidth=(text,size)=>{if(measureContext){measureContext.font='500 '+size+'px Inter,Segoe UI,Arial,sans-serif';return measureContext.measureText(text).width;}return text.length*size*.59;};
+ for(const item of items)if(item.label&&!item.label.negative){const l=item.label;l.x=item.cx;l.font=Math.max(9,Math.min(12,Math.floor(12*(slot-1)/textWidth(l.text,12))));l.font=Math.min(l.font,12*(2*Math.min(l.x-1,w-l.x-1))/textWidth(l.text,12));l.half=textWidth(l.text,l.font)/2;}
+ // A one-pixel gap, with each colliding group balanced around its original dates.
  const losses=placed.filter(l=>l.negative&&!l.vertical);
- if(losses.some((l,i)=>i&&l.x-losses[i-1].x<l.half+losses[i-1].half+3)){
- for(const l of losses){l.font=11;l.half=l.text.length*l.font*.59/2;}
- for(let i=1;i<losses.length;i++)losses[i].x=Math.max(losses[i].x,losses[i-1].x+losses[i-1].half+losses[i].half+3);
- if(losses.length){const last=losses.at(-1);last.x=Math.min(last.x,w-last.half-3);for(let i=losses.length-2;i>=0;i--)losses[i].x=Math.min(losses[i].x,losses[i+1].x-losses[i+1].half-losses[i].half-3);}
+ for(const l of losses)l.half=textWidth(l.text,l.font)/2;
+ if(losses.some((l,i)=>i&&l.x-losses[i-1].x<l.half+losses[i-1].half+1)){
+  for(const l of losses){l.font=11;l.half=textWidth(l.text,11)/2;}
+  const groups=[];
+  const balance=g=>{let offset=0;const offsets=g.map((l,i)=>{if(i)offset+=g[i-1].half+l.half+1;return offset;});const origin=g.reduce((sum,l,i)=>sum+l.anchor-offsets[i],0)/g.length;g.forEach((l,i)=>{l.x=origin+offsets[i];});};
+  for(const l of losses){l.anchor=l.x;groups.push([l]);while(groups.length>1){const last=groups.at(-1),prev=groups.at(-2);if(last[0].x-last[0].half>=prev.at(-1).x+prev.at(-1).half+1)break;groups.splice(-2,2,[...prev,...last]);balance(groups.at(-1));}}
  }
  const shift=Math.max(0,16-Math.min(top,...placed.filter(l=>!l.negative).map(l=>l.y)));
  for(const item of items){item.yt+=shift;if(item.label){item.label.y+=shift;item.label.bottom+=shift;}}

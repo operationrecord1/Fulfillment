@@ -49,4 +49,7 @@ for(const width of [520,900,1500]){const sparse=Array.from({length:31},(_,index)
 
 // A two-cent candle must not put its label above a two-dollar candle.
 const heights=C.profitLayout(lossPoints([200,2,200]),900);assert.ok(heights.items[1].label.y>heights.items[0].label.y);assert.equal(heights.items[0].label.y,heights.items[2].label.y);
-const adjacent=C.profitLayout(lossPoints(Array.from({length:31},(_,i)=>i===16?-207:i===17?-561:100)),600);const negative=adjacent.items.filter(i=>i.p.value<0).map(i=>i.label);assert.equal(negative[0].y,negative[1].y);assert.equal(negative[0].font,11);assert.ok(negative[1].x-negative[0].x>=negative[0].half+negative[1].half+3);
+const adjacent=C.profitLayout(lossPoints(Array.from({length:31},(_,i)=>i===16?-207:i===17?-561:100)),600);const negative=adjacent.items.filter(i=>i.p.value<0).map(i=>i.label);assert.equal(negative[0].y,negative[1].y);assert.equal(negative[0].font,11);assert.ok(negative[1].x-negative[0].x>=negative[0].half+negative[1].half+1-1e-8);
+
+for(const w of [520,700,900,1400]){const l=C.profitLayout(lossPoints([200,2,1800,1700,3300,3100]),w);for(const i of l.items)assert.equal(i.label.x,i.cx);}
+assert.ok(Math.abs((negative[0].x+negative[1].x)/2-(adjacent.items[16].cx+adjacent.items[17].cx)/2)<1e-8);
