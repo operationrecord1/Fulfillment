@@ -1,14 +1,16 @@
 (function(root){'use strict';
-const minimums={order_id:90,quantity:45,earning:65,purchase_id:100,supplier:55,note:40,platform:130,tracking:75,secondary_tracking:85,status:140,product_cost:65,shipping_cost:65,additional_cost:65,gross:65,margin:65,id:100,date:125};
+const rowNumberWidth=33;
+const referenceWidths={order_id:146,quantity:70,earning:129,purchase_id:105,supplier:131,note:202,platform:131,tracking:105,secondary_tracking:140,status:136,product_cost:101,shipping_cost:101,additional_cost:101,gross:101,margin:101,id:130,date:101};
+const minimums={order_id:65,quantity:68,earning:65,purchase_id:78,supplier:83,note:38,platform:70,tracking:68,secondary_tracking:82,status:65,product_cost:66,shipping_cost:73,additional_cost:82,gross:49,margin:59,id:60,date:45};
+const weights={note:1.2,product_cost:1.4,shipping_cost:1.4,additional_cost:1.4,gross:1.4,margin:1.4};
 function allocate(columns,preferences,required,available){
  const floors=columns.map(c=>Math.max(minimums[c.key]||55,required[c.key]||0));
- const values=columns.map((c,i)=>Math.max(floors[i],Math.min(1200,Number(preferences[c.key])||c.width)));
- if(!available)return Object.fromEntries(columns.map((c,i)=>[c.key,values[i]]));
- let excess=values.reduce((a,b)=>a+b,45)-available;
- for(const key of ['note','supplier','quantity','earning','product_cost','shipping_cost','additional_cost','gross','margin','secondary_tracking']){const i=columns.findIndex(c=>c.key===key);if(i<0||excess<=0)continue;const take=Math.min(excess,values[i]-floors[i]);values[i]-=take;excess-=take;}
- if(excess>0){const capacity=values.reduce((n,v,i)=>n+v-floors[i],0),ratio=capacity?Math.min(1,excess/capacity):0;values.forEach((v,i)=>values[i]=v-(v-floors[i])*ratio);}
- const extra=available-values.reduce((a,b)=>a+b,45);if(extra>0){const total=values.reduce((a,b)=>a+b,0);values.forEach((v,i)=>values[i]+=extra*v/total);}
+ const values=columns.map((c,i)=>Math.max(floors[i],Number(preferences[c.key])||(c.type==='select'?floors[i]:(referenceWidths[c.key]||c.width))));
+ if(available){const target=available-rowNumberWidth,total=values.reduce((a,b)=>a+b,0);
+  if(total>target){let lo=0,hi=1;for(let n=0;n<50;n++){const mid=(lo+hi)/2,sum=values.reduce((s,v,i)=>s+Math.max(floors[i],v*(1-mid*(weights[columns[i].key]||1))),0);if(sum>target)lo=mid;else hi=mid;}values.forEach((v,i)=>values[i]=Math.max(floors[i],v*(1-hi*(weights[columns[i].key]||1))));}
+  else if(total<target){const flexible=columns.map((c,i)=>c.type!=='select'?i:-1).filter(i=>i>=0),sum=flexible.reduce((s,i)=>s+values[i],0);for(const i of flexible)values[i]+=(target-total)*values[i]/sum;}
+ }
  return Object.fromEntries(columns.map((c,i)=>[c.key,values[i]]));
 }
-const api={allocate,minimums};root.SheetSizing=api;if(typeof module!=='undefined')module.exports=api;
+const api={allocate,minimums,referenceWidths,rowNumberWidth,weights};root.SheetSizing=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

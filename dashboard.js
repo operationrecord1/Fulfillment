@@ -37,7 +37,7 @@ function renderTable(rows,a){
 }
 let saveTimer,prefTimer,prefDirty=false,prefGeneration=0,prefChain=Promise.resolve(),generation=0,saveChain=Promise.resolve();
 state.formats={};state.periodRevisions={};state.preferences={};state.preferenceRevision=0;
-const grid=new window.OrderSheetGrid($('om-sheet'),{scrollContainer:viewport,fitWidth:()=>window.innerWidth>=1600?Math.min(1800,viewport.clientWidth)-6:0,onWidth:width=>canvas.style.setProperty('--sheet-width',width+'px'),
+const grid=new window.OrderSheetGrid($('om-sheet'),{scrollContainer:viewport,fitWidth:()=>window.innerWidth>=1600?viewport.clientWidth-1:0,onWidth:width=>canvas.style.setProperty('--sheet-width',width+'px'),
  onHistory:async rowId=>{await flush();return rpc('history',{row_id:rowId});},
  onChange(rows,formats){state.formats[state.month]=structuredClone(formats);state.rows=state.rows.filter(r=>r.month!==state.month).concat(rows);generation++;dirty=true;feedback('Saving…');clearTimeout(saveTimer);saveTimer=setTimeout(()=>flush(),350);render();},
  onPreferences(value){state.preferences=value;prefGeneration++;prefDirty=true;clearTimeout(prefTimer);prefTimer=setTimeout(()=>savePreferences(),400);}

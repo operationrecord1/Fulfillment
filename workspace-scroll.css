@@ -67,3 +67,10 @@ body.order-workspace .om,body.order-workspace .om.om-sidebar-collapsed{display:b
 .om .sheet-filter-menu button{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:9px 10px;border-radius:6px;height:auto;white-space:normal;min-height:34px}
 .om .sheet-filter-menu button span{margin:0;color:inherit;font:inherit;overflow-wrap:anywhere}.om .sheet-filter-menu button svg{width:16px;height:16px;visibility:hidden}.om .sheet-filter-menu button[aria-selected=true] svg{visibility:visible}.om .sheet-filter-menu button[aria-selected=true]{color:#174ea6;background:#edf3fc}
 .om .sheet-popover .sheet-chip{max-width:none}.om .sheet-popover{max-width:calc(100vw - 16px)}.om .sheet-popover button{white-space:normal}.om .sheet-popover .sheet-chip span{white-space:normal;overflow-wrap:anywhere}
+/* Reference typography stays fixed; only column geometry responds to width. */
+.om .om-canvas{padding:0;margin:0;box-sizing:border-box;min-width:0}
+.om .sheet-table .sheet-labels th{font:700 11pt Arial,sans-serif;line-height:17px;padding:3px 3px;white-space:normal;overflow-wrap:normal;height:42px}
+.om .sheet-table .sheet-rownum,.om .sheet-table .sheet-corner{width:33px!important;min-width:33px!important;padding-left:.5px;padding-right:.5px;font:11px Arial,sans-serif;font-variant-numeric:tabular-nums}
+.om .sheet-table .sheet-chip{margin:3px 2px;padding:0 5px;gap:4px}
+@media(min-width:1600px){.om .om-canvas{width:max(100%,var(--sheet-width));max-width:none;margin:0}.om .sheet-table .sheet-labels th{font-size:11pt}}
+.om .sheet-labels th:last-child .sheet-resize-col{right:0;width:4px}
