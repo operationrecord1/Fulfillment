@@ -24,7 +24,7 @@ shares.forEach((share,i)=>{if(!values[i])return;const end=angle+share*Math.PI*2,
 }
 function roundChart(a,donut){const values=a.sizes.map(s=>donut?s.count:Math.max(0,s.profit)),total=values.reduce((x,y)=>x+y,0),shares=fittedShares(values,values.map(v=>donut?String(v):(v/100).toFixed(2)),donut);let svg='<svg viewBox="39 -5 262 238" role="img" aria-label="'+(donut?'Unique orders by order size':'Positive gross profit by category')+'">';if(!total)return '<div class="om-chart-empty" role="status">'+(!a.count?'No orders this period':a.sizes.some(s=>s.profit<0)?'No positive gross profit':'Gross Profit: $0.00')+'</div>';
 const id=donut?'om-donut-gloss':'om-pie-gloss';
-svg+='<defs><linearGradient id="'+id+'" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="white" stop-opacity=".35"/><stop offset=".45" stop-color="white" stop-opacity="0"/><stop offset="1" stop-color="#173d10" stop-opacity=".16"/></linearGradient><filter id="'+id+'-shadow" x="-25%" y="-100%" width="150%" height="300%"><feGaussianBlur stdDeviation="6"/></filter></defs><ellipse cx="170" cy="216" rx="112" ry="10" fill="#223921" opacity=".22" filter="url(#'+id+'-shadow)"/>';
+svg+='<defs><linearGradient id="'+id+'" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="white" stop-opacity=".35"/><stop offset=".45" stop-color="white" stop-opacity=".08"/><stop offset="1" stop-color="#173d10" stop-opacity=".16"/></linearGradient><filter id="'+id+'-shadow" x="-25%" y="-100%" width="150%" height="300%"><feGaussianBlur stdDeviation="6"/></filter></defs><ellipse cx="170" cy="216" rx="112" ry="10" fill="#223921" opacity=".22" filter="url(#'+id+'-shadow)"/>';
 let angle=-Math.PI/2;const seg=values.map((v,i)=>{const s={start:angle,end:angle+shares[i]*Math.PI*2,v,i};angle=s.end;return s;}).filter(s=>s.v);
 for(let depth=22;depth>0;depth--)for(const s of seg)svg+='<path d="'+path(170,100+depth,125,96,s.start,s.end,donut?.49:0)+'" fill="'+colors[s.i]+'" style="filter:brightness(.68)"/>';
 const tinyLabels=seg.filter(s=>shares[s.i]<.08).map(s=>({i:s.i,x:170+155*Math.cos((s.start+s.end)/2)})).sort((a,b)=>a.x-b.x);for(let i=1;i<tinyLabels.length;i++)tinyLabels[i].x=Math.max(tinyLabels[i].x,tinyLabels[i-1].x+48);if(tinyLabels.length&&tinyLabels.at(-1).x>308){const shift=tinyLabels.at(-1).x-308;for(const p of tinyLabels)p.x-=shift;}
@@ -48,6 +48,13 @@ function profitLayout(points,width=900){
  
  label={text,x,y,half,vertical:rotated,font,negative:p.value<0,bottom:rotated?base+6+length:y+3};placed.push(label);}
  return {p,cx,yt,label};});
+ // Keep profit labels at their true candle height, with modest horizontal separation.
+ const profits=placed.filter(l=>!l.negative);
+ if(slot<28)for(const l of profits){l.font=11;l.half=l.text.length*11*.59/2;}
+ for(let pass=0;pass<4;pass++)for(let i=1;i<profits.length;i++){
+ const a=profits[i-1],b=profits[i],need=a.half+b.half+2-(b.x-a.x);
+ if(need>0&&Math.abs(a.y-b.y)<11){const move=Math.min(need/2,slot*.12);a.x=Math.max(a.half+3,a.x-move);b.x=Math.min(w-b.half-3,b.x+move);}
+ }
  // Keep losses on one baseline; reduce font before separating labels horizontally.
  const losses=placed.filter(l=>l.negative&&!l.vertical);
  if(losses.some((l,i)=>i&&l.x-losses[i-1].x<l.half+losses[i-1].half+3)){
