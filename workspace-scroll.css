@@ -40,8 +40,8 @@ body.order-workspace .om,body.order-workspace .om.om-sidebar-collapsed{display:b
 .om .sheet-tools .sheet-filter-button{width:auto;max-width:210px;height:28px;padding:4px 10px;border:1px solid #dadfe5;border-radius:7px;background:#fff;font:12px Arial;overflow:hidden;text-overflow:ellipsis}
 .om .sheet-tools .sheet-filter-button[hidden]{display:none}.om .sheet-tools .sheet-filter-button:hover{background:#eef3f8;border-color:#b6c1ce}.om .sheet-tools .sheet-filter-button[aria-expanded=true]{background:#e8f0fe;border-color:#aac5ed;color:#174ea6}
 .om .om-month-trigger{font-size:14px;white-space:normal;text-align:left;line-height:1.35}
-@media(min-width:1200px){
- body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed .om-main{overflow-x:hidden;overflow-y:scroll}
+@media(min-width:1600px){
+ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed .om-main{overflow-x:auto;overflow-y:scroll}
  .om .om-canvas{width:calc(100% - 2px);max-width:1798px;min-width:0;margin-inline:auto}
  .om .om-charts{grid-template-columns:minmax(0,19fr) minmax(0,19fr) minmax(0,62fr)}
  .om .om-kpi{padding:12px 10px;min-height:92px}.om .om-kpi strong{font-size:21px}
@@ -53,4 +53,17 @@ body.order-workspace .om,body.order-workspace .om.om-sidebar-collapsed{display:b
 .om .sheet-tools .sheet-filter-slot{margin:0 0 0 auto;max-width:none;overflow:visible}
 .om .om-head{position:relative;box-sizing:border-box;max-width:calc(100vw - 14px);padding-right:62px}
 .om .om-profile{position:absolute;right:12px;top:12px}
-@media(min-width:1200px){.om .om-canvas{width:calc(100% - 4px)}}
+@media(min-width:1600px){.om .om-canvas{width:calc(100% - 4px)}}
+/* Reserve the text width of dropdown labels before sharing the remaining space. */
+@media(min-width:1600px){.om .om-canvas{width:max(min(calc(100% - 4px),1798px),calc(var(--sheet-width) + 2px));max-width:none}}
+.om .sheet-table .sheet-chip{margin:3px 4px;padding:0 7px;gap:6px}
+.om .sheet-tools .sheet-filter-slot{padding:0;gap:0;border:1px solid #d8dee5;border-radius:8px;background:#fff;box-shadow:0 1px 2px #182b3a08}
+.om .sheet-tools .sheet-filter-button{display:inline-flex;gap:7px;border:0;border-radius:7px;background:transparent;height:28px;max-width:260px;padding:4px 10px;font:500 12px Arial,sans-serif;color:#3c4855}
+.om .sheet-tools .sheet-filter-button+button{border-left:1px solid #e3e7eb;border-radius:0 7px 7px 0}
+.om .sheet-tools .sheet-filter-button span{margin:0;font:inherit;color:inherit;max-width:none;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.om .sheet-tools .sheet-filter-button svg{width:16px;height:16px;stroke-width:1.7}.om .sheet-tools .sheet-filter-button .sheet-filter-chevron{width:12px;height:12px;color:#77838f}
+.om .sheet-tools .sheet-filter-button:hover{background:#f1f4f8}.om .sheet-tools .sheet-filter-button[aria-expanded=true]{background:#e8f0fe;color:#174ea6}.om .sheet-filter-slot.is-filtered{border-color:#b1c9eb;background:#f4f8ff}
+.om .sheet-filter-menu{min-width:210px;padding:5px;border:1px solid #dce2e8;border-radius:10px;box-shadow:0 6px 22px #182b3a24}
+.om .sheet-filter-menu button{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:9px 10px;border-radius:6px;height:auto;white-space:normal;min-height:34px}
+.om .sheet-filter-menu button span{margin:0;color:inherit;font:inherit;overflow-wrap:anywhere}.om .sheet-filter-menu button svg{width:16px;height:16px;visibility:hidden}.om .sheet-filter-menu button[aria-selected=true] svg{visibility:visible}.om .sheet-filter-menu button[aria-selected=true]{color:#174ea6;background:#edf3fc}
+.om .sheet-popover .sheet-chip{max-width:none}.om .sheet-popover{max-width:calc(100vw - 16px)}.om .sheet-popover button{white-space:normal}.om .sheet-popover .sheet-chip span{white-space:normal;overflow-wrap:anywhere}
