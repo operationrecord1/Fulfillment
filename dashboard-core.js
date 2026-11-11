@@ -27,7 +27,13 @@ function aggregate(rows,expenses,investor=false){
  const gs=groups(rows,investor),orders=new Map(),daily=new Map(),margins=[];
  let revenue=0,cost=0,gross=0;
  for(const r of rows){const d=r.data;revenue+=cents(d.earning);cost+=cents(d.product_cost);if(d.order_id){const o=orders.get(d.order_id)||{revenue:0,profit:0};o.revenue+=cents(d.earning);orders.set(d.order_id,o);}if(d.date&&d.order_id&&!daily.has(d.date))daily.set(d.date,0);}
- for(const g of gs){if(g.profit===null)continue;gross+=g.profit;if(g.margin!==null)margins.push(g.margin);const first=g.rows.find(r=>r.data.order_id);if(first)orders.get(first.data.order_id).profit+=g.profit;const dated=g.rows.find(r=>r.data.date);if(dated)daily.set(dated.data.date,(daily.get(dated.data.date)||0)+g.profit);}
+ for(const g of gs){if(g.profit===null)continue;gross+=g.profit;if(g.margin!==null)margins.push(g.margin);const first=g.rows.find(r=>r.data.order_id);if(first){
+ // Attribute each row's existing earning-minus-cost contribution to its order.
+ // A shared purchase group must not move every order's profit into its first category.
+ let allocated=0;
+ for(const r of g.rows){const d=r.data,key=d.order_id||first.data.order_id,value=cents(d.earning)-cents(d.product_cost)-cents(d.shipping_cost)-cents(d.additional_cost);orders.get(key).profit+=value;allocated+=value;}
+ orders.get(first.data.order_id).profit+=g.profit-allocated;
+ }const dated=g.rows.find(r=>r.data.date);if(dated)daily.set(dated.data.date,(daily.get(dated.data.date)||0)+g.profit);}
  const sizes=[{name:'Small',count:0,profit:0},{name:'Medium',count:0,profit:0},{name:'Large',count:0,profit:0}];
  for(const o of orders.values()){const s=sizes[o.revenue<1200?0:o.revenue<3000?1:2];s.count++;s.profit+=o.profit;}
  const expense=expenses.reduce((s,e)=>s+cents(e.amount),0),tax=Math.round(Math.max(0,gross-expense)*.15),count=orders.size;
