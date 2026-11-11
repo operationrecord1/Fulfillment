@@ -43,3 +43,9 @@ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed 
 @media(max-width:600px){.om .om-charts>.om-panel:nth-child(-n+2)>p{min-height:43px}}
 
 @media(max-width:700px){body.order-workspace .om .sheet-grid{margin-left:0;margin-right:0}}
+
+body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed .om-main{padding-left:1px;padding-right:1px}
+.om .om-kpis,.om .om-charts{gap:1px}
+.om .om-charts>.om-panel{padding-left:4px;padding-right:4px}
+.om .om-chart-scroll{overflow:hidden}
+.om .om-chart-scroll .om-day-chart,.om .om-chart-scroll .om-year-chart{min-width:0;width:100%;height:auto;max-height:none}

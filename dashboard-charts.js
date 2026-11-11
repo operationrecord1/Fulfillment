@@ -35,24 +35,39 @@ for(const [date,value]of points){if(Number(date.slice(0,4))!==year)continue;cons
 for(const row of rows){const d=row.data;if(!d.date||!d.order_id||Number(d.date.slice(0,4))!==year)continue;const m=Number(d.date.slice(5,7)),i=yearly?m-1:Number(d.date.slice(8,10))-1;if(!yearly&&m!==month)continue;out[i]?.orders.add(d.order_id);}
 return out.map(({orders,...p})=>({...p,count:orders.size}));}
 function niceStep(raw){const power=10**Math.floor(Math.log10(raw||1)),n=raw/power;return(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*power;}
-function profitChart(points,yearly){
-const amountLabels=points.map(p=>(p.value/100).toFixed(2)),slotWidth=Math.max(40,...amountLabels.map(t=>t.length*6.7+14));
-const w=Math.ceil(61+points.length*slotWidth),h=285,left=43,right=18,top=28,base=210,hi=Math.max(0,...points.map(p=>p.value/100)),step=niceStep((hi||10)/4),max=hi>0?Math.ceil((hi+step*.15)/step)*step:step*4,y=v=>base-v/max*(base-top),slot=(w-left-right)/points.length,depth=3;
-let s='<svg class="'+(yearly?'om-year-chart':'om-day-chart')+'" style="min-width:'+w+'px" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+(yearly?'Monthly':'Daily')+' gross profit and loss"><defs><linearGradient id="om-profit-face"><stop stop-color="#48b48d"/><stop offset=".45" stop-color="#269875"/><stop offset="1" stop-color="#177458"/></linearGradient></defs>';
-for(let v=0;v<=max+step*.01;v+=step)s+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+(w-right)+'" y2="'+y(v)+'" stroke="#e4ebe7"/><text x="35" y="'+(y(v)+3)+'" text-anchor="end" fill="#72817d" font-size="10">'+number(v)+'</text>';
-s+='<path d="M'+left+' '+base+'h'+(w-left-right)+'l'+depth+' -'+depth+'H'+(left+depth)+'Z" fill="#edf2ef"/><line x1="'+left+'" x2="'+(w-right)+'" y1="'+base+'" y2="'+base+'" stroke="#9aaba3"/>';
-for(const p of points){const cx=left+(p.index+.5)*slot,bw=Math.min(26,slot*.56),dx=Math.min(depth,bw*.23),x=cx-bw/2,tip=p.full+'\n'+(p.count?p.count+' unique order'+(p.count===1?'':'s'):'No orders recorded')+'\nGross profit: '+(p.value/100).toFixed(2);s+='<g class="om-chart-hit om-profit-point" tabindex="0" data-chart-tip="'+esc(tip)+'" aria-label="'+esc(tip.replace(/\n/g,', '))+'"><rect class="om-hover-area" x="'+(left+p.index*slot)+'" y="'+(top-8)+'" width="'+slot+'" height="'+(h-top)+'" fill="transparent" rx="3"/>';
-if(p.value>0){const height=Math.max(.8,base-y(p.value/100)),yt=base-height;s+='<path d="M'+(x+bw)+' '+yt+'l'+dx+' -'+dx+'v'+height+'l-'+dx+' '+dx+'Z" fill="#14634d"/><path d="M'+x+' '+yt+'l'+dx+' -'+dx+'h'+bw+'l-'+dx+' '+dx+'Z" fill="#6ac7a4"/><rect x="'+x+'" y="'+yt+'" width="'+bw+'" height="'+height+'" fill="url(#om-profit-face)"/>';
-}else if(p.value<0){s+='<rect class="om-loss-marker" x="'+x+'" y="'+(base-2)+'" width="'+bw+'" height="3" rx="1" fill="#cf4d58"/>';
-}else if(p.count)s+='<circle cx="'+cx+'" cy="'+base+'" r="2.5" fill="white" stroke="#228365"/>';
-s+='<text class="'+(p.value<0?'om-loss-value':'om-profit-value')+'" x="'+cx+'" y="247" text-anchor="middle" fill="'+(p.value<0?'#bd3846':'#38534b')+'" font-family="ui-monospace, Consolas, monospace" font-size="11" font-weight="500">'+(p.count||p.value?(p.value/100).toFixed(2):'—')+'</text>';
-s+='<text x="'+cx+'" y="274" text-anchor="middle" fill="#72817d" font-size="10">'+p.label+'</text></g>';}
-return s+'</svg>';}
+
+function profitLayout(points,width=900){
+ const w=Math.max(160,Math.floor(width||900)),left=52,right=8,slot=(w-left-right)/Math.max(1,points.length),top=28,base=210;
+ const hi=Math.max(0,...points.map(p=>p.value/100)),step=niceStep((hi||10)/4),max=hi>0?Math.ceil((hi+step*.15)/step)*step:step*4;
+ const labels=[],items=points.map((p,i)=>{const cx=left+(i+.5)*slot,yt=base-Math.max(.8,p.value/100/max*(base-top));let label=null;
+ if(p.value||p.count){const text=(p.value/100).toFixed(2),half=text.length*3.5+2,x=Math.max(half+2,Math.min(w-half-2,cx));let y=p.value<0?base+18:yt-10;
+ while(labels.some(q=>Math.abs(q.y-y)<14&&Math.abs(q.x-x)<q.half+half+3))y+=p.value<0?15:-15;
+ label={text,x,y,half};labels.push(label);}
+ return {p,cx,yt,label};});
+ const shift=Math.max(0,16-Math.min(top,...labels.map(l=>l.y))),dateY= Math.max(base+30,...labels.filter(l=>l.y>base).map(l=>l.y+22))+shift;
+ for(const item of items){item.yt+=shift;if(item.label)item.label.y+=shift;}
+ return {w,left,right,slot,top:top+shift,base:base+shift,max,step,items,dateY,h:dateY+(slot<18?27:12)};
+}
+function profitChart(points,yearly,width=900){
+ const l=profitLayout(points,width),{w,h,left,right,slot,top,base,max,step,dateY}=l,depth=3,y=v=>base-v/max*(base-top);
+ let s='<svg class="'+(yearly?'om-year-chart':'om-day-chart')+'" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+(yearly?'Monthly':'Daily')+' gross profit and loss"><defs><linearGradient id="om-profit-face"><stop stop-color="#48b48d"/><stop offset=".45" stop-color="#269875"/><stop offset="1" stop-color="#177458"/></linearGradient></defs>';
+ for(let v=0;v<=max+step*.01;v+=step)s+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+(w-right)+'" y2="'+y(v)+'" stroke="#e4ebe7"/><text x="'+(left-6)+'" y="'+(y(v)+3)+'" text-anchor="end" fill="#72817d" font-size="10">'+number(v)+'</text>';
+ s+='<line x1="'+left+'" x2="'+(w-right)+'" y1="'+base+'" y2="'+base+'" stroke="#9aaba3"/>';
+ for(const {p,cx,yt,label} of l.items){const bw=Math.min(26,slot*.5),dx=Math.min(depth,bw*.23),x=cx-bw/2,tip=p.full+'\nGross profit: '+(p.value/100).toFixed(2);
+ s+='<g class="om-chart-hit om-profit-point" tabindex="0" data-chart-tip="'+esc(tip)+'" aria-label="'+esc(tip.replace(/\n/g,', '))+'"><rect class="om-hover-area" x="'+(cx-slot/2)+'" y="0" width="'+slot+'" height="'+h+'" fill="transparent"/>';
+ if(p.value>0){const height=base-yt;s+='<path d="M'+(x+bw)+' '+yt+'l'+dx+' -'+dx+'v'+height+'l-'+dx+' '+dx+'Z" fill="#14634d"/><path d="M'+x+' '+yt+'l'+dx+' -'+dx+'h'+bw+'l-'+dx+' '+dx+'Z" fill="#6ac7a4"/><rect x="'+x+'" y="'+yt+'" width="'+bw+'" height="'+height+'" fill="url(#om-profit-face)"/>';}
+ else if(p.value<0)s+='<rect class="om-loss-marker" x="'+x+'" y="'+(base-2)+'" width="'+bw+'" height="3" rx="1" fill="#cf4d58"/>';
+ else if(p.count)s+='<circle cx="'+cx+'" cy="'+base+'" r="2.5" fill="white" stroke="#228365"/>';
+ if(label){const anchor=p.value<0?base+3:yt-4;if(Math.abs(label.y-anchor)>20)s+='<path d="M'+cx+' '+anchor+'L'+label.x+' '+(label.y+(p.value<0?-10:3))+'" stroke="'+(p.value<0?'#cf4d58':'#718e80')+'" stroke-opacity=".3" fill="none"/>';
+ s+='<text class="'+(p.value<0?'om-loss-value':'om-profit-value')+'" x="'+label.x+'" y="'+label.y+'" text-anchor="middle" fill="'+(p.value<0?'#bd3846':'#38534b')+'" font-family="ui-monospace,Consolas,monospace" font-size="11">'+label.text+'</text>';}
+ s+='<text x="'+cx+'" y="'+(dateY+(slot<18&&p.index%2?14:0))+'" text-anchor="middle" fill="#72817d" font-size="10">'+p.label+'</text></g>';}
+ return s+'</svg>';
+}
 function bindTooltips(host){const tip=document.createElement('div');tip.className='om-chart-tooltip';tip.role='tooltip';tip.hidden=true;host.append(tip);let active=null;
 const hide=()=>{tip.hidden=true;active=null;};const show=e=>{const point=e.target.closest?.('[data-chart-tip]');if(!point)return;active=point;tip.textContent=point.dataset.chartTip;tip.hidden=false;position(e);};
 const position=e=>{if(!active)return;const r=active.getBoundingClientRect(),x=e.clientX??r.left+r.width/2,y=e.clientY??r.top;tip.style.left=Math.max(8,Math.min(x+14,document.documentElement.clientWidth-tip.offsetWidth-8))+'px';tip.style.top=Math.max(8,Math.min(y+14,document.documentElement.clientHeight-tip.offsetHeight-8))+'px';};
 const leave=e=>{if(active&&!active.contains(e.relatedTarget))hide();};const key=e=>{if(e.key==='Escape')hide();};
 host.addEventListener('pointerover',show);host.addEventListener('pointermove',position);host.addEventListener('pointerout',leave);host.addEventListener('focusin',show);host.addEventListener('focusout',hide);host.addEventListener('click',show);host.addEventListener('keydown',key);host.addEventListener('scroll',hide,true);
 return()=>{host.removeEventListener('pointerover',show);host.removeEventListener('pointermove',position);host.removeEventListener('pointerout',leave);host.removeEventListener('focusin',show);host.removeEventListener('focusout',hide);host.removeEventListener('click',show);host.removeEventListener('keydown',key);host.removeEventListener('scroll',hide,true);tip.remove();};}
-const api={months,dateLabel,orderLabel,sliceShares,roundChart,calendarPoints,profitChart,bindTooltips};root.OrderCharts=api;if(typeof module!=='undefined')module.exports=api;
+const api={months,dateLabel,orderLabel,sliceShares,roundChart,calendarPoints,profitLayout,profitChart,bindTooltips};root.OrderCharts=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
