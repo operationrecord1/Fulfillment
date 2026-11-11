@@ -53,7 +53,7 @@ function profitLayout(points,width=900){
  if(slot<28)for(const l of profits){l.font=11;l.half=l.text.length*11*.59/2;}
  for(let pass=0;pass<4;pass++)for(let i=1;i<profits.length;i++){
  const a=profits[i-1],b=profits[i],need=a.half+b.half+2-(b.x-a.x);
- if(need>0&&Math.abs(a.y-b.y)<11){const move=Math.min(need/2,slot*.12);a.x=Math.max(a.half+3,a.x-move);b.x=Math.min(w-b.half-3,b.x+move);}
+ if(need>0&&Math.abs(a.y-b.y)<Math.max(a.font,b.font)+3){const move=Math.min(need/2,slot*.12);a.x=Math.max(a.half+3,a.x-move);b.x=Math.min(w-b.half-3,b.x+move);}
  }
  // Keep losses on one baseline; reduce font before separating labels horizontally.
  const losses=placed.filter(l=>l.negative&&!l.vertical);
