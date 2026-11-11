@@ -43,3 +43,5 @@
 @font-face{font-family:"Sheet Reference Sans";font-style:normal;font-weight:500;font-display:swap;src:url("https://fonts.gstatic.com/s/googlesans/v29/4UaGrENHsxJlGDuGo1OIlL3Owp4.woff2") format("woff2")}
 .om .sheet-link-preview{padding-right:10px}
 .om .sheet-link-preview a{font:500 14px/20px "Sheet Reference Sans",Arial,sans-serif;color:#0b57d0}
+
+.om .sheet-tools .sheet-search-slot{display:flex;flex:0 1 180px;min-width:100px;margin:0 4px}.om .sheet-tools #om-search{width:100%;height:28px;padding:3px 8px;font-size:12px;border:1px solid #dadce0;border-radius:4px;background:#fff}

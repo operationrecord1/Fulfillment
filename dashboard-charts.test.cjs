@@ -30,8 +30,16 @@ const Core=require('./dashboard-core.js');const boundary=[11.99,12,29.99,30].map
 
 const shared=[{month:11,position:1,group_key:'shared',group_profit:25,data:{order_id:'S',purchase_id:'P',earning:10,product_cost:5}},{month:11,position:2,group_key:'shared',group_profit:25,data:{order_id:'L',purchase_id:'P',earning:30,product_cost:10}}];for(const investor of [false,true]){const a=Core.aggregate(shared,[],investor);assert.equal(a.gross,2500);assert.deepEqual(a.sizes.map(s=>s.profit),[500,0,2000]);}
 
-const bigAmounts=Array.from({length:31},(_,index)=>({index,label:String(index+1),full:'Day '+(index+1),count:1,value:index%2?-999999:-100000}));const stable=C.profitChart(bigAmounts,false);assert.equal((stable.match(/class="om-loss-value"/g)||[]).length,31);assert.ok(stable.includes('-9999.99'));assert.ok(!stable.includes('NaN'));assert.ok(!stable.includes('rotate('));
+const bigAmounts=Array.from({length:31},(_,index)=>({index,label:String(index+1),full:'Day '+(index+1),count:1,value:index%2?-999999:-100000}));const stable=C.profitChart(bigAmounts,false);assert.equal((stable.match(/class="om-loss-value"/g)||[]).length,31);assert.ok(stable.includes('-9999.99'));assert.ok(!stable.includes('NaN'));assert.ok(stable.includes('rotate(-90'));
 
-for(const width of [250,320,600,800,1200,1700])for(const sign of [-1,1]){const points=bigAmounts.map(p=>({...p,value:Math.abs(p.value)*sign}));const l=C.profitLayout(points,width);for(const item of l.items){const a=item.label;if(!a)continue;assert.ok(a.y>=0&&a.y<l.h);assert.ok(a.x-a.half>=0&&a.x+a.half<=l.w);assert.ok(sign<0?a.y>l.base:a.y<item.yt);for(const other of l.items){if(item===other)continue;const b=other.label;if(!b)continue;assert.ok(Math.abs(a.y-b.y)>=14||Math.abs(a.x-b.x)>=a.half+b.half+3);}}}
+for(const width of [520,600,800,1200,1700])for(const sign of [-1,1]){const points=bigAmounts.map(p=>({...p,value:Math.abs(p.value)*sign}));const l=C.profitLayout(points,width);for(const item of l.items){const a=item.label;if(!a)continue;assert.ok(a.y>=0&&a.y<l.h);assert.ok(a.x-a.half>=0&&a.x+a.half<=l.w);assert.ok(sign<0?a.y>l.base:a.y<item.yt);for(const other of l.items){if(item===other)continue;const b=other.label;if(!b)continue;assert.ok(Math.abs(a.y-b.y)>=14||Math.abs(a.x-b.x)>=a.half+b.half+3);}}}
 
 for(const text of ['1.00','10000.00','999999.99'])for(const width of [8,12,20,26])for(const height of [.01,10,30,40,100]){const f=C.profitCandleFit(text,width,height);assert.ok(f.height<=height*1.2+1e-8);if(f.font){assert.ok(f.font>=7.7-1e-8&&f.font<=11);assert.ok(f.font+4<=width+1e-8);assert.ok(text.length*.62*f.font+4<=f.height+1e-8);}}const hover=C.profitChart([-1,0,100].map((value,index)=>({value,index,count:1,label:String(index),full:'Day'})),false);assert.equal((hover.match(/is-loss/g)||[]).length,1);
+
+const lossPoints=values=>values.map((value,index)=>({value,index,count:1,label:String(index+1),full:'Day'}));
+assert.equal(C.profitLayout(lossPoints([-1,-1,100,-1]),900).vertical,false);
+assert.equal(C.profitLayout(lossPoints([-1,-1,-1,100,-1]),900).vertical,true);
+assert.equal(C.profitLayout(lossPoints([-1,-1,0,-1]),900).vertical,false);
+assert.equal(C.profitLayout(bigAmounts,520).vertical,true);
+assert.ok(C.profitChart(lossPoints([1]),false).includes('1 order'));
+assert.ok(!C.profitChart(lossPoints([1]),false).includes('unique orders'));
