@@ -30,3 +30,21 @@
 .om .om-expense .om-expense-detail{min-width:0;overflow-wrap:anywhere}.om .om-expense small{display:block;color:#70808a;margin-top:3px}.om .om-expense a{color:#2466a5}.om .om-expense-buttons{display:flex;gap:5px}.om .om-expense-buttons button{font-size:11px;color:#526574;border:1px solid #dce2e7;padding:5px 7px;border-radius:5px;background:white}.om .om-expense-buttons [data-delete-expense]{color:#b42332}.om .om-expense-index{color:#7c8a94;font-variant-numeric:tabular-nums}
 @media(max-width:480px){.om .om-dialog{padding:14px;width:calc(100vw - 16px)}.om .om-expense-fields{gap:10px 8px}.om .om-expense{grid-template-columns:20px minmax(0,1fr) auto}.om .om-expense-buttons{grid-column:2/-1;justify-content:flex-end}.om .om-expense-fields label{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.om .om-kpi{transition:none}}
+.om .om-kpi label{justify-content:flex-start}
+.om .om-kpi.net{background:#fff;border-color:#e1e7eb}.om .om-kpi.net label{color:#63717c}
+.om .om-expense-table-scroll{overflow:auto;max-width:100%;scrollbar-width:thin}
+.om .om-expense-table{width:100%;border-collapse:collapse;font-size:12px;text-align:left;min-width:650px}
+.om .om-expense-table th,.om .om-expense-table td{padding:9px 7px;border-bottom:1px solid #e5eaf0;vertical-align:middle}
+.om .om-expense-table thead th{font-size:11px;color:#687986;font-weight:600;white-space:nowrap;background:#f6f8fa}
+.om .om-expense-table .om-expense-month-row th{background:#edf2f6;font-size:13px;color:#334b5e;text-align:left;padding:10px 8px}
+.om .om-expense-money{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+.om .om-expense-table button{border:1px solid #dce2e7;background:white;color:#526574;border-radius:5px;padding:4px 6px;font-size:11px}
+.om .om-expense-table [data-delete-expense]{color:#b42332}
+.om .om-expense-table .om-note-preview{max-width:115px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;border-bottom:1px dotted #94a3af;border-radius:0;padding:2px 0;text-align:left}
+.om .om-expense-note-tooltip{position:absolute;z-index:5;width:min(260px,calc(100% - 24px));max-height:160px;overflow:auto;padding:10px 12px;border-radius:7px;background:#253843;color:white;font-size:12px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 3px 12px #0002}
+.om .om-expense-note-tooltip[hidden]{display:none}
+.om .sheet-table .sheet-month-heading th{background:#dbe5ed;color:#2f4655;text-align:left;padding:6px 10px;font:600 13px Arial,sans-serif;height:32px;border-bottom:1px solid #bdcdd9}
+.om .sheet-table td.sheet-date-missing{background:#ffe4e5!important;box-shadow:inset 0 0 0 1px #da6870}
+.om .om-expense-table th,.om .om-expense-table td,.om .om-expense-table th:first-child,.om .om-expense-table td:first-child{width:auto;min-width:0;max-width:none;position:static}
+.om .om-expense-table td:nth-child(2){max-width:150px;overflow-wrap:anywhere}.om .om-expense-table td:nth-child(7){white-space:nowrap}
+.om .om-expense-table th{height:auto}.om .om-expense-table td{height:auto;background:#fff}
