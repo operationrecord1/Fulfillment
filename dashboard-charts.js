@@ -22,7 +22,7 @@ let angle=-Math.PI/2,changed=false;
 shares.forEach((share,i)=>{if(!values[i])return;const end=angle+share*Math.PI*2,mid=(angle+end)/2,cx=125*.76*Math.cos(mid),cy=73*.76*Math.sin(mid);let fits=true;for(const dx of [-widths[i]/2,widths[i]/2])for(const dy of [-7,7]){const x=(cx+dx)/125,y=(cy+dy)/73;let a=Math.atan2(y,x);while(a<angle)a+=Math.PI*2;if(a>end+1e-8||x*x+y*y>1||(donut&&x*x+y*y<.49*.49))fits=false;}if(!fits&&share<.30){mins[i]=share+.001;changed=true;}angle=end;});if(!changed)break;
 }return shares;
 }
-function roundChart(a,donut){const values=a.sizes.map(s=>donut?s.count:Math.max(0,s.profit)),total=values.reduce((x,y)=>x+y,0),shares=fittedShares(values,values.map(v=>donut?String(v):(v/100).toFixed(2)),donut);let svg='<svg viewBox="40 12 260 200" role="img" aria-label="'+(donut?'Unique orders by order size':'Positive gross profit by category')+'">';if(!total)return '<div class="om-chart-empty" role="status">'+(!a.count?'No orders this period':a.sizes.some(s=>s.profit<0)?'No positive gross profit':'Gross Profit: $0.00')+'</div>';
+function roundChart(a,donut){const values=a.sizes.map(s=>donut?s.count:Math.max(0,s.profit)),total=values.reduce((x,y)=>x+y,0),shares=fittedShares(values,values.map(v=>donut?String(v):(v/100).toFixed(2)),donut);let svg='<svg viewBox="45 12 250 200" role="img" aria-label="'+(donut?'Unique orders by order size':'Positive gross profit by category')+'">';if(!total)return '<div class="om-chart-empty" role="status">'+(!a.count?'No orders this period':a.sizes.some(s=>s.profit<0)?'No positive gross profit':'Gross Profit: $0.00')+'</div>';
 let angle=-Math.PI/2;const seg=values.map((v,i)=>{const s={start:angle,end:angle+shares[i]*Math.PI*2,v,i};angle=s.end;return s;}).filter(s=>s.v);
 for(let depth=13;depth>0;depth--)for(const s of seg)svg+='<path d="'+path(170,100+depth,125,73,s.start,s.end,donut?.49:0)+'" fill="'+colors[s.i]+'" style="filter:brightness(.75)"/>';
 const tinyLabels=seg.filter(s=>shares[s.i]<.08).map(s=>({i:s.i,x:170+155*Math.cos((s.start+s.end)/2)})).sort((a,b)=>a.x-b.x);for(let i=1;i<tinyLabels.length;i++)tinyLabels[i].x=Math.max(tinyLabels[i].x,tinyLabels[i-1].x+48);if(tinyLabels.length&&tinyLabels.at(-1).x>308){const shift=tinyLabels.at(-1).x-308;for(const p of tinyLabels)p.x-=shift;}
@@ -37,10 +37,10 @@ return out.map(({orders,...p})=>({...p,count:orders.size}));}
 function niceStep(raw){const power=10**Math.floor(Math.log10(raw||1)),n=raw/power;return(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*power;}
 
 function profitLayout(points,width=900){
- const w=Math.max(160,Math.floor(width||900)),left=52,right=8,slot=(w-left-right)/Math.max(1,points.length),top=28,base=210;
+ const w=Math.max(160,Math.floor(width||900)),left=48,right=3,slot=(w-left-right)/Math.max(1,points.length),top=28,base=210;
  const hi=Math.max(0,...points.map(p=>p.value/100)),step=niceStep((hi||10)/4),max=hi>0?Math.ceil((hi+step*.15)/step)*step:step*4;
  const labels=[],items=points.map((p,i)=>{const cx=left+(i+.5)*slot,yt=base-Math.max(.8,p.value/100/max*(base-top));let label=null;
- if(p.value||p.count){const text=(p.value/100).toFixed(2),half=text.length*3.5+2,x=Math.max(half+2,Math.min(w-half-2,cx));let y=p.value<0?base+18:yt-10;
+ if(p.value<0){const text=(p.value/100).toFixed(2),half=text.length*3.5+2,x=Math.max(half+2,Math.min(w-half-2,cx));let y=p.value<0?base+18:yt-10;
  while(labels.some(q=>Math.abs(q.y-y)<14&&Math.abs(q.x-x)<q.half+half+3))y+=p.value<0?15:-15;
  label={text,x,y,half};labels.push(label);}
  return {p,cx,yt,label};});
@@ -48,14 +48,22 @@ function profitLayout(points,width=900){
  for(const item of items){item.yt+=shift;if(item.label)item.label.y+=shift;}
  return {w,left,right,slot,top:top+shift,base:base+shift,max,step,items,dateY,h:dateY+(slot<18?27:12)};
 }
+function profitCandleFit(text,width,height){
+ const normal=11,minimum=normal*.7,pad=4,ratio=text.length*.62;
+ const font=Math.min(normal,width-pad,(height-pad)/ratio);
+ if(font>=minimum)return {font,height};
+ const needed=ratio*minimum+pad;
+ if(width-pad>=minimum&&needed<=height*1.2)return {font:minimum,height:Math.max(height,needed)};
+ return {font:null,height};
+}
 function profitChart(points,yearly,width=900){
  const l=profitLayout(points,width),{w,h,left,right,slot,top,base,max,step,dateY}=l,depth=3,y=v=>base-v/max*(base-top);
  let s='<svg class="'+(yearly?'om-year-chart':'om-day-chart')+'" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+(yearly?'Monthly':'Daily')+' gross profit and loss"><defs><linearGradient id="om-profit-face"><stop stop-color="#48b48d"/><stop offset=".45" stop-color="#269875"/><stop offset="1" stop-color="#177458"/></linearGradient></defs>';
  for(let v=0;v<=max+step*.01;v+=step)s+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+(w-right)+'" y2="'+y(v)+'" stroke="#e4ebe7"/><text x="'+(left-6)+'" y="'+(y(v)+3)+'" text-anchor="end" fill="#72817d" font-size="10">'+number(v)+'</text>';
  s+='<line x1="'+left+'" x2="'+(w-right)+'" y1="'+base+'" y2="'+base+'" stroke="#9aaba3"/>';
- for(const {p,cx,yt,label} of l.items){const bw=Math.min(26,slot*.5),dx=Math.min(depth,bw*.23),x=cx-bw/2,tip=p.full+'\nGross profit: '+(p.value/100).toFixed(2);
- s+='<g class="om-chart-hit om-profit-point" tabindex="0" data-chart-tip="'+esc(tip)+'" aria-label="'+esc(tip.replace(/\n/g,', '))+'"><rect class="om-hover-area" x="'+(cx-slot/2)+'" y="0" width="'+slot+'" height="'+h+'" fill="transparent"/>';
- if(p.value>0){const height=base-yt;s+='<path d="M'+(x+bw)+' '+yt+'l'+dx+' -'+dx+'v'+height+'l-'+dx+' '+dx+'Z" fill="#14634d"/><path d="M'+x+' '+yt+'l'+dx+' -'+dx+'h'+bw+'l-'+dx+' '+dx+'Z" fill="#6ac7a4"/><rect x="'+x+'" y="'+yt+'" width="'+bw+'" height="'+height+'" fill="url(#om-profit-face)"/>';}
+ for(const {p,cx,yt,label} of l.items){const bw=Math.min(26,slot*.7),dx=Math.min(depth,bw*.23),x=cx-bw/2,tip=p.full+'\n'+p.count+' unique orders\nGross profit: '+(p.value/100).toFixed(2);
+ s+='<g class="om-chart-hit om-profit-point'+(p.value<0?' is-loss':'')+'" tabindex="0" data-chart-tip="'+esc(tip)+'" aria-label="'+esc(tip.replace(/\n/g,', '))+'"><rect class="om-hover-area" x="'+(cx-slot/2)+'" y="0" width="'+slot+'" height="'+h+'" fill="transparent"/>';
+ if(p.value>0){const fit=profitCandleFit((p.value/100).toFixed(2),bw,base-yt),height=fit.height,barTop=base-height;s+='<path d="M'+(x+bw)+' '+barTop+'l'+dx+' -'+dx+'v'+height+'l-'+dx+' '+dx+'Z" fill="#14634d"/><path d="M'+x+' '+barTop+'l'+dx+' -'+dx+'h'+bw+'l-'+dx+' '+dx+'Z" fill="#6ac7a4"/><rect x="'+x+'" y="'+barTop+'" width="'+bw+'" height="'+height+'" fill="url(#om-profit-face)"/>';if(fit.font){const cy=barTop+height/2;s+='<text class="om-profit-value" x="'+cx+'" y="'+cy+'" transform="rotate(-90 '+cx+' '+cy+')" text-anchor="middle" dominant-baseline="central" fill="white" font-family="ui-monospace,Consolas,monospace" font-size="'+fit.font+'">'+(p.value/100).toFixed(2)+'</text>';}}
  else if(p.value<0)s+='<rect class="om-loss-marker" x="'+x+'" y="'+(base-2)+'" width="'+bw+'" height="3" rx="1" fill="#cf4d58"/>';
  else if(p.count)s+='<circle cx="'+cx+'" cy="'+base+'" r="2.5" fill="white" stroke="#228365"/>';
  if(label){const anchor=p.value<0?base+3:yt-4;if(Math.abs(label.y-anchor)>20)s+='<path d="M'+cx+' '+anchor+'L'+label.x+' '+(label.y+(p.value<0?-10:3))+'" stroke="'+(p.value<0?'#cf4d58':'#718e80')+'" stroke-opacity=".3" fill="none"/>';
@@ -69,5 +77,5 @@ const position=e=>{if(!active)return;const r=active.getBoundingClientRect(),x=e.
 const leave=e=>{if(active&&!active.contains(e.relatedTarget))hide();};const key=e=>{if(e.key==='Escape')hide();};
 host.addEventListener('pointerover',show);host.addEventListener('pointermove',position);host.addEventListener('pointerout',leave);host.addEventListener('focusin',show);host.addEventListener('focusout',hide);host.addEventListener('click',show);host.addEventListener('keydown',key);host.addEventListener('scroll',hide,true);
 return()=>{host.removeEventListener('pointerover',show);host.removeEventListener('pointermove',position);host.removeEventListener('pointerout',leave);host.removeEventListener('focusin',show);host.removeEventListener('focusout',hide);host.removeEventListener('click',show);host.removeEventListener('keydown',key);host.removeEventListener('scroll',hide,true);tip.remove();};}
-const api={months,dateLabel,orderLabel,sliceShares,roundChart,calendarPoints,profitLayout,profitChart,bindTooltips};root.OrderCharts=api;if(typeof module!=='undefined')module.exports=api;
+const api={months,dateLabel,orderLabel,sliceShares,roundChart,calendarPoints,profitLayout,profitCandleFit,profitChart,bindTooltips};root.OrderCharts=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

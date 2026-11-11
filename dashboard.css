@@ -49,3 +49,13 @@ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed 
 .om .om-charts>.om-panel{padding-left:4px;padding-right:4px}
 .om .om-chart-scroll{overflow:hidden}
 .om .om-chart-scroll .om-day-chart,.om .om-chart-scroll .om-year-chart{min-width:0;width:100%;height:auto;max-height:none}
+
+.om .om-charts>.om-panel{padding-left:3px;padding-right:3px}
+.om .om-charts h2{white-space:nowrap;line-height:20px;min-height:20px;margin:0;overflow-wrap:normal}
+.om .om-charts>.om-panel:nth-child(-n+2){display:grid;grid-template-rows:20px 36px auto 1fr;align-content:start}
+.om .om-charts .om-chart{width:100%;max-width:none;margin:0}
+.om .om-charts .om-chart svg{max-height:none;min-height:0}
+.om .om-charts .om-legend{align-content:start;margin-top:0}
+.om .om-chart-scroll{overflow-x:auto;overflow-y:hidden}
+.om-profit-point.is-loss:hover .om-hover-area,.om-profit-point.is-loss:focus .om-hover-area{fill:#fff1ef}
+@media(max-width:600px){.om .om-charts>.om-panel:nth-child(-n+2){grid-template-rows:20px 54px auto 1fr}}
