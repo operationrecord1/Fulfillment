@@ -60,3 +60,17 @@ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed 
 .om-profit-point.is-loss:hover .om-hover-area,.om-profit-point.is-loss:focus .om-hover-area{fill:#fff1ef}
 @media(max-width:600px){.om .om-charts>.om-panel:nth-child(-n+2){grid-template-rows:20px 54px auto 1fr}}
 .om .om-charts>.om-panel:nth-child(-n+2){grid-template-columns:minmax(0,1fr)}
+
+/* Stacked summaries reserve the wide panel for daily labels. */
+@container(min-width:850px){
+.om .om-charts{grid-template-columns:minmax(245px,.85fr) minmax(0,2.65fr);gap:4px;align-items:stretch}
+.om .om-charts>.om-panel:nth-child(1){grid-column:1;grid-row:1}
+.om .om-charts>.om-panel:nth-child(2){grid-column:1;grid-row:2}
+.om .om-charts>.om-panel:nth-child(3){grid-column:2;grid-row:1 / span 2}
+.om .om-charts>.om-panel:nth-child(-n+2){grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-rows:20px 40px auto;padding-top:12px;padding-bottom:12px}
+.om .om-charts>.om-panel:nth-child(-n+2)>h2,.om .om-charts>.om-panel:nth-child(-n+2)>p{grid-column:1/-1}
+.om .om-charts>.om-panel:nth-child(-n+2)>.om-chart{grid-column:1;grid-row:3;align-self:center}
+.om .om-charts>.om-panel:nth-child(-n+2)>.om-legend{grid-column:2;grid-row:3;align-self:center;padding:0 5px;gap:12px}
+.om .om-charts>.om-panel{background:linear-gradient(145deg,#fff,#f9fcfb);box-shadow:0 2px 5px #203c2910}
+.om .om-charts .om-chart svg{filter:drop-shadow(0 5px 3px #254c2620)}
+}

@@ -37,20 +37,19 @@ return out.map(({orders,...p})=>({...p,count:orders.size}));}
 function niceStep(raw){const power=10**Math.floor(Math.log10(raw||1)),n=raw/power;return(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*power;}
 
 function profitLayout(points,width=900){
- const w=Math.max(160,Math.floor(width||900)),right=3,top=28,base=210;
+ const w=Math.max(160,Math.floor(width||900)),right=3,top=32,base=310,font=12;
  const hi=Math.max(0,...points.map(p=>p.value/100)),step=niceStep((hi||10)/4),max=hi>0?Math.ceil((hi+step*.15)/step)*step:step*4;
  const left=Math.max(...Array.from({length:Math.round(max/step)+1},(_,i)=>number(i*step).length))*6+9,slot=(w-left-right)/Math.max(1,points.length);
- let run=0,vertical=false;
- for(const p of points){run=p.value<0?run+1:0;if(run>=3)vertical=true;}
- const losses=points.map((p,i)=>({p,cx:left+(i+.5)*slot,text:(p.value/100).toFixed(2)})).filter(p=>p.p.value<0);
- for(let i=1;i<losses.length;i++)if(losses[i].cx-losses[i-1].cx<(losses[i].text.length+losses[i-1].text.length)*3.5+7)vertical=true;
- if(losses.some(l=>l.cx-l.text.length*3.5<left||l.cx+l.text.length*3.5>w-right))vertical=true;
- const font=vertical?Math.min(11,Math.max(7.7,slot-3)):11;
- const items=points.map((p,i)=>{const cx=left+(i+.5)*slot,yt=base-Math.max(.8,p.value/100/max*(base-top));let label=null;
- if(p.value<0){const text=(p.value/100).toFixed(2),length=text.length*font*.62;label={text,x:cx,y:vertical?base+6+length/2:base+16,half:vertical?font/2:text.length*3.5,vertical,font,bottom:vertical?base+6+length:base+19};}
+ let run=0,vertical=false;for(const p of points){run=p.value<0?run+1:0;if(run>=3)vertical=true;}
+ const placed=[];const items=points.map((p,i)=>{const cx=left+(i+.5)*slot,yt=base-Math.max(.8,p.value/100/max*(base-top));let label=null;
+ if(p.value!==0){const text=(p.value/100).toFixed(2),rotated=p.value<0&&vertical,length=text.length*font*.59,half=rotated?font/2:length/2,x=rotated?cx:Math.max(half+3,Math.min(w-half-3,cx));let y=p.value<0?(rotated?base+6+length/2:base+18):yt-9;
+ if(!rotated)while(placed.some(q=>q.negative===(p.value<0)&&Math.abs(q.y-y)<font+3&&Math.abs(q.x-x)<q.half+half+3))y+=p.value<0?font+4:-(font+4);
+ label={text,x,y,half,vertical:rotated,font,negative:p.value<0,bottom:rotated?base+6+length:y+3};placed.push(label);}
  return {p,cx,yt,label};});
- const dateY=Math.max(base+20,...items.filter(i=>i.label).map(i=>i.label.bottom+15));
- return {w,left,right,slot,top,base,max,step,items,dateY,h:dateY+(slot<18?23:9),vertical};
+ const shift=Math.max(0,16-Math.min(top,...placed.filter(l=>!l.negative).map(l=>l.y)));
+ for(const item of items){item.yt+=shift;if(item.label){item.label.y+=shift;item.label.bottom+=shift;}}
+ const dateY=Math.max(base+shift+20,...items.filter(i=>i.label?.negative).map(i=>i.label.bottom+15));
+ return {w,left,right,slot,top:top+shift,base:base+shift,max,step,items,dateY,h:dateY+(slot<18?23:9),vertical};
 }
 function profitCandleFit(text,width,height){
  const normal=11,minimum=normal*.7,pad=4,ratio=text.length*.62;
@@ -67,10 +66,10 @@ function profitChart(points,yearly,width=900){
  s+='<line x1="'+left+'" x2="'+(w-right)+'" y1="'+base+'" y2="'+base+'" stroke="#9aaba3"/>';
  for(const {p,cx,yt,label} of l.items){const bw=Math.min(26,slot*.7),dx=Math.min(depth,bw*.23),x=cx-bw/2,tip=p.full+'\n'+p.count+(p.count===1?' order':' orders')+'\nGross profit: '+(p.value/100).toFixed(2);
  s+='<g class="om-chart-hit om-profit-point'+(p.value<0?' is-loss':'')+'" tabindex="0" data-chart-tip="'+esc(tip)+'" aria-label="'+esc(tip.replace(/\n/g,', '))+'"><rect class="om-hover-area" x="'+(cx-slot/2)+'" y="0" width="'+slot+'" height="'+h+'" fill="transparent"/>';
- if(p.value>0){const fit=profitCandleFit((p.value/100).toFixed(2),bw,base-yt),height=fit.height,barTop=base-height;s+='<path d="M'+(x+bw)+' '+barTop+'l'+dx+' -'+dx+'v'+height+'l-'+dx+' '+dx+'Z" fill="#14634d"/><path d="M'+x+' '+barTop+'l'+dx+' -'+dx+'h'+bw+'l-'+dx+' '+dx+'Z" fill="#6ac7a4"/><rect x="'+x+'" y="'+barTop+'" width="'+bw+'" height="'+height+'" fill="url(#om-profit-face)"/>';if(fit.font){const cy=barTop+height/2;s+='<text class="om-profit-value" x="'+cx+'" y="'+cy+'" transform="rotate(-90 '+cx+' '+cy+')" text-anchor="middle" dominant-baseline="central" fill="white" font-family="ui-monospace,Consolas,monospace" font-size="'+fit.font+'">'+(p.value/100).toFixed(2)+'</text>';}}
+ if(p.value>0){const height=base-yt,barTop=yt;s+='<path d="M'+(x+bw)+' '+barTop+'l'+dx+' -'+dx+'v'+height+'l-'+dx+' '+dx+'Z" fill="#14634d"/><path d="M'+x+' '+barTop+'l'+dx+' -'+dx+'h'+bw+'l-'+dx+' '+dx+'Z" fill="#83dc9b"/><rect x="'+x+'" y="'+barTop+'" width="'+bw+'" height="'+height+'" fill="url(#om-profit-face)"/>';}
  else if(p.value<0)s+='<rect class="om-loss-marker" x="'+x+'" y="'+(base-2)+'" width="'+bw+'" height="3" rx="1" fill="#cf4d58"/>';
  else if(p.count)s+='<circle cx="'+cx+'" cy="'+base+'" r="2.5" fill="white" stroke="#228365"/>';
- if(label)s+='<text class="om-loss-value" x="'+label.x+'" y="'+label.y+'" '+(label.vertical?'transform="rotate(-90 '+label.x+' '+label.y+')" dominant-baseline="central" ':'')+'text-anchor="middle" fill="#bd3846" font-family="ui-monospace,Consolas,monospace" font-size="'+label.font+'">'+label.text+'</text>';
+ if(label)s+='<text class="'+(label.negative?'om-loss-value':'om-profit-value')+'" x="'+label.x+'" y="'+label.y+'" '+(label.vertical?'transform="rotate(-90 '+label.x+' '+label.y+')" dominant-baseline="central" ':'')+'text-anchor="middle" fill="'+(label.negative?'#bd3846':'#264b3e')+'" font-family="Inter,Segoe UI,Arial,sans-serif" font-weight="500" style="font-variant-numeric:tabular-nums" font-size="'+label.font+'">'+label.text+'</text>';
  s+='<text x="'+cx+'" y="'+(dateY+(slot<18&&p.index%2?14:0))+'" text-anchor="middle" fill="#72817d" font-size="10">'+p.label+'</text></g>';}
  return s+'</svg>';
 }

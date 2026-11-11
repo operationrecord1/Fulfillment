@@ -43,3 +43,6 @@ assert.equal(C.profitLayout(lossPoints([-1,-1,0,-1]),900).vertical,false);
 assert.equal(C.profitLayout(bigAmounts,520).vertical,true);
 assert.ok(C.profitChart(lossPoints([1]),false).includes('1 order'));
 assert.ok(!C.profitChart(lossPoints([1]),false).includes('unique orders'));
+
+// Rotation depends only on a run of three negative calendar days.
+for(const width of [520,900,1500]){const sparse=Array.from({length:31},(_,index)=>({index,label:String(index+1),full:'Day',count:1,value:index%2?0:-999999}));const l=C.profitLayout(sparse,width);assert.equal(l.vertical,false);assert.ok(l.items.filter(i=>i.label).every(i=>!i.label.vertical));const run=sparse.map(p=>({...p}));run[1].value=-1;const r=C.profitLayout(run,width);assert.equal(r.vertical,true);assert.ok(r.items.filter(i=>i.p.value<0).every(i=>i.label.vertical));const profits=C.profitLayout(sparse.map(p=>({...p,value:999999})),width);assert.ok(profits.items.every(i=>!i.label.vertical&&i.label.y<i.yt));}
