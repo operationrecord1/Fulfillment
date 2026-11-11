@@ -11,3 +11,4 @@ assert.equal(C.link('https://example.com/order/1','order_id').text,'https://exam
 assert.equal(C.link('javascript:alert(1)','order_id').url,'');
 assert.equal(C.columns.length,17);assert.equal(C.columns[15][0],'id');assert.equal(C.columns[16][0],'date');
 console.log('PASS: aggregation, grouped orders, duplicate runs, loss, category boundaries, tax, safe links and 17 columns');
+const taxRows=[{id:'tax',position:1,month:11,data:{order_id:'tax',earning:100,product_cost:20,date:'2026-11-01'}}];assert.equal(C.aggregate(taxRows,[{amount:10}],false,0).tax,0);assert.equal(C.aggregate(taxRows,[{amount:10}],false,5).tax,350);assert.equal(C.aggregate(taxRows,[{amount:10}],false,15).net,5950);assert.equal(C.aggregate(taxRows,[],false,2.5).tax,200);console.log('PASS: configurable 0/5/15/2.5 percent tax, unchanged base and net formula');

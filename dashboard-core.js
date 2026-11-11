@@ -23,7 +23,7 @@ function groups(rows,investor=false){
  for(const g of out){g.profit=investor?(present(g.rows[0].group_profit)?cents(g.rows[0].group_profit):null):(g.hasRevenue&&g.hasCost?g.revenue-g.cost-g.other:null);g.margin=g.revenue&&g.profit!==null?Math.max(-100,Math.min(100,g.profit/g.revenue*100)):null;}
  return out;
 }
-function aggregate(rows,expenses,investor=false){
+function aggregate(rows,expenses,investor=false,taxPercentage=15){
  const gs=groups(rows,investor),orders=new Map(),daily=new Map(),margins=[];
  let revenue=0,cost=0,gross=0;
  for(const r of rows){const d=r.data;revenue+=cents(d.earning);cost+=cents(d.product_cost);if(d.order_id){const o=orders.get(d.order_id)||{revenue:0,profit:0};o.revenue+=cents(d.earning);orders.set(d.order_id,o);}if(d.date&&d.order_id&&!daily.has(d.date))daily.set(d.date,0);}
@@ -36,7 +36,7 @@ function aggregate(rows,expenses,investor=false){
  }const dated=g.rows.find(r=>r.data.date);if(dated)daily.set(dated.data.date,(daily.get(dated.data.date)||0)+g.profit);}
  const sizes=[{name:'Small',count:0,profit:0},{name:'Medium',count:0,profit:0},{name:'Large',count:0,profit:0}];
  for(const o of orders.values()){const s=sizes[o.revenue<1200?0:o.revenue<3000?1:2];s.count++;s.profit+=o.profit;}
- const expense=expenses.reduce((s,e)=>s+cents(e.amount),0),tax=Math.round(Math.max(0,gross-expense)*.15),count=orders.size;
+ const expense=expenses.reduce((s,e)=>s+cents(e.amount),0),tax=Math.round(Math.max(0,gross-expense)*(Number.isFinite(Number(taxPercentage))?Math.max(0,Number(taxPercentage)):15)/100),count=orders.size;
  return {groups:gs,count,revenue,cost,gross,expense,tax,net:gross-expense-tax,margin:margins.length?margins.reduce((a,b)=>a+b,0)/margins.length:0,avgOrder:count?Math.round(revenue/count):0,avgProfit:count?Math.round(gross/count):0,avgDaily:daily.size?count/daily.size:0,sizes,points:[...daily].sort(([a],[b])=>a.localeCompare(b))};
 }
 function duplicates(rows,fields=['order_id','purchase_id']){const marks=new Set();for(const key of fields){const runs=new Map();let prev='',month=null,position=null;for(const r of rows){const value=r.data[key]||'';if(value){if(!runs.has(value))runs.set(value,[]);if(value!==prev||month!==r.month||(r.position!==undefined&&position!==null&&r.position!==position+1))runs.get(value).push([]);runs.get(value).at(-1).push(r);}prev=value;month=r.month;position=r.position??null;}for(const run of runs.values())if(run.length>1)run.flat().forEach(r=>marks.add(r.id||r._key));}return marks;}
