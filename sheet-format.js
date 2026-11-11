@@ -18,7 +18,7 @@ class Formatting{
  }
  active(){const {r,c}=this.g.selection;return F.get(this.g.formats||{},r,this.g.cols[c]?.key);}
  paint(){if(!this.g.cols.length)return;const f=this.active(),g=this.g;this.size.disabled=!g.editable;if(document.activeElement!==this.size)this.size.value=f.fontSize;
- this.toolbar.querySelectorAll('button[data-format]').forEach(b=>{const k=b.dataset.format;b.disabled=!g.editable||(k==='undo'&&!g.history.length)||(k==='redo'&&!g.future.length);if(['bold','italic'].includes(k))b.setAttribute('aria-pressed',String(f[k]));});
+ this.toolbar.querySelectorAll('button[data-format]').forEach(b=>{const k=b.dataset.format;b.disabled=k==='undo'?(g.options.canUndo?!g.options.canUndo():!g.editable||!g.history.length):k==='redo'?(g.options.canRedo?!g.options.canRedo():!g.editable||!g.future.length):!g.editable;if(['bold','italic'].includes(k))b.setAttribute('aria-pressed',String(f[k]));});
  this.toolbar.querySelector('[data-format=color]').style.setProperty('--indicator',f.color);this.toolbar.querySelector('[data-format=fill]').style.setProperty('--indicator',f.fill);this.toolbar.querySelector('[data-format=left]').innerHTML=icon(f.align)+icon('chevron');
  }
  apply(values){const g=this.g;if(!g.editable||!g.commitEditor())return;g.checkpoint();const b=g.bounds();for(let r=b.r1;r<=b.r2;r++)for(let c=b.c1;c<=b.c2;c++)F.patch(g.formats,r,g.cols[c].key,values);g.closePopup();g.changed();g.host.focus({preventScroll:true});}
