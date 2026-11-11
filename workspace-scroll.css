@@ -28,3 +28,29 @@ body.order-workspace{margin:0}
 .om .sheet-table .sheet-labels th{top:40px;z-index:20}.om .sheet-table .sheet-labels .sheet-corner{z-index:22!important}
 .om .om-main:focus-visible{outline:none}
 
+/* Desktop uses the available width; compact devices retain the shared canvas. */
+body.order-workspace .om,body.order-workspace .om.om-sidebar-collapsed{display:block;grid-template-columns:none}
+.om-profile{position:fixed;top:12px;right:24px;z-index:60}
+.om-profile-trigger{width:36px;height:36px;border:1px solid #dadce0;border-radius:50%;background:#e8f0fe;color:#174ea6;font:600 15px Arial;cursor:pointer;transition:box-shadow .15s}
+.om-profile-trigger:hover{box-shadow:0 0 0 4px #e8f0fe80}.om-profile-trigger:focus-visible{outline:2px solid #1a73e8;outline-offset:3px}
+.om-profile-menu{position:fixed;inset:56px 20px auto auto;margin:0;width:min(280px,calc(100vw - 40px));box-sizing:border-box;padding:16px 8px 8px;border:1px solid #e2e6ea;border-radius:16px;background:#fff;color:#202124;box-shadow:0 8px 28px #25304426}
+.om-profile-menu strong,.om-profile-menu small{display:block;padding:0 12px;overflow-wrap:anywhere}.om-profile-menu strong{font:500 13px Arial}.om-profile-menu small{font:12px Arial;color:#687177;margin:7px 0 12px}
+.om-profile-menu button{display:block;width:100%;text-align:left;border:0;background:transparent;border-radius:8px;padding:10px 12px;font:13px Arial;color:#30363b;cursor:pointer}.om-profile-menu button[hidden]{display:none}.om-profile-menu button:hover{background:#f1f4f8}.om-profile-menu button:focus-visible{outline:2px solid #1a73e8}
+.om .sheet-filter-slot{margin-left:auto;display:inline-flex;align-items:center;gap:4px;padding-left:8px}
+.om .sheet-tools .sheet-filter-button{width:auto;max-width:210px;height:28px;padding:4px 10px;border:1px solid #dadfe5;border-radius:7px;background:#fff;font:12px Arial;overflow:hidden;text-overflow:ellipsis}
+.om .sheet-tools .sheet-filter-button[hidden]{display:none}.om .sheet-tools .sheet-filter-button:hover{background:#eef3f8;border-color:#b6c1ce}.om .sheet-tools .sheet-filter-button[aria-expanded=true]{background:#e8f0fe;border-color:#aac5ed;color:#174ea6}
+.om .om-month-trigger{font-size:14px;white-space:normal;text-align:left;line-height:1.35}
+@media(min-width:1200px){
+ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed .om-main{overflow-x:hidden;overflow-y:scroll}
+ .om .om-canvas{width:calc(100% - 2px);max-width:1798px;min-width:0;margin-inline:auto}
+ .om .om-charts{grid-template-columns:minmax(0,19fr) minmax(0,19fr) minmax(0,62fr)}
+ .om .om-kpi{padding:12px 10px;min-height:92px}.om .om-kpi strong{font-size:21px}
+ .om .sheet-table .sheet-labels th{font-size:10px;white-space:normal;overflow-wrap:normal;padding:3px 2px;line-height:1.15}
+ .om .sheet-table td{padding-left:3px;padding-right:3px}.om .sheet-tools{padding-inline:4px;gap:1px}
+ .om .sheet-search-slot input{width:135px;min-width:0}.om .sheet-tools>.om-save{font-size:10px;padding:0 4px;margin-left:4px}
+}
+@media(prefers-reduced-motion:reduce){.om-profile-trigger{transition:none}}
+.om .sheet-tools .sheet-filter-slot{margin:0 0 0 auto;max-width:none;overflow:visible}
+.om .om-head{position:relative;box-sizing:border-box;max-width:calc(100vw - 14px);padding-right:62px}
+.om .om-profile{position:absolute;right:12px;top:12px}
+@media(min-width:1200px){.om .om-canvas{width:calc(100% - 4px)}}
