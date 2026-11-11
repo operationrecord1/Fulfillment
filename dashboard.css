@@ -33,11 +33,13 @@ body.order-workspace{background:#f3f6f5;color:#1b302d}body.order-workspace .poli
 .om-chart-empty{display:flex;align-items:center;justify-content:center;min-height:160px;text-align:center;padding:12px;color:#72817d;font-size:12px}@media(max-width:600px){.om-chart-empty{min-height:110px;font-size:11px;padding:4px}}
 
 /* Compact page gutters and stable, measured daily amount columns. */
-.om .om-main,.om.om-sidebar-collapsed .om-main{max-width:none;padding-left:3px;padding-right:3px}
+body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed .om-main{max-width:none;padding-left:3px;padding-right:3px}
 .om .om-kpis,.om .om-charts{gap:4px}
 .om .om-charts>.om-panel{padding-left:4px;padding-right:4px}
 .om .om-chart-scroll .om-day-chart,.om .om-chart-scroll .om-year-chart{min-width:0}
 .om .om-charts>.om-panel:nth-child(-n+2)>p{min-height:32px}
 @container(min-width:1100px){.om .om-charts{grid-template-columns:minmax(175px,.64fr) minmax(175px,.64fr) minmax(0,2.72fr)}.om .om-charts>.om-panel:last-child{grid-column:auto}}
-@media(max-width:1440px){.om .om-main,.om.om-sidebar-collapsed .om-main{padding-left:2px;padding-right:2px}}
+@media(max-width:1440px){body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed .om-main{padding-left:2px;padding-right:2px}}
 @media(max-width:600px){.om .om-charts>.om-panel:nth-child(-n+2)>p{min-height:43px}}
+
+@media(max-width:700px){body.order-workspace .om .sheet-grid{margin-left:0;margin-right:0}}
