@@ -31,3 +31,13 @@ body.order-workspace{background:#f3f6f5;color:#1b302d}body.order-workspace .poli
 @media(max-width:600px){.om .om-charts{gap:6px}.om .om-charts>.om-panel{padding:10px 4px;border-radius:11px}.om .om-charts h2{font-size:12px;min-height:33px;margin:0 3px}.om .om-charts p{font-size:10px;min-height:43px;margin:5px 3px}.om .om-charts .om-legend div{font-size:10px}.om .om-charts .om-legend i{width:6px;height:6px}.om .om-charts>.om-panel:last-child h2,.om .om-charts>.om-panel:last-child p{min-height:0}.om .om-charts .om-legend{padding:0 2px}.om .om-charts .om-chart svg{min-height:100px}}
 @media(max-width:380px){.om #om-pie-legend div{display:grid;grid-template-columns:6px minmax(0,1fr);gap:2px 4px}.om #om-pie-legend b{grid-column:2;margin-left:0}.om .om-charts p{font-size:9px}}
 .om-chart-empty{display:flex;align-items:center;justify-content:center;min-height:160px;text-align:center;padding:12px;color:#72817d;font-size:12px}@media(max-width:600px){.om-chart-empty{min-height:110px;font-size:11px;padding:4px}}
+
+/* Compact page gutters and stable, measured daily amount columns. */
+.om .om-main,.om.om-sidebar-collapsed .om-main{max-width:none;padding-left:3px;padding-right:3px}
+.om .om-kpis,.om .om-charts{gap:4px}
+.om .om-charts>.om-panel{padding-left:4px;padding-right:4px}
+.om .om-chart-scroll .om-day-chart,.om .om-chart-scroll .om-year-chart{min-width:0}
+.om .om-charts>.om-panel:nth-child(-n+2)>p{min-height:32px}
+@container(min-width:1100px){.om .om-charts{grid-template-columns:minmax(175px,.64fr) minmax(175px,.64fr) minmax(0,2.72fr)}.om .om-charts>.om-panel:last-child{grid-column:auto}}
+@media(max-width:1440px){.om .om-main,.om.om-sidebar-collapsed .om-main{padding-left:2px;padding-right:2px}}
+@media(max-width:600px){.om .om-charts>.om-panel:nth-child(-n+2)>p{min-height:43px}}
