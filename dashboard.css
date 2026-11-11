@@ -59,3 +59,4 @@ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed 
 .om .om-chart-scroll{overflow-x:auto;overflow-y:hidden}
 .om-profit-point.is-loss:hover .om-hover-area,.om-profit-point.is-loss:focus .om-hover-area{fill:#fff1ef}
 @media(max-width:600px){.om .om-charts>.om-panel:nth-child(-n+2){grid-template-rows:20px 54px auto 1fr}}
+.om .om-charts>.om-panel:nth-child(-n+2){grid-template-columns:minmax(0,1fr)}
