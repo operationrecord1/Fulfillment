@@ -49,8 +49,9 @@ function profitLayout(points,width=900){
  label={text,x,y,half,vertical:rotated,font,negative:p.value<0,bottom:rotated?base+6+length:y+3};placed.push(label);}
  return {p,cx,yt,label};});
  // Profit labels stay anchored to their own candle, never to a neighbouring date.
- const measureContext=typeof document!=='undefined'?document.createElement('canvas').getContext('2d'):null;
- const textWidth=(text,size)=>{if(measureContext){measureContext.font='500 '+size+'px Inter,Segoe UI,Arial,sans-serif';return measureContext.measureText(text).width;}return text.length*size*.59;};
+ const measureSvg=typeof document!=='undefined'?document.createElementNS('http://www.w3.org/2000/svg','svg'):null;
+ let measureText=null;if(measureSvg){measureSvg.setAttribute('aria-hidden','true');measureSvg.style.cssText='position:absolute;visibility:hidden;width:0;height:0;overflow:hidden;pointer-events:none';measureText=document.createElementNS(measureSvg.namespaceURI,'text');measureText.style.cssText='font-family:Inter,Segoe UI,Arial,sans-serif;font-weight:500;font-variant-numeric:tabular-nums';measureSvg.append(measureText);document.body.append(measureSvg);}
+ const textWidth=(text,size)=>{if(measureText){measureText.setAttribute('font-size',size);measureText.textContent=text;return measureText.getComputedTextLength();}return text.length*size*.59;};
  for(const item of items)if(item.label&&!item.label.negative){const l=item.label;l.x=item.cx;l.font=Math.max(9,Math.min(12,Math.floor(12*(slot-1)/textWidth(l.text,12))));l.font=Math.min(l.font,12*(2*Math.min(l.x-1,w-l.x-1))/textWidth(l.text,12));l.half=textWidth(l.text,l.font)/2;}
  // A one-pixel gap, with each colliding group balanced around its original dates.
  const losses=placed.filter(l=>l.negative&&!l.vertical);
@@ -61,6 +62,7 @@ function profitLayout(points,width=900){
   const balance=g=>{let offset=0;const offsets=g.map((l,i)=>{if(i)offset+=g[i-1].half+l.half+1;return offset;});const origin=g.reduce((sum,l,i)=>sum+l.anchor-offsets[i],0)/g.length;g.forEach((l,i)=>{l.x=origin+offsets[i];});};
   for(const l of losses){l.anchor=l.x;groups.push([l]);while(groups.length>1){const last=groups.at(-1),prev=groups.at(-2);if(last[0].x-last[0].half>=prev.at(-1).x+prev.at(-1).half+1)break;groups.splice(-2,2,[...prev,...last]);balance(groups.at(-1));}}
  }
+ measureSvg?.remove();
  const shift=Math.max(0,16-Math.min(top,...placed.filter(l=>!l.negative).map(l=>l.y)));
  for(const item of items){item.yt+=shift;if(item.label){item.label.y+=shift;item.label.bottom+=shift;}}
  const dateY=Math.max(base+shift+20,...items.filter(i=>i.label?.negative).map(i=>i.label.bottom+15));
