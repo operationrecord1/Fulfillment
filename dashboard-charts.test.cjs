@@ -55,4 +55,7 @@ for(const w of [520,700,900,1400]){const l=C.profitLayout(lossPoints([200,2,1800
 assert.ok(Math.abs((negative[0].x+negative[1].x)/2-(adjacent.items[16].cx+adjacent.items[17].cx)/2)<1e-8);
 
 // Scrolling mode retains every nonzero amount with enough space per date.
-for(const points of [dense,bigAmounts,lossPoints([2,-1,200,-561,0])]){const width=C.profitScrollWidth(points),svg=C.profitChart(points,false,width,{showAmounts:true});assert.equal((svg.match(/class="om-(?:profit|loss)-value"/g)||[]).length,points.filter(p=>p.value!==0).length);assert.ok(width>=700);}
+for(const points of [dense,bigAmounts,lossPoints([2,-1,200,-561,0])]){const width=C.profitScrollWidth(points),svg=C.profitChart(points,false,width,{showAmounts:true});assert.equal((svg.match(/class="om-(?:profit|loss)-value"/g)||[]).length,points.filter(p=>p.value!==0).length);assert.ok(width>=360);}
+
+const scrollLoss=lossPoints([-100,-200,-300,500]);const compact=C.profitChart(scrollLoss,false,C.profitScrollWidth(scrollLoss),{showAmounts:true,compactScroll:true,horizontalLoss:true});assert.equal((compact.match(/class="om-loss-value"/g)||[]).length,3);assert.ok(!compact.includes('rotate(-90'));
+const annual=C.profitChart(lossPoints([10000,-200,0]),true,700);assert.ok(annual.includes('om-year-profit-value'));assert.ok(annual.includes('fill="white"'));assert.ok(annual.includes('rotate(-90'));assert.ok(C.profitScrollWidth(dense)<1400);

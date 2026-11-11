@@ -38,21 +38,22 @@ for(const row of rows){const d=row.data;if(!d.date||!d.order_id||Number(d.date.s
 return out.map(({orders,...p})=>({...p,count:orders.size}));}
 function niceStep(raw){const power=10**Math.floor(Math.log10(raw||1)),n=raw/power;return(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*power;}
 
-function profitLayout(points,width=900){
- const w=Math.max(160,Math.floor(width||900)),right=3,top=20,base=230,font=12;
+function profitLayout(points,width=900,options={}){
+ const w=Math.max(160,Math.floor(width||900)),right=3,top=20,base=210,font=12;
  const hi=Math.max(0,...points.map(p=>p.value/100)),step=niceStep((hi||10)/4),max=hi>0?Math.ceil(hi/step)*step:step*4;
  const left=Math.max(...Array.from({length:Math.round(max/step)+1},(_,i)=>number(i*step).length))*6+9,slot=(w-left-right)/Math.max(1,points.length);
- let run=0,vertical=false;for(const p of points){run=p.value<0?run+1:0;if(run>=3)vertical=true;}
- const placed=[];const items=points.map((p,i)=>{const cx=left+(i+.5)*slot,yt=base-Math.max(.8,p.value/100/max*(base-top));let label=null;
+ const weights=options.compactScroll?profitSlotWidths(points,options.yearly):points.map(()=>1),weightTotal=weights.reduce((a,b)=>a+b,0)||1;let cursor=left;
+ let run=0,vertical=false;for(const p of points){run=p.value<0?run+1:0;if(run>=3)vertical=true;}if(options.horizontalLoss||options.yearly)vertical=false;
+ const placed=[];const items=points.map((p,i)=>{const pointSlot=(w-left-right)*weights[i]/weightTotal,cx=cursor+pointSlot/2;cursor+=pointSlot;const yt=base-Math.max(.8,p.value/100/max*(base-top));let label=null;
  if(p.value!==0){const text=(p.value/100).toFixed(2),rotated=p.value<0&&vertical,length=text.length*font*.59,half=rotated?font/2:length/2,x=rotated?cx:Math.max(half+3,Math.min(w-half-3,cx));let y=p.value<0?(rotated?base+6+length/2:base+18):yt-9;
  
  label={text,x,y,half,vertical:rotated,font,negative:p.value<0,bottom:rotated?base+6+length:y+3};placed.push(label);}
- return {p,cx,yt,label};});
+ return {p,cx,yt,label,pointSlot};});
  // Profit labels stay anchored to their own candle, never to a neighbouring date.
  const measureSvg=typeof document!=='undefined'?document.createElementNS('http://www.w3.org/2000/svg','svg'):null;
  let measureText=null;if(measureSvg){measureSvg.setAttribute('aria-hidden','true');measureSvg.style.cssText='position:absolute;visibility:hidden;width:0;height:0;overflow:hidden;pointer-events:none';measureText=document.createElementNS(measureSvg.namespaceURI,'text');measureText.style.cssText='font-family:Inter,Segoe UI,Arial,sans-serif;font-weight:500;font-variant-numeric:tabular-nums';measureSvg.append(measureText);document.body.append(measureSvg);}
  const textWidth=(text,size)=>{if(measureText){measureText.setAttribute('font-size',size);measureText.textContent=text;return measureText.getComputedTextLength();}return text.length*size*.59;};
- for(const item of items)if(item.label&&!item.label.negative){const l=item.label;l.x=item.cx;l.font=Math.max(9,Math.min(12,Math.floor(12*(slot-1)/textWidth(l.text,12))));l.font=Math.min(l.font,12*(2*Math.min(l.x-1,w-l.x-1))/textWidth(l.text,12));l.half=textWidth(l.text,l.font)/2;}
+ for(const item of items)if(item.label&&!item.label.negative){const l=item.label;l.x=item.cx;l.font=Math.max(9,Math.min(12,Math.floor(12*(item.pointSlot-1)/textWidth(l.text,12))));l.font=Math.min(l.font,12*(2*Math.min(l.x-1,w-l.x-1))/textWidth(l.text,12));l.half=textWidth(l.text,l.font)/2;}
  // A one-pixel gap, with each colliding group balanced around its original dates.
  const losses=placed.filter(l=>l.negative&&!l.vertical);
  for(const l of losses)l.half=textWidth(l.text,l.font)/2;
@@ -78,18 +79,20 @@ function profitCandleFit(text,width,height){
  if(width-pad>=minimum&&needed<=height*1.2)return {font:minimum,height:Math.max(height,needed)};
  return {font:null,height};
 }
-function profitScrollWidth(points){const labelWidth=Math.max(0,...points.map(p=>(p.value/100).toFixed(2).length*12*.65));return Math.max(700,Math.ceil(points.length*(labelWidth+12)+60));}
+function profitSlotWidths(points,yearly=false){return points.map(p=>Math.max(26,(!p.value||(yearly&&p.value>0))?26:(p.value/100).toFixed(2).length*11*.62+2));}
+function profitScrollWidth(points,yearly=false){return Math.max(360,Math.ceil(profitSlotWidths(points,yearly).reduce((a,b)=>a+b,0)+60));}
 function profitChart(points,yearly,width=900,options={}){
- const l=profitLayout(points,width),{w,h,left,right,slot,top,base,max,step,dateY}=l,depth=3,y=v=>base-v/max*(base-top);
+ const l=profitLayout(points,width,{...options,yearly}),{w,h,left,right,slot,top,base,max,step,dateY}=l,depth=3,y=v=>base-v/max*(base-top);
  let s='<svg class="'+(yearly?'om-year-chart':'om-day-chart')+'" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+(yearly?'Monthly':'Daily')+' gross profit and loss"><defs><linearGradient id="om-profit-face"><stop stop-color="#48b48d"/><stop offset=".45" stop-color="#269875"/><stop offset="1" stop-color="#177458"/></linearGradient></defs>';
  for(let v=0;v<=max+step*.01;v+=step)s+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+(w-right)+'" y2="'+y(v)+'" stroke="#e4ebe7"/><text x="'+(left-6)+'" y="'+(y(v)+3)+'" text-anchor="end" fill="#72817d" font-size="10">'+number(v)+'</text>';
  s+='<line x1="'+left+'" x2="'+(w-right)+'" y1="'+base+'" y2="'+base+'" stroke="#9aaba3"/>';
- for(const {p,cx,yt,label} of l.items){const bw=Math.min(26,slot*.7),dx=Math.min(depth,bw*.23),x=cx-bw/2,tip=p.full+'\n'+p.count+(p.count===1?' order':' orders')+'\nGross profit: '+(p.value/100).toFixed(2);
- s+='<g class="om-chart-hit om-profit-point'+(p.value<0?' is-loss':'')+'" tabindex="0" data-chart-tip="'+esc(tip)+'" aria-label="'+esc(tip.replace(/\n/g,', '))+'"><rect class="om-hover-area" x="'+(cx-slot/2)+'" y="0" width="'+slot+'" height="'+h+'" fill="transparent"/>';
+ for(const {p,cx,yt,label,pointSlot} of l.items){const bw=Math.min(26,pointSlot-4),dx=Math.min(depth,bw*.23),x=cx-bw/2,tip=p.full+'\n'+p.count+(p.count===1?' order':' orders')+'\nGross profit: '+(p.value/100).toFixed(2);
+ s+='<g class="om-chart-hit om-profit-point'+(p.value<0?' is-loss':'')+'" tabindex="0" data-chart-tip="'+esc(tip)+'" aria-label="'+esc(tip.replace(/\n/g,', '))+'"><rect class="om-hover-area" x="'+(cx-pointSlot/2)+'" y="0" width="'+slot+'" height="'+h+'" fill="transparent"/>';
  if(p.value>0){const height=base-yt,barTop=yt;s+='<path d="M'+(x+bw)+' '+barTop+'l'+dx+' -'+dx+'v'+height+'l-'+dx+' '+dx+'Z" fill="#14634d"/><path d="M'+x+' '+barTop+'l'+dx+' -'+dx+'h'+bw+'l-'+dx+' '+dx+'Z" fill="#83dc9b"/><rect x="'+x+'" y="'+barTop+'" width="'+bw+'" height="'+height+'" fill="url(#om-profit-face)"/>';}
  else if(p.value<0)s+='<rect class="om-loss-marker" x="'+x+'" y="'+(base-2)+'" width="'+bw+'" height="3" rx="1" fill="#cf4d58"/>';
  else if(p.count)s+='<circle cx="'+cx+'" cy="'+base+'" r="2.5" fill="white" stroke="#228365"/>';
- if(label&&(options.showAmounts||!l.hideAmounts))s+='<text class="'+(label.negative?'om-loss-value':'om-profit-value')+'" x="'+label.x+'" y="'+label.y+'" '+(label.vertical?'transform="rotate(-90 '+label.x+' '+label.y+')" dominant-baseline="central" ':'')+'text-anchor="middle" fill="'+(label.negative?'#bd3846':'#264b3e')+'" font-family="Inter,Segoe UI,Arial,sans-serif" font-weight="500" style="font-variant-numeric:tabular-nums" font-size="'+label.font+'">'+label.text+'</text>';
+ if(yearly&&label&&!label.negative){const insideFont=Math.min(11,bw-4,(base-yt-6)/(label.text.length*.62));if(insideFont>=7.7)s+='<text class="om-profit-value om-year-profit-value" x="'+cx+'" y="'+((base+yt)/2)+'" transform="rotate(-90 '+cx+' '+((base+yt)/2)+')" dominant-baseline="central" text-anchor="middle" fill="white" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="'+insideFont+'" font-weight="500">'+label.text+'</text>';}
+ else if(label&&(yearly||options.showAmounts||!l.hideAmounts))s+='<text class="'+(label.negative?'om-loss-value':'om-profit-value')+'" x="'+label.x+'" y="'+label.y+'" '+(label.vertical?'transform="rotate(-90 '+label.x+' '+label.y+')" dominant-baseline="central" ':'')+'text-anchor="middle" fill="'+(label.negative?'#bd3846':'#264b3e')+'" font-family="Inter,Segoe UI,Arial,sans-serif" font-weight="500" style="font-variant-numeric:tabular-nums" font-size="'+label.font+'">'+label.text+'</text>';
  s+='<text x="'+cx+'" y="'+(dateY+(slot<18&&p.index%2?14:0))+'" text-anchor="middle" fill="#72817d" font-size="10">'+p.label+'</text></g>';}
  return s+'</svg>';
 }
