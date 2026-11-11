@@ -39,8 +39,8 @@ return out.map(({orders,...p})=>({...p,count:orders.size}));}
 function niceStep(raw){const power=10**Math.floor(Math.log10(raw||1)),n=raw/power;return(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*power;}
 
 function profitLayout(points,width=900){
- const w=Math.max(160,Math.floor(width||900)),right=3,top=32,base=310,font=12;
- const hi=Math.max(0,...points.map(p=>p.value/100)),step=niceStep((hi||10)/4),max=hi>0?Math.ceil((hi+step*.15)/step)*step:step*4;
+ const w=Math.max(160,Math.floor(width||900)),right=3,top=20,base=230,font=12;
+ const hi=Math.max(0,...points.map(p=>p.value/100)),step=niceStep((hi||10)/4),max=hi>0?Math.ceil(hi/step)*step:step*4;
  const left=Math.max(...Array.from({length:Math.round(max/step)+1},(_,i)=>number(i*step).length))*6+9,slot=(w-left-right)/Math.max(1,points.length);
  let run=0,vertical=false;for(const p of points){run=p.value<0?run+1:0;if(run>=3)vertical=true;}
  const placed=[];const items=points.map((p,i)=>{const cx=left+(i+.5)*slot,yt=base-Math.max(.8,p.value/100/max*(base-top));let label=null;
@@ -78,7 +78,8 @@ function profitCandleFit(text,width,height){
  if(width-pad>=minimum&&needed<=height*1.2)return {font:minimum,height:Math.max(height,needed)};
  return {font:null,height};
 }
-function profitChart(points,yearly,width=900){
+function profitScrollWidth(points){const labelWidth=Math.max(0,...points.map(p=>(p.value/100).toFixed(2).length*12*.65));return Math.max(700,Math.ceil(points.length*(labelWidth+12)+60));}
+function profitChart(points,yearly,width=900,options={}){
  const l=profitLayout(points,width),{w,h,left,right,slot,top,base,max,step,dateY}=l,depth=3,y=v=>base-v/max*(base-top);
  let s='<svg class="'+(yearly?'om-year-chart':'om-day-chart')+'" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+(yearly?'Monthly':'Daily')+' gross profit and loss"><defs><linearGradient id="om-profit-face"><stop stop-color="#48b48d"/><stop offset=".45" stop-color="#269875"/><stop offset="1" stop-color="#177458"/></linearGradient></defs>';
  for(let v=0;v<=max+step*.01;v+=step)s+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+(w-right)+'" y2="'+y(v)+'" stroke="#e4ebe7"/><text x="'+(left-6)+'" y="'+(y(v)+3)+'" text-anchor="end" fill="#72817d" font-size="10">'+number(v)+'</text>';
@@ -88,7 +89,7 @@ function profitChart(points,yearly,width=900){
  if(p.value>0){const height=base-yt,barTop=yt;s+='<path d="M'+(x+bw)+' '+barTop+'l'+dx+' -'+dx+'v'+height+'l-'+dx+' '+dx+'Z" fill="#14634d"/><path d="M'+x+' '+barTop+'l'+dx+' -'+dx+'h'+bw+'l-'+dx+' '+dx+'Z" fill="#83dc9b"/><rect x="'+x+'" y="'+barTop+'" width="'+bw+'" height="'+height+'" fill="url(#om-profit-face)"/>';}
  else if(p.value<0)s+='<rect class="om-loss-marker" x="'+x+'" y="'+(base-2)+'" width="'+bw+'" height="3" rx="1" fill="#cf4d58"/>';
  else if(p.count)s+='<circle cx="'+cx+'" cy="'+base+'" r="2.5" fill="white" stroke="#228365"/>';
- if(label&&!l.hideAmounts)s+='<text class="'+(label.negative?'om-loss-value':'om-profit-value')+'" x="'+label.x+'" y="'+label.y+'" '+(label.vertical?'transform="rotate(-90 '+label.x+' '+label.y+')" dominant-baseline="central" ':'')+'text-anchor="middle" fill="'+(label.negative?'#bd3846':'#264b3e')+'" font-family="Inter,Segoe UI,Arial,sans-serif" font-weight="500" style="font-variant-numeric:tabular-nums" font-size="'+label.font+'">'+label.text+'</text>';
+ if(label&&(options.showAmounts||!l.hideAmounts))s+='<text class="'+(label.negative?'om-loss-value':'om-profit-value')+'" x="'+label.x+'" y="'+label.y+'" '+(label.vertical?'transform="rotate(-90 '+label.x+' '+label.y+')" dominant-baseline="central" ':'')+'text-anchor="middle" fill="'+(label.negative?'#bd3846':'#264b3e')+'" font-family="Inter,Segoe UI,Arial,sans-serif" font-weight="500" style="font-variant-numeric:tabular-nums" font-size="'+label.font+'">'+label.text+'</text>';
  s+='<text x="'+cx+'" y="'+(dateY+(slot<18&&p.index%2?14:0))+'" text-anchor="middle" fill="#72817d" font-size="10">'+p.label+'</text></g>';}
  return s+'</svg>';
 }
@@ -98,5 +99,5 @@ const position=e=>{if(!active)return;const r=active.getBoundingClientRect(),x=e.
 const leave=e=>{if(active&&!active.contains(e.relatedTarget))hide();};const key=e=>{if(e.key==='Escape')hide();};
 host.addEventListener('pointerover',show);host.addEventListener('pointermove',position);host.addEventListener('pointerout',leave);host.addEventListener('focusin',show);host.addEventListener('focusout',hide);host.addEventListener('click',show);host.addEventListener('keydown',key);host.addEventListener('scroll',hide,true);
 return()=>{host.removeEventListener('pointerover',show);host.removeEventListener('pointermove',position);host.removeEventListener('pointerout',leave);host.removeEventListener('focusin',show);host.removeEventListener('focusout',hide);host.removeEventListener('click',show);host.removeEventListener('keydown',key);host.removeEventListener('scroll',hide,true);tip.remove();};}
-const api={months,dateLabel,orderLabel,sliceShares,roundChart,calendarPoints,profitLayout,profitCandleFit,profitChart,bindTooltips};root.OrderCharts=api;if(typeof module!=='undefined')module.exports=api;
+const api={months,dateLabel,orderLabel,sliceShares,roundChart,calendarPoints,profitLayout,profitCandleFit,profitScrollWidth,profitChart,bindTooltips};root.OrderCharts=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

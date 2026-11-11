@@ -73,3 +73,13 @@ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed 
 .om .om-charts>.om-panel:nth-child(-n+2)>.om-legend{align-self:start}
 .om .om-charts .om-legend{font-size:11px}
 }
+
+/* Compact analytics, with readable values throughout the tablet swipe area. */
+body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed .om-main{max-width:1680px;width:100%;margin-inline:auto}
+.om .om-charts{align-items:start}
+.om .om-charts>.om-panel:nth-child(-n+2){grid-template-rows:20px 36px auto auto;padding-bottom:10px;align-self:start}
+.om .om-charts>.om-panel:nth-child(-n+2)>.om-chart{max-width:210px;margin-inline:auto}
+.om .om-charts>.om-panel:nth-child(-n+2)>.om-legend{align-self:start}
+.om .om-charts>.om-panel:last-child{align-self:start;padding-top:12px}
+.om .om-chart-scroll{touch-action:pan-x pan-y pinch-zoom;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+@media(max-width:600px){.om .om-charts>.om-panel:nth-child(-n+2){grid-template-rows:20px 54px auto auto}}

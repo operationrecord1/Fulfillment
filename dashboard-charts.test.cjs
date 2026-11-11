@@ -53,3 +53,6 @@ const adjacent=C.profitLayout(lossPoints(Array.from({length:31},(_,i)=>i===16?-2
 
 for(const w of [520,700,900,1400]){const l=C.profitLayout(lossPoints([200,2,1800,1700,3300,3100]),w);for(const i of l.items)assert.equal(i.label.x,i.cx);}
 assert.ok(Math.abs((negative[0].x+negative[1].x)/2-(adjacent.items[16].cx+adjacent.items[17].cx)/2)<1e-8);
+
+// Scrolling mode retains every nonzero amount with enough space per date.
+for(const points of [dense,bigAmounts,lossPoints([2,-1,200,-561,0])]){const width=C.profitScrollWidth(points),svg=C.profitChart(points,false,width,{showAmounts:true});assert.equal((svg.match(/class="om-(?:profit|loss)-value"/g)||[]).length,points.filter(p=>p.value!==0).length);assert.ok(width>=700);}
