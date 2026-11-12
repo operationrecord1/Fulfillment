@@ -499,3 +499,15 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 .om .om-period-card .om-month-trigger,.om .om-period-card:has(option[value="all"]:checked) .om-month-trigger{color:#111;font-size:clamp(23px,1.7vw,30px);font-weight:650;line-height:1.2;font-variant-numeric:tabular-nums}
 @media(max-width:600px){.om .om-period-card .om-month-trigger,.om .om-period-card:has(option[value="all"]:checked) .om-month-trigger{font-size:clamp(20px,5.5vw,26px)}}
 .om .om-profile-menu{border-radius:4px}.om .om-profile-menu button{padding-left:30px!important;padding-right:30px!important;border-radius:0}
+
+/* Quiet Outline: shared status, platform and filter surfaces. */
+.om .sheet-chip{border-radius:4px;gap:5px}.om .sheet-chip>span{flex:1;min-width:0}
+.om .status-symbol{width:14px;height:14px;min-width:14px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.om .quiet-outline,.om .order-filter-panel{border:1px solid #dbe0e4;border-radius:6px;box-shadow:0 6px 16px #1e303b08,0 1px 3px #1e303b05}
+.om .quiet-outline [role=listbox]{padding:2px 6px}.om .quiet-outline [role=option]{justify-content:flex-start;gap:8px;border:1px solid transparent;border-radius:4px;min-height:40px;padding:6px 8px;margin:2px 0;font-weight:500}
+.om .quiet-outline [role=option][aria-selected=true]{background:#eef2f3;border-color:#dce3e7}.om .quiet-outline [role=option][aria-selected=true]:after{content:'✓';margin-left:auto;color:#364f40}
+.om .quiet-outline .sheet-chip{border-radius:4px;font-weight:500;padding:4px 7px;height:auto}.om .quiet-outline button:hover,.om .filter-options label:hover{background:#f1f3f4}
+.om .quiet-outline .sheet-clear-selection{justify-content:flex-start;gap:7px;color:#6c7780;border-top:1px solid #e9edef;margin-top:5px;padding:8px 9px;border-radius:4px}
+.om .order-filter-trigger{border-radius:5px;border-color:#d4d9dd}.om .order-filter-panel .filter-options label,.om .order-filter-panel .filter-categories button{border-radius:4px;border:1px solid transparent}.om .filter-options label:has(input:checked){background:#eef2f3;border-color:#dce3e7}.om .filter-options label{display:flex;align-items:center;gap:8px}
+
+.om .sheet-chip.sheet-select-frame{border:1px solid #d4d9dd;border-radius:5px;background:#fff;color:#6b7881;padding:1px 4px;margin:2px 3px;height:22px;min-height:22px;gap:4px}.om .sheet-select-frame:hover{border-color:#8e9ba5}.om .sheet-select-frame .sheet-selected-value{display:inline-flex;align-items:center;gap:4px;flex:0 1 auto;border-radius:4px;padding:1px 4px;min-width:0}.om .sheet-select-frame .sheet-selected-value>span{min-width:0;overflow:hidden;text-overflow:ellipsis}.om .sheet-select-frame .sheet-chip-arrow{margin-left:auto}.om .sheet-select-frame.empty .sheet-selected-value{display:none}

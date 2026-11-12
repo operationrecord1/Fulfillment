@@ -5,7 +5,7 @@ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n/100);
 const pct=n=>(Number.isFinite(n)?n:0).toFixed(1)+'%';
 function shares(a,profit){const total=profit?a.sizes.reduce((s,x)=>s+Math.max(0,x.profit),0):a.count;return a.sizes.map(x=>({...x,percent:total?(profit?Math.max(0,x.profit):x.count)/total*100:0}));}
-function progress(a,profit){if(!a.count)return '<div class="om-progress-empty">No orders this period</div>';return '<div class="om-progress-list">'+shares(a,profit).map(x=>'<div class="om-progress-row" tabindex="0" title="'+esc(profit?'Percentage of positive category profit; losses contribute 0%':'Share of unique orders')+'"><span>'+x.name+'</span><b class="'+(x.profit<0&&profit?'negative':'')+'">'+(profit?money(x.profit):x.count)+'</b><div class="om-progress-track" role="progressbar" aria-label="'+x.name+(profit?' positive profit contribution':' order share')+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+x.percent.toFixed(2)+'"><i style="width:'+x.percent+'%"></i></div><span class="om-progress-percent">'+pct(x.percent)+'</span></div>').join('')+'</div>';}
+function progress(a,profit){if(!a.count)return '<div class="om-progress-empty">No Orders This Period</div>';return '<div class="om-progress-list">'+shares(a,profit).map(x=>'<div class="om-progress-row" tabindex="0" title="'+esc(profit?'Percentage of positive category profit; losses contribute 0%':'Share of unique orders')+'"><span>'+x.name+'</span><b class="'+(x.profit<0&&profit?'negative':'')+'">'+(profit?money(x.profit):x.count)+'</b><div class="om-progress-track" role="progressbar" aria-label="'+x.name+(profit?' positive profit contribution':' order share')+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+x.percent.toFixed(2)+'"><i style="width:'+x.percent+'%"></i></div><span class="om-progress-percent">'+pct(x.percent)+'</span></div>').join('')+'</div>';}
 function statusBreakdown(rows,investor=false){
  const orders=new Map(),extra={status:'Unassigned',count:0,revenue:0,cost:0,profit:0};
  for(const r of rows){const d=r.data;if(!d.order_id){extra.revenue+=C.cents(d.earning);extra.cost+=C.cents(d.product_cost);continue;}const o=orders.get(d.order_id)||{status:'Unassigned',revenue:0,cost:0,profit:0};if(d.status)o.status=C.statusLabel(d.status);o.revenue+=C.cents(d.earning);o.cost+=C.cents(d.product_cost);orders.set(d.order_id,o);}
@@ -19,16 +19,16 @@ const alignedPercent=n=>'<span class="om-detail-percent"><span>'+pct(n).slice(0,
 function details(key,a,rows,expenses,investor,tax){
  const statuses=statusBreakdown(rows,investor);const moneyWidth=Math.max(4,...statuses.map(s=>new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Math.abs(s.profit)/100).length))+2;
  const pairs=items=>'<dl class="om-detail-pairs">'+items.map(([label,value])=>'<div><dt>'+esc(label)+'</dt><dd>'+value+'</dd></div>').join('')+'</dl>';
- if(key==='count'&&!a.count)return '<p>No orders this period</p>';
+ if(key==='count'&&!a.count)return '<p>No Orders This Period</p>';
  if(key==='count')return '<table class="om-status-details" style="--profit-width:'+moneyWidth+'ch"><thead><tr><th>Order Status</th><th>Orders</th><th>Profit</th><th><span class="om-margin-heading">Margin</span></th></tr></thead><tbody>'+statuses.map(s=>'<tr><th>'+esc(s.status)+'</th><td>'+s.count+'</td><td>'+currency(s.profit)+'</td><td class="'+(s.margin<0?'negative':'')+'">'+alignedPercent(s.margin)+'</td></tr>').join('')+'</tbody></table>';
  if(key==='net')return pairs([['Gross Profit',currency(a.gross)],['Expense',currency(a.expense)],['Tax',currency(a.tax)],['Net Profit',currency(a.net)]]);
  if(key==='expense'){const types=new Map();for(const e of expenses)types.set(e.type||'Other',(types.get(e.type||'Other')||0)+C.cents(e.amount));return pairs([...types].map(([k,v])=>[k,currency(v)]).concat([['Total Expense',currency(a.expense)]]));}
  if(['revenue','cost','gross'].includes(key))return pairs(statuses.map(s=>[s.status,currency(s[key==='gross'?'profit':key])]));
- if(key==='tax')return pairs([['Gross Profit',currency(a.gross)],['Expense',currency(a.expense)],['Taxable amount',currency(Math.max(0,a.gross-a.expense))],['Tax rate',pct(tax)],['Tax',currency(a.tax)]]);
- if(key==='avgOrder')return pairs([['Gross Revenue',currency(a.revenue)],['Unique orders',a.count],['Average Order Value',currency(a.avgOrder)]]);
- if(key==='avgProfit')return pairs([['Gross Profit',currency(a.gross)],['Unique orders',a.count],['Average Profit per Order',currency(a.avgProfit)]]);
- if(key==='avgDaily')return pairs([['Unique orders',a.count],['Dates with orders',a.points.length],['Unrounded daily average',a.avgDaily.toFixed(2)]]);
- return pairs([['Calculated order groups',a.groups.filter(g=>g.margin!==null).length],['Average group profit margin',pct(a.margin)]]);
+ if(key==='tax')return pairs([['Gross Profit',currency(a.gross)],['Expense',currency(a.expense)],['Taxable Amount',currency(Math.max(0,a.gross-a.expense))],['Tax Rate',pct(tax)],['Tax',currency(a.tax)]]);
+ if(key==='avgOrder')return pairs([['Gross Revenue',currency(a.revenue)],['Unique Orders',a.count],['Average Order Value',currency(a.avgOrder)]]);
+ if(key==='avgProfit')return pairs([['Gross Profit',currency(a.gross)],['Unique Orders',a.count],['Average Profit per Order',currency(a.avgProfit)]]);
+ if(key==='avgDaily')return pairs([['Unique Orders',a.count],['Dates with Orders',a.points.length],['Unrounded Daily Average',a.avgDaily.toFixed(2)]]);
+ return pairs([['Calculated Order Groups',a.groups.filter(g=>g.margin!==null).length],['Average Group Profit Margin',pct(a.margin)]]);
 }
 function bind(host){
  const pop=document.createElement('div');pop.className='om-kpi-details';pop.setAttribute('popover','auto');pop.setAttribute('role','dialog');pop.setAttribute('aria-label','Metric details');host.append(pop);let anchor=null;
