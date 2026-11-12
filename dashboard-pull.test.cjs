@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
 const s=fs.readFileSync('dashboard.js','utf8');const events={};let reloads=0;
 const hint={hidden:true,setAttribute(){}},viewport={scrollTop:0,getBoundingClientRect:()=>({top:40})};
 const host={querySelector:()=>({append(){}}),addEventListener:(name,fn)=>events[name]=fn};
-const context={AbortController,document:{createElement:()=>hint},host,viewport,window:{innerWidth:390},grid:{editor:null},$:()=>({open:false}),location:{reload:()=>reloads++},flush:async()=>true,feedback(){},setTimeout};
+const context={settingsPage:null,AbortController,document:{createElement:()=>hint},host,viewport,window:{innerWidth:390},grid:{editor:null},$:()=>({open:false}),location:{reload:()=>reloads++},flush:async()=>true,feedback(){},setTimeout};
 vm.runInNewContext(s.slice(s.indexOf('const pullEvents='),s.indexOf('const poll=')),context);
 const event=(x,y)=>({touches:[{clientX:x,clientY:y}],target:{closest:()=>null},preventDefault(){}});
 (async()=>{
