@@ -46,7 +46,7 @@ const grid=new window.OrderSheetGrid($('om-sheet'),{scrollContainer:viewport,fit
  onChange(rows,formats){if(gridBefore&&!session.running){session.record({kind:"grid",year:state.year,month:state.month,before:gridBefore,after:grid.snapshot()});gridBefore=null;}state.formats[state.month]=structuredClone(formats);state.rows=state.rows.filter(r=>r.month!==state.month).concat(rows);generation++;dirty=true;feedback('Saving…');clearTimeout(saveTimer);saveTimer=setTimeout(()=>flush(),350);render();},
  onPreferences(value){if(!session.running&&JSON.stringify(value)!==JSON.stringify(lastPreferences))session.record({kind:"preferences",before:lastPreferences,after:value});lastPreferences=structuredClone(value);state.preferences=value;prefGeneration++;prefDirty=true;clearTimeout(prefTimer);prefTimer=setTimeout(()=>savePreferences(),400);}
 });
-const gridResize=new ResizeObserver(()=>grid.render());gridResize.observe(viewport);
+const gridResize=new ResizeObserver(()=>{canvas.style.setProperty('--workspace-view-width',viewport.clientWidth+'px');grid.render();});gridResize.observe(viewport);
 async function savePreferences(){if(!prefDirty)return true;const v=prefGeneration;prefChain=prefChain.then(async()=>{if(!prefDirty)return true;try{const data=await rpc('grid_preferences',{value:state.preferences,revision:state.preferenceRevision});state.preferenceRevision=data.revision;if(v===prefGeneration)prefDirty=false;return true;}catch(e){feedback(e.message,true);return false;}});return prefChain;}
 async function flush(){
  clearTimeout(saveTimer);if(!grid.commitEditor())return false;

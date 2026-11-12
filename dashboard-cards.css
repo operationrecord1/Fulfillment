@@ -49,5 +49,23 @@
 .om .om-expense-table td:nth-child(2){max-width:150px;overflow-wrap:anywhere}.om .om-expense-table td:nth-child(7){white-space:nowrap}
 .om .om-expense-table th{height:auto}.om .om-expense-table td{height:auto;background:#fff}
 .om .om-table-foot:empty{display:none}
+/* Phone/Duo: four KPI cells and both round charts fit the visible workspace.
+   Other cards and the daily chart retain the shared horizontal scrolling. */
+@media(max-width:540px){
+ .om .om-kpis{grid-template-columns:repeat(6,minmax(0,calc((var(--workspace-view-width,100vw) - 4px)/2)))}
+ .om .om-kpi{min-height:108px;padding:10px 10px 25px}
+ .om .om-kpi label{font-size:11px;gap:5px}
+ .om .om-kpi strong{font-size:clamp(20px,5.5vw,26px)}
+ .om .om-period-card .om-month-trigger{font-size:clamp(16px,4.5vw,24px);padding-left:0;padding-right:10px;white-space:normal}
+ .om .om-charts{grid-template-columns:repeat(2,minmax(0,calc((var(--workspace-view-width,100vw) - 4px)/2))) minmax(0,1fr)}
+ .om .om-charts>.om-panel:nth-child(-n+2){padding:10px 3px;grid-template-rows:20px 46px auto auto;align-content:start}
+ .om .om-charts>.om-panel:nth-child(-n+2)>.om-chart{max-width:210px;width:100%;margin-inline:auto}
+ .om .om-charts>.om-panel:nth-child(-n+2)>p{font-size:10px;line-height:14px;min-height:0}
+ .om .om-charts>.om-panel:nth-child(-n+2)>.om-legend{padding:0 2px;gap:6px}
+ .om .om-charts>.om-panel:nth-child(-n+2)>.om-legend div{font-size:10px;gap:3px;flex-wrap:nowrap}
+ .om .om-charts>.om-panel:nth-child(-n+2)>.om-legend b{white-space:nowrap;font-size:10px}
+ .om #om-pie-legend div{display:flex;flex-wrap:nowrap}
+ .om #om-pie-legend b{grid-column:auto;margin-left:auto}
+}
 .om .om-settings-section{padding:8px 0 18px;border-bottom:1px solid #e6ebef;margin-bottom:14px}.om .om-settings-section h3{font-size:15px;margin:0 0 6px}.om .om-platform-add{display:flex;gap:8px;margin-top:14px}.om .om-platform-add input{flex:1;min-width:0}.om .om-platform-option{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 11px;border:1px solid #e3e8ed;border-radius:7px;margin:6px 0}.om .om-platform-option span{overflow-wrap:anywhere}.om .om-platform-option button{background:transparent;border:0;color:#9c3d44;font-size:12px}.om #om-platform-list{max-height:220px;overflow:auto}.om .om-tax-label{display:flex;align-items:center;gap:12px;font-size:13px;margin:14px 0}.om .om-tax-label input{width:140px}.om .om-settings-actions{display:flex;justify-content:flex-end}.om #om-settings-error{color:#b42332}
 @media(min-width:1200px) and (max-width:1600px){.om .om-charts{grid-template-columns:238px 238px minmax(0,1fr)}.om .om-charts>.om-panel:nth-child(-n+2){padding-inline:13px}.om .om-charts>.om-panel:nth-child(-n+2)>.om-chart{width:100%;max-width:210px;margin-inline:0}}
