@@ -6,7 +6,8 @@ const weights={note:1.2,product_cost:1.4,shipping_cost:1.4,additional_cost:1.4,g
 function allocate(columns,preferences,required,available){
  const floors=columns.map(c=>Math.max(minimums[c.key]||55,required[c.key]||0));
  const values=columns.map((c,i)=>Math.max(floors[i],Number(preferences[c.key])||(c.type==='select'?floors[i]:(referenceWidths[c.key]||c.width))));
- if(columns.length===16&&!columns.some(c=>c.key==='purchase_id')){for(const [i,c] of columns.entries())if(['order_id','note','tracking','secondary_tracking'].includes(c.key))values[i]+=referenceWidths.purchase_id/4;}
+ if(columns.length===15&&!columns.some(c=>c.key==='purchase_id')){for(const [i,c] of columns.entries())if(['order_id','note','tracking','secondary_tracking'].includes(c.key))values[i]+=referenceWidths.purchase_id/4;}
+ if(columns.length===15&&!columns.some(c=>c.key==='platform')){for(const [i,c] of columns.entries())if(['tracking','earning','supplier'].includes(c.key))values[i]+=referenceWidths.platform/3;}
  if(available){const target=available-rowNumberWidth,total=values.reduce((a,b)=>a+b,0);
   if(total>target){let lo=0,hi=1;for(let n=0;n<50;n++){const mid=(lo+hi)/2,sum=values.reduce((s,v,i)=>s+Math.max(floors[i],v*(1-mid*(weights[columns[i].key]||1))),0);if(sum>target)lo=mid;else hi=mid;}values.forEach((v,i)=>values[i]=Math.max(floors[i],v*(1-hi*(weights[columns[i].key]||1))));}
   else if(total<target){const flexible=columns.map((c,i)=>c.type!=='select'?i:-1).filter(i=>i>=0),sum=flexible.reduce((s,i)=>s+values[i],0);for(const i of flexible)values[i]+=(target-total)*values[i]/sum;}
