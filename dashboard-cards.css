@@ -267,3 +267,4 @@
 .om-detail-pairs dd{min-width:0;flex-shrink:0;max-width:100%;overflow-wrap:anywhere}
 .om-status-details{min-width:310px}
 @media(max-width:350px){.om-status-details{min-width:280px;font-size:11px}}
+@media(max-width:350px){.om-status-details{min-width:0;font-size:10px}.om-status-details th,.om-status-details td{padding:8px 2px}.om-status-details th:nth-child(2){white-space:nowrap}.om-status-details .om-detail-percent,.om-status-details .om-margin-heading{width:auto}}
