@@ -108,3 +108,38 @@
  .om .om-expense-record td:nth-child(8) button,.om .om-expense-record td:nth-child(9) button{width:64px;min-height:36px;font-size:12px}
  .om .om-expense-table .om-expense-month-row,.om .om-expense-table .om-expense-month-row th{display:block;width:100%}
 }
+
+/* Compact expense cards and an in-flow, downward-only date list. */
+.om .om-date-field{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:12px;color:#526574}
+.om .om-date-trigger{min-height:44px;width:100%;text-align:left;padding:10px 32px 10px 11px;border:1px solid #dce3e9;border-radius:6px;background:#fff;color:#263e4d;font:400 14px Arial,sans-serif;position:relative}
+.om .om-date-trigger:after{content:'';position:absolute;right:14px;top:17px;width:6px;height:6px;border-right:1.5px solid #657482;border-bottom:1.5px solid #657482;transform:rotate(45deg)}
+.om #om-date-options{max-height:180px;overflow-y:auto;overscroll-behavior:contain;border:1px solid #dce3e9;border-radius:6px;padding:4px;background:#fff}
+.om #om-date-options[hidden]{display:none}
+.om #om-date-options button{display:block;text-align:left;width:100%;min-height:40px;padding:9px;border:0;border-radius:4px;background:#fff;color:#263e4d;font:400 13px Arial,sans-serif}
+.om #om-date-options button:hover,.om #om-date-options button:focus-visible,.om #om-date-options button[aria-selected=true]{background:#edf3fa;outline:none}
+.om .om-expense-inline-type,.om .om-expense-record [data-edit-expense] svg,.om .om-expense-record [data-delete-expense] svg,.om .om-expense-record a svg{display:none}
+@media(max-width:820px){
+.om .om-expense-fields select,.om .om-expense-month select{font-size:14px}
+.om .om-expense-table-scroll{overflow:visible}
+.om .om-expense-table,.om .om-expense-table tbody{display:block;width:100%;min-width:0}
+.om .om-expense-table thead{display:none}
+.om .om-expense-table .om-expense-record{display:grid;grid-template-columns:22px minmax(0,1fr) repeat(4,32px);gap:4px;align-items:center;margin:8px 0;padding:10px;border:1px solid #e2e8ef;border-radius:10px;background:#fff}
+.om .om-expense-table .om-expense-record td{padding:0;border:0;background:transparent;min-width:0;max-width:none;text-align:left;grid-row:auto;grid-column:auto}
+.om .om-expense-table .om-expense-record td:nth-child(1){grid-area:1/1;color:#73818c;font-size:11px}
+.om .om-expense-table .om-expense-record td:nth-child(2){grid-area:1/2/2/5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:600}
+.om .om-expense-table .om-expense-record td:nth-child(3){grid-area:1/5/2/7;justify-self:end;font-size:13px}
+.om .om-expense-table .om-expense-record td:nth-child(4){display:none}
+.om .om-expense-table .om-expense-record td:nth-child(5){grid-area:2/3}
+.om .om-expense-table .om-expense-record td:nth-child(6){grid-area:2/4}
+.om .om-expense-table .om-expense-record td:nth-child(7){grid-area:2/1/3/3;font-size:11px;line-height:17px;color:#647582;white-space:normal}
+.om .om-expense-inline-type{display:block;font-size:10px;color:#788691}
+.om .om-expense-table .om-expense-record td:nth-child(8){grid-area:2/5}
+.om .om-expense-table .om-expense-record td:nth-child(9){grid-area:2/6}
+.om .om-expense-table .om-expense-record button,.om .om-expense-table .om-expense-record a{display:inline-grid;place-items:center;width:32px;min-height:36px;padding:6px;border:0;border-radius:6px;background:#f3f6f9;color:#506777}
+.om .om-expense-table .om-expense-record [data-delete-expense]{color:#b42332}
+.om .om-expense-record button span,.om .om-expense-record a span{display:none}
+.om .om-expense-record button svg,.om .om-expense-record a svg{display:block;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.om .om-expense-table .om-expense-month-row,.om .om-expense-table .om-expense-month-row th{display:block;width:100%}
+}
+
+@media(max-width:820px){.om .om-expense-table .om-expense-record td:nth-child(2){grid-area:1/2/2/4}.om .om-expense-table .om-expense-record td:nth-child(3){grid-area:1/4/2/7;font-size:12px}}
