@@ -359,3 +359,10 @@ html[data-om-theme=dark] .om .om-month-menu,html[data-om-theme=dark] .om .sheet-
 html[data-om-theme=dark] .om .om-month-menu button,html[data-om-theme=dark] .om .sheet-format-pop button,html[data-om-theme=dark] .om .sheet-menu button{color:#e8eaed}
 html[data-om-theme=dark] .om .sheet-mobile-editor{background:#20262d;border-color:#525c68}
 html[data-om-theme=dark] .om .sheet-mobile-editor label{color:#e8eaed}
+/* Keep the compact chart legends in their grid at narrow widths. */
+.om .om-charts .om-performance-legend .om-progress-list{display:grid}
+.om .om-charts .om-performance-legend .om-progress-row{display:grid}
+.om .om-charts .om-performance-legend .om-progress-track{display:block}
+html[data-om-theme=dark] .om .sheet-table td[style*="background-color:#e7ecef"]{background-color:#252d36!important}
+html[data-om-theme=dark] .om .sheet-cell-link{color:#8ab4f8}
+html[data-om-theme=dark] .om .sheet-search-slot input{background:#252d36;color:#e8eaed}
