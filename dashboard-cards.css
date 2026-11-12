@@ -254,3 +254,16 @@
 .om .om-kpi .om-kpi-icon:focus-visible{outline:2px solid #1a73e8;outline-offset:2px}
 .om .om-kpi-title>span{cursor:default}
 .om-detail-money,.om-status-details .om-detail-money{display:inline-block;width:auto;max-width:none;white-space:nowrap;text-align:center;font-variant-numeric:tabular-nums}
+
+/* Content-sized metric popovers on every viewport. */
+.om-kpi-details{width:auto;height:auto;max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);padding:12px;border:1px solid #dce0e4;border-radius:12px;overflow:auto}
+.om-details-heading{gap:8px;margin-bottom:10px}
+.om-details-heading>div{min-width:0;overflow-wrap:anywhere}
+.om-details-heading h3{font-size:13px}
+.om-details-heading strong{font-size:21px}
+.om-details-heading button{flex:0 0 28px;width:28px;height:28px}
+.om-detail-pairs>div{gap:8px;padding:8px 0;flex-wrap:wrap}
+.om-detail-pairs dt{min-width:0;overflow-wrap:anywhere}
+.om-detail-pairs dd{min-width:0;flex-shrink:0;max-width:100%;overflow-wrap:anywhere}
+.om-status-details{min-width:310px}
+@media(max-width:350px){.om-status-details{min-width:280px;font-size:11px}}
