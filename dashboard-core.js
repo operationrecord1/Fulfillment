@@ -2,7 +2,7 @@
 'use strict';
 const statusLabel=value=>/^buyer cancel(?:led)?$/i.test(value||'')?'Cancelled':value;
 const statuses=['Pending','Processed','Delivered','Label Created','Cancelled','Refunded','OOS','Alert'];
-const columns=[['order_id','Order ID'],['quantity','Quantity','number'],['earning','Order Earning','money'],['purchase_id','Purchase ID'],['supplier','Supplier Reference'],['note','Note'],['platform','Platform','select'],['tracking','Tracking'],['secondary_tracking','Secondary Tracking'],['status','Order Status','select'],['product_cost','Product Cost','money'],['shipping_cost','Shipping Cost','money'],['additional_cost','Additional Cost','money'],['gross','Gross Profit','computed'],['margin','Profit Margin','computed'],['id','Order Unique ID','computed'],['date','Order Date','date']];
+const columns=[['order_id','Order ID'],['quantity','Quantity','number'],['earning','Order Earning','money'],['purchase_id','Purchase ID'],['supplier','Supplier Reference'],['note','Note'],['platform','Platform','select'],['tracking','Tracking'],['secondary_tracking','Secondary Tracking'],['status','Order Status','select'],['product_cost','Product Cost','money'],['shipping_cost','Shipping Cost','money'],['additional_cost','Additional Cost','money'],['gross','Gross Profit','computed'],['margin','Profit Margin','computed'],['id','Unique ID','computed'],['date','Order Date','date']];
 const investorFields=new Set(['order_id','quantity','earning','status','product_cost','shipping_cost','additional_cost','gross','margin','date']);
 const present=v=>v!==''&&v!==null&&v!==undefined;
 const cents=v=>Math.round(Number(v||0)*100);

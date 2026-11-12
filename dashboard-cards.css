@@ -367,3 +367,39 @@ html[data-om-theme=dark] .om .sheet-table td[style*="background-color:#e7ecef"]{
 html[data-om-theme=dark] .om .sheet-cell-link{color:#8ab4f8}
 html[data-om-theme=dark] .om .sheet-search-slot input{background:#252d36;color:#e8eaed}
 .om #om-pie-legend.om-performance-legend .om-progress-list{display:grid;grid-template-columns:1fr}.om #om-pie-legend.om-performance-legend .om-progress-row{display:grid;grid-template-columns:37px minmax(40px,auto) minmax(12px,1fr) 34px}.om #om-pie-legend.om-performance-legend .om-progress-track{display:block}.om #om-pie-legend.om-performance-legend b{white-space:nowrap;margin:0;grid-column:auto}@media(max-width:599.98px){.om #om-pie-legend.om-performance-legend .om-progress-row{grid-template-columns:1fr auto auto}}
+/* Compact cards, anchored controls, and stable expense overlays. */
+.om .om-kpi{min-height:98.6px;padding-bottom:18px}
+@media(max-width:540px){.om .om-kpi{min-height:91.8px;padding-bottom:18px}}
+.om .om-date-field{position:relative}
+.om #om-date-options{position:absolute;top:100%;left:0;right:0;z-index:20;height:170px;max-height:170px;box-sizing:border-box;box-shadow:0 5px 16px #0002;overscroll-behavior:contain}
+.om #om-date-options button{height:40px;min-height:40px;white-space:nowrap}
+.om .om-expense-table [data-edit-expense],.om .om-expense-table [data-delete-expense]{border:1px solid #dce3e9;border-radius:5px;padding:5px 8px;background:transparent}
+.om .om-expense-table .om-expense-record [data-edit-expense],.om .om-expense-table .om-expense-record [data-delete-expense]{border:1px solid #dce3e9;border-radius:5px}
+.om .om-site-brand{border:0;background:transparent;color:inherit;padding:0;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
+.om .om-preference-row{display:flex;align-items:center;gap:12px;padding:8px;font-size:12px}
+.om #om-theme-choices{display:flex;padding:0;gap:4px}
+.om #om-theme-choices button{min-width:42px;padding:6px 5px;font-size:11px;border-radius:6px}
+.om .om-profile-menu{min-width:260px;max-width:calc(100vw - 16px)}
+.om .settings-option-columns{grid-template-columns:minmax(0,1fr)}
+.om .om-platform-option button{color:#68727c;background:transparent}
+.om .om-platform-option button:hover{color:#bd4653;background:transparent}
+.om #om-settings-error[data-state=success],.om #om-settings-error[data-state=neutral]{color:#66717b}
+.om #om-settings-error[data-state=error]{color:#b42332}
+.om .settings-logo-control{display:flex;align-items:center;gap:14px;margin:14px 0}
+.om .settings-logo-control small{color:#74808a;font-size:11px}
+.om #settings-logo-pick{position:relative;flex:0 0 68px;width:68px;height:68px;border:1px solid #dce1e5;border-radius:50%;padding:0;background:#eef1f5;color:#526375;cursor:pointer}
+.om #settings-logo-pick:hover{box-shadow:0 0 0 4px #eef1f5}
+.om .settings-avatar-placeholder{font-size:25px}
+.om #settings-logo-pick #settings-logo-preview{position:absolute;inset:0;width:66px;height:66px;object-fit:cover;border:0;border-radius:50%;margin:0;background:#fff}
+.om .settings-avatar-edit{position:absolute;right:-2px;bottom:-2px;width:23px;height:23px;border-radius:50%;border:2px solid white;background:#e5eaf0;color:#34475c;font-size:17px;line-height:19px}
+.om .sheet-mobile-editor{display:block;padding:6px 8px}
+.om .sheet-mobile-editor label{position:relative;display:block;width:100%}
+.om .sheet-mobile-editor .sheet-mobile-input{display:block;width:100%;height:42px;min-height:42px;padding:9px 75px 9px 10px;border:1px solid #a9bacb;border-radius:7px;font:16px Arial,sans-serif;background:#fff;color:#202124;box-sizing:border-box;white-space:nowrap;overflow-x:auto}
+.om .sheet-mobile-editor button{position:absolute;right:1px;top:1px;height:40px;width:65px;padding:0;border:0;border-left:1px solid #dce3e9;border-radius:0 6px 6px 0;background:#f2f5f8;color:#174ea6}
+.om .om-pull-refresh{top:48px;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:#20242c;box-shadow:0 2px 6px #0004;font-size:0}
+.om .om-pull-refresh::before{content:'';position:absolute;inset:10px;border:3px solid #b2bffe;border-left-color:transparent;border-radius:50%;transform:rotate(-35deg)}
+.om .om-pull-refresh[data-phase=pull]::after{content:'';position:absolute;left:8px;bottom:9px;border:4px solid transparent;border-right-color:#b2bffe;transform:rotate(-25deg)}
+.om .om-pull-refresh[data-phase=loading]::before{animation:om-refresh-spin .7s linear infinite}
+@keyframes om-refresh-spin{to{transform:rotate(325deg)}}
+@media(prefers-reduced-motion:reduce){.om .om-pull-refresh[data-phase=loading]::before{animation-duration:1.5s}}
+.om .sheet-mobile-editor .sheet-mobile-input:focus-visible{outline:1px solid #1a73e8;outline-offset:0}

@@ -14,12 +14,12 @@ assert.ok(C.roundChart(a,true).includes('>1</text>'));
 assert.ok(C.roundChart(a,false).includes('>0.01</text>'));
 const rows=[{data:{date:'2026-01-01',order_id:'A',earning:1.23,product_cost:0}},{data:{date:'2026-01-02',order_id:'A',earning:0,product_cost:.23}},{data:{date:'2026-02-01',order_id:'B',earning:0,product_cost:.5}}];
 const pts=[['2026-01-01',123],['2026-01-02',-23],['2026-02-01',-50]];
-const year=C.calendarPoints(pts,rows,2026,'all');assert.equal(year.length,12);assert.equal(year[0].value,100);assert.equal(year[0].count,1);assert.equal(year[1].value,-50);assert.equal(year.reduce((s,p)=>s+p.value,0),50);
+const year=C.calendarPoints(pts,rows,2026,'all');assert.equal(year.length,12);assert.equal(year[0].value,85);assert.equal(year[0].count,1);assert.equal(year[1].value,-50);assert.equal(year.reduce((s,p)=>s+p.value,0),35);
 assert.equal(C.calendarPoints(pts,rows,2026,2).length,28);assert.equal(C.calendarPoints([],[],2028,2).length,29);
 for(const p of [year,C.calendarPoints([],[],2026,11)]){const svg=C.profitChart(p,true);assert.ok(!/NaN|Infinity/.test(svg));assert.equal((svg.match(/class="om-chart-hit om-profit-point(?: is-loss)?"/g)||[]).length,p.length);}
 console.log('PASS: readable IDs, date/leap-year rules, tiny exact labels, monthly totals, unique counts and empty charts');
 
-const undated=C.calendarPoints([], [{month:11,year:2026,position:1,data:{order_id:'UNDATED',earning:20,product_cost:3}}],2026,'all');assert.equal(undated[10].value,1700);assert.equal(undated[10].count,1);
+const undated=C.calendarPoints([], [{month:11,year:2026,position:1,data:{order_id:'UNDATED',earning:20,product_cost:3}}],2026,'all');assert.equal(undated[10].value,1445);assert.equal(undated[10].count,1);
 
 for(const cents of [-97,-10000,-1000000]){const svg=C.profitChart([{index:0,label:'1',full:'1 November 2026',count:1,value:cents}],false);assert.ok(svg.includes('class="om-loss-marker"'));assert.ok(svg.includes('height="3"'));assert.ok(!svg.includes('min-width:'));assert.ok(!svg.includes('NaN'));}
 assert.deepEqual(C.sliceShares([1,999]),[.001,.999]);
@@ -59,3 +59,5 @@ for(const points of [dense,bigAmounts,lossPoints([2,-1,200,-561,0])]){const widt
 
 const scrollLoss=lossPoints([-100,-200,-300,500]);const compact=C.profitChart(scrollLoss,false,C.profitScrollWidth(scrollLoss),{showAmounts:true,compactScroll:true,horizontalLoss:true});assert.equal((compact.match(/class="om-loss-value"/g)||[]).length,3);assert.ok(!compact.includes('rotate(-90'));
 const annual=C.profitChart(lossPoints([10000,-200,0]),true,700);assert.ok(annual.includes('om-year-profit-value'));assert.ok(annual.includes('fill="white"'));assert.ok(annual.includes('rotate(-90'));assert.ok(C.profitScrollWidth(dense)<1400);
+
+const netPoints=C.calendarPoints(pts,rows,2026,'all',false,[{date:'2026-01-10',amount:.5},{date:'2026-03-10',amount:12},{date:'2025-03-10',amount:50}],20);assert.equal(netPoints[0].value,40);assert.equal(netPoints[1].value,-50);assert.equal(netPoints[2].value,-1200);assert.equal(netPoints[2].count,0);assert.equal(C.calendarPoints(pts,rows,2026,1,false,[{date:'2026-01-10',amount:50}],20)[0].value,123);console.log('PASS: yearly net includes monthly expense, tax, expense-only loss and year isolation; daily gross unchanged');
