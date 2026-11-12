@@ -62,7 +62,7 @@ class SheetGrid{
    for(const label of col.key==='status'?(this.statuses||C.statuses):(this.platforms||[]))measure(label);
    for(const row of this.rows){const f=window.SheetFormatModel.get(this.formats,row.position,col.key);if(row.data[col.key])measure(row.data[col.key],f);}
    for(const [position,fields] of Object.entries(this.formats)){const f=window.SheetFormatModel.get(this.formats,position,col.key);for(const label of fields[col.key]?.options||[])measure(label,f);}
-   context.font='12px Arial';this.selectWidths[col.key]=col.key==='status'?Math.ceil(context.measureText('Label Created').width)+42:Math.ceil(width)+23;required[col.key]=Math.max(Math.ceil(width)+(col.key==='status'?68:50),this.selectWidths[col.key]+8);
+   context.font='13.3333px Arial';this.selectWidths[col.key]=col.key==='status'?Math.ceil(context.measureText('Label Created').width)+42:Math.ceil(width)+23;required[col.key]=Math.max(Math.ceil(width)+(col.key==='status'?68:50),this.selectWidths[col.key]+8);
   }
   for(const col of this.cols){context.font='700 '+(11*4/3)+'px Arial';const words=col.key==='id'?['Unique ID']:this.headerLabel(col).replace(/<br>/g,' ').split(' ');required[col.key]=Math.max(required[col.key]||0,...words.map(word=>Math.ceil(context.measureText(word).width)+8));}
   this.columnWidths=window.SheetSizing.allocate(this.cols,this.preferences.widthPreset==='reference-11pt'?(this.preferences.widths||{}):{},required,this.options.fitWidth?.());
