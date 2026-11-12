@@ -534,4 +534,4 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 .om .sheet-select-frame .sheet-selected-value>span{text-align:center}
 .om .order-filter-trigger>svg:first-child{width:0;height:0;flex:none;border:4px solid transparent;border-top-color:#879198;border-bottom:0;overflow:hidden;fill:none;stroke:none}
 .om .order-filter-trigger .filter-arrow{border-top-color:#879198}.om .sheet-select-frame.select-status,.om .sheet-select-frame.select-status .sheet-selected-value{gap:1px}
-.om .sheet-filter-button>svg:first-child{width:0;height:0;flex:none;border:4px solid transparent;border-top-color:#879198;border-bottom:0;overflow:hidden;fill:none;stroke:none}
+.om .sheet-filter-button .filter-arrow{width:0;height:0;flex:none;border:4px solid transparent;border-top-color:#879198;border-bottom:0;overflow:hidden;fill:none;stroke:none}
