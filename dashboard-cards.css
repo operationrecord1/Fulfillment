@@ -180,3 +180,50 @@
 }
 .om .om-pull-refresh{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:1000;padding:8px 14px;border:1px solid #dce3e9;border-radius:20px;background:white;color:#405767;box-shadow:0 2px 10px #0002;font-size:12px;pointer-events:none}
 .om .om-pull-refresh[hidden]{display:none}
+/* Reference-aligned performance bars and metric details. */
+.om .om-kpi{justify-content:center}
+.om .om-kpi .om-kpi-title{position:absolute;left:12px;top:10px;right:12px;display:flex;align-items:center;gap:7px;padding:0;border:0;border-radius:0;background:none;text-align:left;color:#202124;font-size:12px;font-weight:400;line-height:14px}
+.om .om-kpi-title svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.om .om-kpi>strong{position:absolute;left:8px;right:8px;top:50%;transform:translateY(-50%);text-align:center;color:#111}
+.om .om-kpi>strong.negative{color:#bd2638}
+.om .om-charts>.om-panel:nth-child(-n+2){display:flex;flex-direction:column;justify-content:flex-start}
+.om .om-charts>.om-panel:nth-child(-n+2)>.om-chart{width:100%;max-width:none;margin:0;flex:1;display:flex;align-items:center}
+.om .om-charts .om-legend[hidden]{display:none}
+.om .om-progress-list{width:100%;display:grid;gap:3px}
+.om .om-progress-row{display:grid;grid-template-columns:42px minmax(48px,auto) minmax(15px,1fr) 38px;align-items:center;gap:5px;padding:14px 3px;border-bottom:1px solid #eeeeef;font-size:11px;color:#202124;font-variant-numeric:tabular-nums;border-radius:5px}
+.om .om-progress-row:hover,.om .om-progress-row:focus-visible{background:#f6f6f6;outline:none}
+.om .om-progress-row>b{text-align:center;font-weight:600;overflow-wrap:anywhere}
+.om .om-progress-percent{text-align:right}
+.om .om-progress-track{height:8px;border-radius:9px;background:#e6e6e7;overflow:hidden}
+.om .om-progress-track i{display:block;height:100%;background:#77797b;border-radius:inherit}
+.om .om-progress-empty{width:100%;padding:30px 0;text-align:center;color:#73777b;font-size:12px}
+.om-kpi-details{position:fixed;inset:auto;margin:0;width:min(480px,calc(100vw - 16px));max-height:calc(100dvh - 16px);overflow:auto;padding:18px;border:1px solid #dce0e4;border-radius:12px;background:#fff;color:#202124;box-shadow:0 8px 28px #0002;box-sizing:border-box;font:13px/1.45 Arial,sans-serif}
+.om-details-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.om-details-heading h3{margin:0;font-size:15px}.om-details-heading strong{display:block;font-size:24px;margin-top:4px}
+.om-details-heading button{border:0;background:#f3f4f5;border-radius:50%;width:32px;height:32px;font-size:22px;color:#4d545b;cursor:pointer}
+.om-status-details{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
+.om-status-details th,.om-status-details td{padding:10px 3px;border-bottom:1px solid #e7e7e7;text-align:center;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.om-status-details th:first-child{width:29%;text-align:left;font-weight:400}.om-status-details th:nth-child(2){width:14%}.om-status-details th:nth-child(3){width:34%}.om-status-details th:nth-child(4){width:23%}
+.om-status-details tbody tr:hover,.om-detail-pairs>div:hover{background:#f7f7f7}
+.om-kpi-details .negative{color:#bd2638}
+.om-detail-money{display:inline-grid;grid-template-columns:8px 9px minmax(0,1fr);width:100%;font-variant-numeric:tabular-nums;text-align:right}
+.om-detail-money>span:nth-child(2){text-align:left}
+.om-detail-pairs{margin:0}.om-detail-pairs>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #eee}
+.om-detail-pairs dt{flex:1}.om-detail-pairs dd{margin:0;min-width:110px;text-align:right;font-variant-numeric:tabular-nums}
+.om .om-store-mark{display:none}
+@media(max-width:599.98px){
+.om .om-head{position:sticky;top:0;left:0;z-index:50;width:var(--workspace-view-width,100vw);max-width:var(--workspace-view-width,100vw);min-height:70px;display:flex;gap:8px;padding:calc(8px + env(safe-area-inset-top)) 52px 8px 8px;background:#fff;border-bottom:1px solid #e5e7e9;margin:0 0 4px}
+.om .om-head>.om-store-mark{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:7px;background:#eff1f2;color:#353b40;font-weight:700}
+.om .om-head>div:not(.om-profile){min-width:0;flex:1}
+.om .om-head h1{font-size:18px;line-height:22px;letter-spacing:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.om .om-head .om-eyebrow{display:none}.om .om-head p{font-size:10px;margin:2px 0}
+.om .om-head .om-profile{position:absolute;right:8px;top:calc(12px + env(safe-area-inset-top))}
+.om .sheet-tools{top:var(--mobile-header-height,70px)}
+.om .sheet-table thead th,.om .sheet-table .sheet-labels th{top:calc(var(--mobile-header-height,70px) + 40px)}
+.om .om-kpi .om-kpi-title{left:8px;right:8px;font-size:11px;gap:4px}
+.om .om-progress-row{grid-template-columns:1fr auto auto;gap:4px;padding:10px 3px;font-size:10px}
+.om .om-progress-track{grid-column:1/-1;grid-row:2}.om .om-progress-percent{grid-column:3;grid-row:1}
+.om-kpi-details{width:100vw;height:100dvh;max-height:100dvh;border-radius:0;border:0;padding:calc(16px + env(safe-area-inset-top)) 12px 16px}
+.om .om-expense-table .om-expense-record [data-edit-expense],.om .om-expense-table .om-expense-record [data-delete-expense]{border:0;background:transparent;box-shadow:none;border-radius:0}
+.om .om-expense-table .om-expense-record td:nth-child(8),.om .om-expense-table .om-expense-record td:nth-child(9){border:0}
+}
