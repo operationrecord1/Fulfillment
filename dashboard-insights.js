@@ -14,7 +14,7 @@ function statusBreakdown(rows,investor=false){
  if(extra.revenue||extra.cost||extra.profit){const existing=grouped.get('Unassigned')||{...extra,revenue:0,cost:0,profit:0};for(const key of ['revenue','cost','profit'])existing[key]+=extra[key];grouped.set('Unassigned',existing);}
  return [...grouped.values()].map(x=>({...x,margin:x.revenue?Math.max(-100,Math.min(100,x.profit/x.revenue*100)):0}));
 }
-function currency(n){return '<span class="om-detail-money '+(n<0?'negative':'')+'"><span>'+(n<0?'-':'')+'</span><span>$</span><span>'+new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Math.abs(n)/100)+'</span></span>';}
+function currency(n){return '<span class="om-detail-money '+(n<0?'negative':'')+'">'+money(n)+'</span>';}
 const alignedPercent=n=>'<span class="om-detail-percent"><span>'+pct(n).slice(0,-1)+'</span><span>%</span></span>';
 function details(key,a,rows,expenses,investor,tax){
  const statuses=statusBreakdown(rows,investor);const moneyWidth=Math.max(4,...statuses.map(s=>new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Math.abs(s.profit)/100).length))+2;

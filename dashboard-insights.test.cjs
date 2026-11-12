@@ -11,3 +11,6 @@ const zero=C.aggregate([row(1,'Z',1,1,'Delivered')],[]);assert.doesNotMatch(I.pr
 assert.match(I.details('net',a,rows,[],false,15),/Net Profit/);
 console.log('PASS: unique counts, signed category profits, positive-share denominator, zero/empty states, status totals and metric details');
 const unsetRows=[row(1,'U',10,4,''),row(2,'',3,1,'')];const unset=I.statusBreakdown(unsetRows);assert.equal(unset.length,1);assert.equal(unset[0].status,'Unassigned');assert.equal(unset[0].count,1);assert.equal(unset[0].revenue,1300);assert.equal(unset[0].profit,C.aggregate(unsetRows,[]).gross);assert.doesNotMatch(I.details('count',C.aggregate(unsetRows,[]),unsetRows,[],false,15),/Not set/);console.log('PASS: unassigned orders and unassigned financial rows merge without losing totals');
+
+assert.match(I.details('count',a,rows,[],false,15),/>-\$5\.00<\/span>/);
+assert.match(I.details('count',a,rows,[],false,15),/>\$9\.00<\/span>/);

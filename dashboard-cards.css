@@ -247,3 +247,10 @@
 .om .om-performance-legend .om-progress-track{grid-column:1/-1;grid-row:2}
 .om .om-performance-legend .om-progress-percent{grid-column:3;grid-row:1}
 }
+
+/* KPI references: only the icon activates metric details. */
+.om .om-kpi .om-kpi-icon{position:static;display:inline-flex;align-items:center;justify-content:center;flex:0 0 24px;width:24px;height:24px;margin:-5px 0;padding:3px;border:0;border-radius:4px;background:transparent;color:inherit;cursor:pointer}
+.om .om-kpi .om-kpi-icon:hover{background:#f1f3f4}
+.om .om-kpi .om-kpi-icon:focus-visible{outline:2px solid #1a73e8;outline-offset:2px}
+.om .om-kpi-title>span{cursor:default}
+.om-detail-money,.om-status-details .om-detail-money{display:inline-block;width:auto;max-width:none;white-space:nowrap;text-align:center;font-variant-numeric:tabular-nums}
