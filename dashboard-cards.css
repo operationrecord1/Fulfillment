@@ -433,3 +433,10 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 @media(max-width:599.98px){.om .om-main{overscroll-behavior-y:contain}}
 .om .om-expense-fields>label,.om .om-date-field>span{text-align:center}
 .om .om-expense-fields input,.om .om-expense-fields textarea{text-align:left}
+.om .sheet-resize-col:hover,.om .sheet-resize-row:hover{background:transparent}
+.om .sheet-header-text{user-select:text;-webkit-user-select:text;cursor:text;outline:none}
+.om .om-expense-table .om-expense-record [data-delete-expense]:hover,.om .om-expense-table .om-expense-record [data-delete-expense]:focus-visible{background:#fff1ef;color:#b42332;border-color:#f1c5bf}
+.om .om-expense-fields select option,.om .om-date-trigger,.om #om-date-options button{font:400 14px Arial,sans-serif!important}
+.om .om-expense-dialog #om-close{width:32px;height:32px;min-width:32px;border:1px solid #e1e6eb;border-radius:6px;background:#f8fafb;color:#64717d;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s,box-shadow .15s;font:400 24px/1 Arial,sans-serif;box-shadow:0 1px 2px #00000008}
+.om .om-expense-dialog #om-close:hover{background:#edf1f5;color:#253746;box-shadow:0 2px 5px #00000012}
+.om .om-expense-dialog #om-close:active{background:#e2e8ef;box-shadow:none}
