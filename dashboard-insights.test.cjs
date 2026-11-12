@@ -6,7 +6,7 @@ assert.equal(a.count,4);assert.deepEqual(I.shares(a,false).map(x=>x.percent),[50
 const profit=I.shares(a,true);assert.equal(profit[0].percent,0);assert.equal(profit[0].profit,-500);assert.ok(Math.abs(profit.reduce((s,x)=>s+x.percent,0)-100)<1e-9);
 const statuses=I.statusBreakdown(rows);for(const [key,field] of [['count','count'],['revenue','revenue'],['cost','cost'],['gross','profit']])assert.equal(statuses.reduce((s,x)=>s+x[field],0),a[key]);
 assert.equal(statuses.find(x=>x.status==='Delivered').count,1);
-assert.match(I.progress(a,true),/-\$5.00/);assert.match(I.progress(C.aggregate([],[]),true),/No orders this period/);
+assert.match(I.progress(a,true),/-\$5.00/);assert.match(I.progress(C.aggregate([],[]),true),/No Orders This Period/);
 const zero=C.aggregate([row(1,'Z',1,1,'Delivered')],[]);assert.doesNotMatch(I.progress(zero,true),/No orders/);assert.equal(I.shares(zero,true).every(x=>x.percent===0),true);
 assert.match(I.details('net',a,rows,[],false,15),/Net Profit/);
 console.log('PASS: unique counts, signed category profits, positive-share denominator, zero/empty states, status totals and metric details');
