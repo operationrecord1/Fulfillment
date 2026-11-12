@@ -1,0 +1,1 @@
+do $$ declare definition text; begin definition:=pg_get_functiondef('fulfillment_private.order_workspace(text,jsonb)'::regprocedure); definition:=replace(definition,'mon is null or mon not between 1 and 12 or n is null','mon is null or mon not between 0 and 12 or n is null'); execute definition;end $$;
