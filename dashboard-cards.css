@@ -440,3 +440,9 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 .om .om-expense-dialog #om-close{width:32px;height:32px;min-width:32px;border:1px solid #e1e6eb;border-radius:6px;background:#f8fafb;color:#64717d;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s,box-shadow .15s;font:400 24px/1 Arial,sans-serif;box-shadow:0 1px 2px #00000008}
 .om .om-expense-dialog #om-close:hover{background:#edf1f5;color:#253746;box-shadow:0 2px 5px #00000012}
 .om .om-expense-dialog #om-close:active{background:#e2e8ef;box-shadow:none}
+.om .sheet-pagination{position:sticky;left:0;display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;width:var(--workspace-view-width,100%);max-width:100%;padding:12px 8px;background:#fff;border-top:1px solid #e1e6eb;color:#53616d;font:12px Arial,sans-serif;box-sizing:border-box}
+.om .sheet-pagination label,.om .sheet-page-buttons,.om .sheet-page-jump{display:flex;align-items:center;gap:5px;margin:0}
+.om .sheet-pagination button,.om .sheet-pagination select,.om .sheet-pagination input{position:static;height:32px;min-width:32px;padding:5px 8px;border:1px solid #dce2e8;border-radius:5px;background:#fff;color:#364553;font:12px Arial,sans-serif}
+.om .sheet-pagination button:hover{background:#f1f4f8}.om .sheet-pagination button[aria-current=page]{background:#eaf1fc;border-color:#b4c9e5;color:#174ea6;font-weight:700}
+.om .sheet-page-buttons{margin-left:auto}.om .sheet-page-jump input{width:58px}.om .sheet-page-range{white-space:nowrap}
+@media(max-width:599px){.om .sheet-pagination{gap:9px 6px}.om .sheet-page-range{margin-left:auto}.om .sheet-page-buttons{margin-left:0}.om .sheet-page-jump{margin-left:auto}}
