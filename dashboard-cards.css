@@ -366,3 +366,4 @@ html[data-om-theme=dark] .om .sheet-mobile-editor label{color:#e8eaed}
 html[data-om-theme=dark] .om .sheet-table td[style*="background-color:#e7ecef"]{background-color:#252d36!important}
 html[data-om-theme=dark] .om .sheet-cell-link{color:#8ab4f8}
 html[data-om-theme=dark] .om .sheet-search-slot input{background:#252d36;color:#e8eaed}
+.om #om-pie-legend.om-performance-legend .om-progress-list{display:grid;grid-template-columns:1fr}.om #om-pie-legend.om-performance-legend .om-progress-row{display:grid;grid-template-columns:37px minmax(40px,auto) minmax(12px,1fr) 34px}.om #om-pie-legend.om-performance-legend .om-progress-track{display:block}.om #om-pie-legend.om-performance-legend b{white-space:nowrap;margin:0;grid-column:auto}@media(max-width:599.98px){.om #om-pie-legend.om-performance-legend .om-progress-row{grid-template-columns:1fr auto auto}}
