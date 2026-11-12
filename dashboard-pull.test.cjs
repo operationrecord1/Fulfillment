@@ -1,14 +1,15 @@
 const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
 const s=fs.readFileSync('dashboard.js','utf8');const events={};let reloads=0;
-const hint={hidden:true,dataset:{},setAttribute(k,v){this[k]=v}},viewport={scrollTop:0,getBoundingClientRect:()=>({top:40})};
+const hint={hidden:true,dataset:{},style:{setProperty(k,v){this[k]=v}},setAttribute(k,v){this[k]=v}},viewport={scrollTop:0,getBoundingClientRect:()=>({top:40})};
 const host={querySelector:()=>({append(){}}),addEventListener:(name,fn)=>events[name]=fn};
 const context={settingsPage:null,AbortController,document:{createElement:()=>hint},host,viewport,window:{innerWidth:390},grid:{editor:null},$:()=>({open:false}),location:{reload:()=>reloads++},flush:async()=>true,feedback(){},setTimeout};
 vm.runInNewContext(s.slice(s.indexOf('const pullEvents='),s.indexOf('const poll=')),context);
 const event=(x,y)=>({touches:[{clientX:x,clientY:y}],target:{closest:()=>null},preventDefault(){}});
 (async()=>{
-events.touchstart(event(30,350));events.touchmove(event(30,440));assert.equal(hint['aria-label'],'Release to refresh');await events.touchend();assert.equal(reloads,1);
+events.touchstart(event(30,350));events.touchmove(event(30,370));assert.equal(hint.style['--pull-y'],'-26px');assert.equal(hint.dataset.phase,'pull');events.touchmove(event(30,440));assert.equal(hint.dataset.phase,'ready');assert.equal(reloads,0);assert.equal(hint['aria-label'],'Release to refresh');await events.touchend();assert.equal(reloads,1);assert.equal(hint.dataset.phase,'loading');
 events.touchstart(event(30,350));events.touchmove(event(30,390));await events.touchend();assert.equal(reloads,1);
 events.touchstart(event(30,350));events.touchmove(event(90,450));await events.touchend();assert.equal(reloads,1);
+events.touchstart(event(30,350));events.touchmove(event(30,500));assert.equal(hint.style['--pull-y'],'76px');events.touchmove(event(30,370));await events.touchend();assert.equal(reloads,1);
 viewport.scrollTop=10;events.touchstart(event(30,350));events.touchmove(event(30,450));await events.touchend();assert.equal(reloads,1);
 console.log('PASS: pull refresh from any non-input area, threshold, horizontal cancellation and scroll-top guard');
 })();

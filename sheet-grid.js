@@ -51,7 +51,7 @@ class SheetGrid{
   html+='</tbody>';this.table.innerHTML=html;this.table.style.width=gutter+this.cols.reduce((s,c)=>s+this.width(c),0)+'px';this.options.onWidth?.(gutter+this.cols.reduce((s,c)=>s+this.width(c),0));this.table.setAttribute('aria-rowcount',this.count);this.table.setAttribute('aria-colcount',this.cols.length);this.paint();this.paintMissingDates();
  }
  paintMissingDates(){if(this.disposed)return;const c=this.cols.findIndex(x=>x.key==='date');for(const cell of this.table.querySelectorAll('[data-c="'+c+'"][data-r]')){const overdue=!this.investor&&this.dateTracker.overdue(this.get(+cell.dataset.r));cell.classList.toggle('sheet-date-missing',overdue);if(overdue)cell.title='Order date is missing. Enter a date for this order.';else cell.removeAttribute('title');}}
- headerLabel(c){const breaks={earning:'Order<br>Earning',supplier:'Supplier<br>Reference',secondary_tracking:'Secondary<br>Tracking',product_cost:'Product<br>Cost',shipping_cost:'Shipping<br>Cost',additional_cost:'Additional<br>Cost',gross:'Gross<br>Profit',margin:'Profit<br>Margin',id:'Unique<br>ID'};return breaks[c.key]||esc(c.label);}
+ headerLabel(c){const breaks={earning:'Order<br>Earning',supplier:'Supplier<br>Reference',secondary_tracking:'Secondary<br>Tracking',product_cost:'Product<br>Cost',shipping_cost:'Shipping<br>Cost',additional_cost:'Additional<br>Cost',gross:'Gross<br>Profit',margin:'Profit<br>Margin',id:'Unique ID'};return breaks[c.key]||esc(c.label);}
  measureColumnWidths(){
   this.measureContext ||= document.createElement('canvas').getContext('2d');const context=this.measureContext,required={};
   for(const col of this.cols.filter(c=>c.type==='select')){
@@ -61,7 +61,7 @@ class SheetGrid{
    for(const [position,fields] of Object.entries(this.formats)){const f=window.SheetFormatModel.get(this.formats,position,col.key);for(const label of fields[col.key]?.options||[])measure(label,f);}
    required[col.key]=Math.ceil(width)+34;
   }
-  for(const col of this.cols){context.font='700 '+(11*4/3)+'px Arial';const words=col.key==='id'?['Unique','ID']:this.headerLabel(col).replace(/<br>/g,' ').split(' ');required[col.key]=Math.max(required[col.key]||0,...words.map(word=>Math.ceil(context.measureText(word).width)+8));}
+  for(const col of this.cols){context.font='700 '+(11*4/3)+'px Arial';const words=col.key==='id'?['Unique ID']:this.headerLabel(col).replace(/<br>/g,' ').split(' ');required[col.key]=Math.max(required[col.key]||0,...words.map(word=>Math.ceil(context.measureText(word).width)+8));}
   this.columnWidths=window.SheetSizing.allocate(this.cols,this.preferences.widthPreset==='reference-11pt'?(this.preferences.widths||{}):{},required,this.options.fitWidth?.());
  }
  width(c){return this.columnWidths?.[c.key]||Math.max(45,Number(this.preferences.widths?.[c.key])||c.width);}

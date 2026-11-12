@@ -412,3 +412,24 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record,html[data-om-t
 html[data-om-theme=dark] .om .om-expense-table .om-expense-record td:before{color:#b5c0cc}
 html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-edit-expense]{color:#b5cfff;border-color:#525c68}
 html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-expense]{color:#ff9aa6;background:transparent;border-color:#525c68}
+/* Consistent expense actions and readable compact labels. */
+.om .om-expense-dialog #om-close,.om .om-expense-note-tooltip header button{display:grid;place-items:center;width:34px;height:32px;min-width:34px;padding:0;border:1px solid #dce3e9;border-radius:4px;line-height:1;font-size:22px;background:#fff;color:#53616d}
+.om .om-expense-dialog #om-close:hover,.om .om-expense-note-tooltip header button:hover,.om .om-expense-table [data-edit-expense]:hover,.om .om-expense-table [data-delete-expense]:hover,.om #om-expenses:hover,.om .om-expense-actions button:hover{background:#edf3fa;border-color:#bacbdb}
+.om .om-expense-dialog #om-close:focus-visible,.om .om-expense-actions button:focus-visible{outline:2px solid #bacbdb;outline-offset:1px}
+.om .om-expense-fields select,.om .om-date-trigger,.om #om-date-options button{font-size:14px!important;font-family:Arial,sans-serif;font-weight:400}
+.om .om-expense-table th{text-align:center}
+.om .om-expense-table .om-expense-record td:nth-child(5),.om .om-expense-table .om-expense-record td:nth-child(6){text-align:center}
+.om .om-expense-table .om-expense-record td:before{text-align:center}
+.om .om-platform-option{padding:9px 12px!important}
+.om .settings-store-name form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px}
+.om .settings-store-name label{flex:1 1 220px}
+.om #settings-name-status{flex-basis:100%;margin:0;color:#66717b}
+.om #settings-name-status[data-state=error]{color:#b42332}
+.om .om-profile-menu{min-width:170px}
+.om .om-pull-refresh{top:0;transform:translate(-50%,var(--pull-y,-44px));transition:transform .15s ease-out;will-change:transform}
+.om .om-pull-refresh::before{transform:rotate(var(--pull-turn,0deg))}
+.om .om-pull-refresh[data-phase=ready]::before,.om .om-pull-refresh[data-phase=loading]::before{animation:om-refresh-spin .7s linear infinite}
+.om .om-pull-refresh[data-phase=ready]::after{content:none}
+@media(max-width:599.98px){.om .om-main{overscroll-behavior-y:contain}}
+.om .om-expense-fields>label,.om .om-date-field>span{text-align:center}
+.om .om-expense-fields input,.om .om-expense-fields textarea{text-align:left}
