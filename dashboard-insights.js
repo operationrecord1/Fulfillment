@@ -24,7 +24,7 @@ function details(key,a,rows,expenses,investor,tax){
  if(key==='net')return pairs([['Gross Profit',currency(a.gross)],['Expense',currency(a.expense)],['Tax',currency(a.tax)],['Net Profit',currency(a.net)]]);
  if(key==='expense'){const types=new Map();for(const e of expenses)types.set(e.type||'Other',(types.get(e.type||'Other')||0)+C.cents(e.amount));return pairs([...types].map(([k,v])=>[k,currency(v)]).concat([['Total Expense',currency(a.expense)]]));}
  if(['revenue','cost','gross'].includes(key))return '<table class="om-status-details om-revenue-details"><thead><tr><th>Order Status</th><th>Revenue</th></tr></thead><tbody>'+statuses.map(s=>'<tr><th>'+esc(s.status)+'</th><td>'+currency(s[key==='gross'?'profit':key])+'</td></tr>').join('')+'</tbody></table>';
- if(key==='tax')return pairs([['Gross Profit',currency(a.gross)],['Expense',currency(a.expense)],['Taxable Amount',currency(Math.max(0,a.gross-a.expense))],['Tax Rate',pct(tax)],['Tax',currency(a.tax)]]);
+ if(key==='tax')return pairs([['Gross Profit',currency(a.gross)],['Expense',currency(a.expense)],[a.taxableAmount===undefined?'Taxable Amount':'Monthly Taxable Total',currency(a.taxableAmount??Math.max(0,a.gross-a.expense))],['Tax Rate',pct(tax)],['Tax',currency(a.tax)]]);
  if(key==='avgOrder')return pairs([['Gross Revenue',currency(a.revenue)],['Unique Orders',a.count],['Average Order Value',currency(a.avgOrder)]]);
  if(key==='avgProfit')return pairs([['Gross Profit',currency(a.gross)],['Unique Orders',a.count],['Average Profit per Order',currency(a.avgProfit)]]);
  if(key==='avgDaily')return pairs([['Unique Orders',a.count],['Dates with Orders',a.points.length],['Unrounded Daily Average',a.avgDaily.toFixed(2)]]);

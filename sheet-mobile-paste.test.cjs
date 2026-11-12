@@ -19,3 +19,21 @@ console.log('PASS: 1000-row paste + 20 blank rows, one undo checkpoint, atomic i
 
 
 context.window.matchMedia=()=>({matches:true});touch.touchPointer(down);listeners.get('pointerup')({pointerId:1});assert.equal(touch.opened,2);console.log('PASS: mobile single tap starts the editor without waiting for double tap');
+const headerGrid=Object.create(prototype),header={dataset:{col:'2'}};
+const headerText={closest:selector=>selector==='[data-col]'?header:null};
+const headerTarget={closest:selector=>selector==='.sheet-header-text'?headerText:selector==='[data-col]'?header:null};
+let prevented=false,paints=0;
+Object.assign(headerGrid,{count:75,commitEditor:()=>true,closePopup(){},paint(){paints++;}});
+headerGrid.pointer({target:headerTarget,button:0,pointerType:'mouse',preventDefault(){prevented=true;}});
+assert.equal(headerGrid.selection.kind,'column');assert.equal(headerGrid.selection.c,2);assert.equal(headerGrid.selection.r,1);assert.equal(headerGrid.selection.er,75);assert.equal(prevented,false);assert.equal(paints,1);
+const touchHeaderTarget={closest:selector=>selector==='[data-col]'?{dataset:{col:'1'},closest:()=>({dataset:{col:'1'}})}:null};
+headerGrid.pointer({target:touchHeaderTarget,button:0,pointerType:'touch',preventDefault(){prevented=true;}});assert.equal(headerGrid.selection.c,1);assert.equal(headerGrid.selection.kind,'column');
+context.window.getSelection=()=>({isCollapsed:false,anchorNode:{parentElement:{closest:()=>headerText}}});
+headerGrid.clipboardEvent({target:headerTarget,preventDefault(){throw Error('Native header copying was blocked');}},false);
+console.log('PASS: header text and touch header select entire column, preserve native text selection and copy');
+const fillGrid=Object.create(prototype),fillRows=[1,2,3].map(position=>({position,data:{order_id:'ORDER-'+position,platform:position===1?'Amazon':'AutoDS'}}));
+Object.assign(fillGrid,{selection:{r:1,c:0,er:1,ec:0,kind:'cell'},cols:[{key:'platform'}],rows:fillRows,slots:[1,3],platforms:['Amazon','AutoDS'],year:2026,month:11,raw:()=> 'Amazon',canEdit:()=>true,paint(){},scroll:{scrollTop:0,getBoundingClientRect:()=>({top:0,bottom:500})},checkpoint(){this.checkpoints=(this.checkpoints||0)+1;},assign(row,c,value){row.data.platform=value;},changed(){this.didChange=true;},select(){}});
+document.elementFromPoint=()=>({closest:()=>({dataset:{r:'3',c:'0'}})});
+fillGrid.fillPlatformDrag({pointerId:8});listeners.get('pointermove')({pointerId:8,clientX:30,clientY:100});listeners.get('pointerup')({pointerId:8});
+assert.equal(fillRows[2].data.platform,'Amazon');assert.equal(fillRows[1].data.platform,'AutoDS');assert.equal(fillGrid.checkpoints,1);assert.equal(fillGrid.didChange,true);assert.equal(listeners.size,0);
+console.log('PASS: platform fill copies selected value into visible destination rows, preserves filtered rows, and records one undo checkpoint');

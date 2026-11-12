@@ -17,7 +17,7 @@ function link(value,kind){
 function groups(rows,investor=false){
  const out=[];let prev=null;
  for(const r of rows){const a=r.data,b=prev?.data;
-  const connected=prev&&r.month===prev.month&&(r.position===undefined||prev.position===undefined||(r.sourcePosition??r.position)===(prev.sourcePosition??prev.position)+1)&&(investor?r.group_key===prev.group_key:((a.order_id&&a.order_id===b.order_id)||(a.purchase_id&&a.purchase_id===b.purchase_id)));
+  const connected=prev&&r.year===prev.year&&r.month===prev.month&&(r.position===undefined||prev.position===undefined||(r.sourcePosition??r.position)===(prev.sourcePosition??prev.position)+1)&&(investor?r.group_key===prev.group_key:((a.order_id&&a.order_id===b.order_id)||(a.purchase_id&&a.purchase_id===b.purchase_id)));
   if(!connected)out.push({rows:[],revenue:0,cost:0,other:0,hasRevenue:false,hasCost:false});
   const g=out[out.length-1];g.rows.push(r);g.revenue+=cents(a.earning);g.cost+=cents(a.product_cost);g.other+=cents(a.shipping_cost)+cents(a.additional_cost);g.hasRevenue||=present(a.earning);g.hasCost||=present(a.product_cost);prev=r;
  }
@@ -40,6 +40,19 @@ function aggregate(rows,expenses,investor=false,taxPercentage=15){
  const expense=expenses.reduce((s,e)=>s+cents(e.amount),0),tax=Math.round(Math.max(0,gross-expense)*(Number.isFinite(Number(taxPercentage))?Math.max(0,Number(taxPercentage)):15)/100),count=orders.size;
  return {groups:gs,count,revenue,cost,gross,expense,tax,net:gross-expense-tax,margin:margins.length?margins.reduce((a,b)=>a+b,0)/margins.length:0,avgOrder:count?Math.round(revenue/count):0,avgProfit:count?Math.round(gross/count):0,avgDaily:daily.size?count/daily.size:0,sizes,points:[...daily].sort(([a],[b])=>a.localeCompare(b))};
 }
+// Annual tax is the sum of monthly liabilities; a loss month cannot undo another month's tax.
+function aggregateYear(rows,expenses,investor=false,taxPercentage=15){
+ const periods=new Map(),period=(year,month)=>String(year||'')+'-'+String(month).padStart(2,'0');
+ const bucket=key=>{if(!periods.has(key))periods.set(key,{rows:[],expenses:[]});return periods.get(key);};
+ for(const row of rows)bucket(period(row.year??row.data.date?.slice(0,4),row.month??row.data.date?.slice(5,7))).rows.push(row);
+ for(const expense of expenses)bucket(expense.date?.slice(0,7)||'').expenses.push(expense);
+ const ordered=[...periods.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([,value])=>value);
+ const result=aggregate(ordered.flatMap(p=>p.rows),expenses,investor,taxPercentage);
+ const monthly=ordered.map(p=>aggregate(p.rows,p.expenses,investor,taxPercentage));
+ for(const key of ['gross','expense','tax','net'])result[key]=monthly.reduce((sum,a)=>sum+a[key],0);
+ result.taxableAmount=monthly.reduce((sum,a)=>sum+Math.max(0,a.gross-a.expense),0);
+ return result;
+}
 function duplicates(rows,fields=['order_id','purchase_id']){const marks=new Set();for(const key of fields){const runs=new Map();let prev='',month=null,position=null;for(const r of rows){const value=r.data[key]||'';if(value){if(!runs.has(value))runs.set(value,[]);if(value!==prev||month!==r.month||(r.position!==undefined&&position!==null&&r.position!==position+1))runs.get(value).push([]);runs.get(value).at(-1).push(r);}prev=value;month=r.month;position=r.position??null;}for(const run of runs.values())if(run.length>1)run.flat().forEach(r=>marks.add(r.id||r._key));}return marks;}
 const statusPaths={
     delivered:'<path d="m3 7 7-4 7 4-7 4-7-4Z"/><path d="M3 7v9l7 4V11m7-4v5M6.5 5l7 4"/><path d="m14 17 2 2 5-5"/>',
@@ -58,5 +71,5 @@ const statusPaths={
   };
 const statusIcon=value=>{const key=({'Label Created':'label','Clear Selection':'clear'})[value]||String(value).toLowerCase();return statusPaths[key]?'<svg class="status-symbol" viewBox="0 0 24 24" aria-hidden="true">'+statusPaths[key]+'</svg>':'';};
 const statusOrder=values=>[...values].sort((a,b)=>(statuses.indexOf(a)<0?99:statuses.indexOf(a))-(statuses.indexOf(b)<0?99:statuses.indexOf(b)));
-const api={statusIcon,statusOrder,statusLabel,statuses,columns,investorFields,present,cents,link,groups,aggregate,duplicates};root.OrderCore=api;if(typeof module!=='undefined')module.exports=api;
+const api={statusIcon,statusOrder,statusLabel,statuses,columns,investorFields,present,cents,link,groups,aggregate,aggregateYear,duplicates};root.OrderCore=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

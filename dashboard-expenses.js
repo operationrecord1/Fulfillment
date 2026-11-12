@@ -31,7 +31,7 @@ window.openExpenseManager=function({state,dialog,save,remove},editing=null){
 
  const trigger=d.querySelector('.om-date-trigger'),options=d.querySelector('#om-date-options');
  const closeDates=()=>{options.hidden=true;trigger.setAttribute('aria-expanded','false');};
- const openDates=()=>{options.hidden=false;trigger.setAttribute('aria-expanded','true');(options.querySelector('[aria-selected="true"]')||options.firstElementChild)?.focus({preventScroll:true});};
+ const openDates=()=>{options.hidden=false;trigger.setAttribute('aria-expanded','true');const selected=options.querySelector('[aria-selected="true"]')||options.firstElementChild;if(selected){selected.focus({preventScroll:true});options.scrollTop=selected.offsetTop-options.firstElementChild.offsetTop;}};
  trigger.onclick=()=>options.hidden?openDates():closeDates();
  options.onclick=e=>{const b=e.target.closest('[data-date]');if(!b)return;dates.value=b.dataset.date;trigger.textContent=b.textContent;options.querySelectorAll('button').forEach(o=>o.setAttribute('aria-selected',String(o===b)));closeDates();trigger.focus({preventScroll:true});};
  d.addEventListener('pointerdown',e=>{if(!e.target.closest('.om-date-field'))closeDates();},{signal});

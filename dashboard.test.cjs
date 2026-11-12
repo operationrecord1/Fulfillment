@@ -12,3 +12,14 @@ assert.equal(C.link('javascript:alert(1)','order_id').url,'');
 assert.equal(C.columns.length,17);assert.equal(C.columns[15][0],'id');assert.equal(C.columns[16][0],'date');
 console.log('PASS: aggregation, grouped orders, duplicate runs, loss, category boundaries, tax, safe links and 17 columns');
 const taxRows=[{id:'tax',position:1,month:11,data:{order_id:'tax',earning:100,product_cost:20,date:'2026-11-01'}}];assert.equal(C.aggregate(taxRows,[{amount:10}],false,0).tax,0);assert.equal(C.aggregate(taxRows,[{amount:10}],false,5).tax,350);assert.equal(C.aggregate(taxRows,[{amount:10}],false,15).net,5950);assert.equal(C.aggregate(taxRows,[],false,2.5).tax,200);console.log('PASS: configurable 0/5/15/2.5 percent tax, unchanged base and net formula');
+
+const yearlyRows=[row('jan',{order_id:'shared',purchase_id:'shared',earning:100,product_cost:0,date:'2026-01-01'},1),row('feb',{order_id:'loss',earning:10,product_cost:60,date:'2026-02-01'},2),row('mar',{order_id:'shared',purchase_id:'shared',earning:20,date:'2026-03-01'},3),row('apr',{order_id:'shared',purchase_id:'shared',product_cost:5,date:'2026-04-01'},4)];
+const yearlyExpenses=[{amount:10,date:'2026-01-02'},{amount:3,date:'2026-05-01'}];
+const annual=C.aggregateYear(yearlyRows,yearlyExpenses,false,15);
+assert.equal(annual.gross,5000);assert.equal(annual.tax,1350);assert.equal(annual.taxableAmount,9000);assert.equal(annual.net,2350);assert.equal(annual.expense,1300);
+assert.equal(annual.groups.length,4);assert.equal(annual.groups[2].profit,null);assert.equal(annual.groups[3].profit,null);
+const monthlyTotals=Array.from({length:12},(_,i)=>C.aggregate(yearlyRows.filter(r=>r.month===i+1),yearlyExpenses.filter(e=>Number(e.date.slice(5,7))===i+1),false,15));
+for(const key of ['gross','tax','expense','net'])assert.equal(annual[key],monthlyTotals.reduce((sum,a)=>sum+a[key],0));
+assert.equal(C.aggregateYear([],[],false,15).net,0);
+assert.equal(C.aggregateYear(yearlyRows,yearlyExpenses,false,0).tax,0);
+console.log('PASS: annual metrics sum monthly tax and profit, expense-only months, and independent cross-month groups');
