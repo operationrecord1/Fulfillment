@@ -486,3 +486,12 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 @media(prefers-reduced-motion:reduce){.om-details-heading>button,.om .om-expense-dialog #om-close{transition:none}}
 .om .om-period-card .om-month-picker,.om .om-period-card .om-month-trigger{min-width:0}.om .om-period-card:has(option[value="all"]:checked) .om-month-trigger{font-size:clamp(12px,1.1vw,18px)}@media(max-width:600px){.om .om-period-card:has(option[value="all"]:checked) .om-month-trigger{font-size:clamp(10px,3vw,16px)}}
 .om .om-kpi.om-period-card{grid-template-columns:minmax(0,1fr)}.om .om-period-card .om-month-picker{grid-template-columns:minmax(0,1fr)}
+/* Period label sizing and square, geometrically centered close controls. */
+.om .om-period-card .om-month-trigger{gap:10px;padding:0 10px!important;white-space:normal}
+.om .om-period-card .om-month-trigger:after{position:static;margin:0;flex:0 0 5px;transform:rotate(45deg)}
+.om .om-period-card:has(option[value="all"]:checked) .om-month-trigger{font-size:clamp(23px,1.7vw,30px);line-height:1.2}
+@media(max-width:600px){.om .om-period-card:has(option[value="all"]:checked) .om-month-trigger{font-size:clamp(20px,5.5vw,26px)}}
+.om-details-heading>button,.om .om-expense-dialog #om-close,.om .om-expense-note-tooltip header button,.om .target-form [data-target-close]{border-radius:4px;font-size:0;position:relative}
+.om .target-form [data-target-close]{position:absolute}
+.om-details-heading>button:before,.om-details-heading>button:after,.om .om-expense-dialog #om-close:before,.om .om-expense-dialog #om-close:after,.om .om-expense-note-tooltip header button:before,.om .om-expense-note-tooltip header button:after,.om .target-form [data-target-close]:before,.om .target-form [data-target-close]:after{content:'';position:absolute;left:50%;top:50%;width:13px;height:1.5px;border-radius:1px;background:currentColor;transform:translate(-50%,-50%) rotate(45deg);pointer-events:none}
+.om-details-heading>button:after,.om .om-expense-dialog #om-close:after,.om .om-expense-note-tooltip header button:after,.om .target-form [data-target-close]:after{transform:translate(-50%,-50%) rotate(-45deg)}
