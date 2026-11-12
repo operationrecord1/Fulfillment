@@ -557,3 +557,17 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 .om .om-platform-option .platform-remove{margin-left:auto;flex:none;color:#6b747d}
 .om .om-platform-option .platform-remove:hover{color:#b42332;background:#fff1f1}
 @media(max-width:600px){.om .om-platform-option{gap:7px;padding:9px 8px}.om .platform-color-control{width:32px!important;min-width:32px}.om .om-platform-option .platform-remove{padding:6px}.om .om-head .om-report-nav{padding:4px 6px;font-size:11px}}
+
+/* Neutral settings actions and explicit platform color previews. */
+.om .settings-save,.om .target-form button,.om #settings-name-form button[type=submit]{background:#202124;color:#fff;border-color:#202124;border-radius:5px;box-shadow:none;transition:background-color .15s,border-color .15s,color .15s}
+.om .settings-save:hover,.om .target-form button:hover,.om #settings-name-form button[type=submit]:hover{background:#3c4043!important;border-color:#3c4043;color:#fff!important;box-shadow:none;transform:none}
+.om .settings-logo-control{display:grid;grid-template-columns:68px 1fr;align-items:center;gap:10px 14px}
+.om .settings-logo-control>small{grid-column:1 / -1;display:block}
+.om #settings-logo-remove,.om #settings-delete,.om #settings-confirm-delete{background:#fff;color:#5f6368;border:1px solid #dce1e5;border-radius:6px;transition:background-color .15s,color .15s,border-color .15s;box-shadow:none;transform:none}
+.om #settings-logo-remove:hover,.om #settings-delete:hover,.om #settings-confirm-delete:hover{background:#fff1f1;color:#b42332;border-color:#b42332;box-shadow:none;transform:none}
+.om .om-head .om-report-nav{color:#202124}
+.om .platform-color-control{width:auto!important;min-width:100px;gap:6px;padding:5px 7px 9px!important}
+.om .platform-color-control .platform-color-code{font:11px Arial,sans-serif;white-space:nowrap;color:#3c4043}
+.om .platform-new-colors,.om .platform-option-colors{flex-wrap:wrap}
+.om .om-platform-option{flex-wrap:wrap}
+@media(max-width:600px){.om .platform-color-control{width:auto!important;min-width:90px}.om .settings-add>input{flex-basis:100%}.om .om-platform-option .platform-option-colors{flex-basis:100%}}
