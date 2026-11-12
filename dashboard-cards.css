@@ -582,4 +582,6 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 .om .platform-color-control:focus-visible{outline:1px solid #80868b;outline-offset:-1px}
 .om .settings-add>[data-add]{display:inline-flex;align-items:center;justify-content:center;height:28px!important;min-height:28px!important;box-sizing:border-box;padding:0 14px!important;line-height:26px;border:1px solid #d9dee3;border-radius:5px;background:#fff;color:#3c4043;box-shadow:0 1px 2px #2021240a;transition:background-color .15s,border-color .15s,color .15s}
 .om .settings-add>[data-add]:hover{background:#f1f3f4;border-color:#c4c9ce;color:#202124}
+.om-settings-page input:focus,.om-settings-page input:focus-visible{border-color:#cbd2d9!important;outline:none!important;box-shadow:none!important}
+html[data-om-theme=dark] .om-settings-page input:focus,html[data-om-theme=dark] .om-settings-page input:focus-visible{border-color:#525c68!important}
 @media(max-width:600px){.om .om-platform-option .platform-option-colors{flex-basis:auto}}
