@@ -6,7 +6,7 @@ class SessionHistory{
  async travel(redo,apply){if(this.running)return false;const source=redo?this.future:this.past,target=redo?this.past:this.future;if(!source.length)return false;this.running=true;try{const entry=source[source.length-1];await apply(entry,redo);source.pop();target.push(entry);this.persist();return true;}finally{this.running=false;}}
  clear(){this.past=[];this.future=[];this.storage?.removeItem(this.key);}
 }
-function averageDaily(value){return value<=.66?.5:Math.max(1,Math.round(value));}
+function averageDaily(value){return value<=0?0:value<=.66?.5:Math.max(1,Math.round(value));}
 function days(year,month){return Array.from({length:new Date(year,month,0).getDate()},(_,i)=>`${year}-${String(month).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`);}
 function receipt(value){if(!value.trim())return '';const u=new URL(value.trim());if(!['http:','https:'].includes(u.protocol)||!u.hostname)throw Error('Enter a valid http or https receipt link.');return u.href;}
 function amountText(value){const parts=String(value).replace(/[^0-9.]/g,'').split('.');return parts[0]+(parts.length>1?'.'+parts.slice(1).join('').slice(0,2):'');}

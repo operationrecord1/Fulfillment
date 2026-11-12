@@ -288,3 +288,63 @@
 }
 body.workspace-pending #info-view{visibility:hidden}
 body.workspace-pending{background:#f4f7f6}
+/* Compact application header outside the worksheet scroller. */
+body.order-workspace{position:fixed;inset:0;width:100%;height:100dvh;overflow:hidden}
+body.order-workspace .om>.om-head{position:fixed;inset:0 0 auto 0;z-index:80;height:40px;min-height:40px;width:100%;max-width:none;margin:0;padding:0 46px 0 8px;display:flex;align-items:center;gap:6px;background:#fff;border-bottom:1px solid #e1e5e9}
+.om .om-head .om-site-brand{font-size:14px;white-space:nowrap;color:#202124}
+.om .om-head>.om-store-mark{display:grid;width:23px;height:23px;min-width:23px;border-radius:5px;place-items:center;font-size:13px;background:#eef1f3;color:#34434c}
+.om .om-head>div:not(.om-profile){margin-left:auto;flex:0 1 auto;min-width:0}
+.om .om-head h1{font-size:13px;line-height:18px;margin:0;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.om .om-head>.om-profile{position:absolute;inset:5px 8px auto auto}
+.om .om-profile-trigger{width:30px;height:30px;display:grid;place-items:center;padding:0;overflow:hidden}
+.om .om-profile-trigger img{width:100%;height:100%;object-fit:contain}
+.om .om-profile-menu{inset:44px 8px auto auto}
+.om #om-theme-choices{padding:2px 8px 8px;display:flex;gap:4px}.om #om-theme-choices[hidden]{display:none}
+.om #om-theme-choices button{padding:8px 5px;text-align:center;font-size:12px;border:1px solid #dce1e5}
+.om #om-theme-choices button[aria-pressed=true]{background:#e8f0fe;color:#174ea6;border-color:#9ab8e6}
+body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed .om-main{position:fixed;top:40px;bottom:0;left:0;right:0;height:calc(100dvh - 40px);width:100%;margin:0;max-width:none}
+body.order-workspace .om .om-main[hidden]{display:none}
+.om .sheet-tools{top:0}.om .sheet-table thead th,.om .sheet-table .sheet-labels th{top:40px}
+.om .sheet-mobile-editor{top:40px;z-index:90}
+.om-pull-refresh{position:fixed;top:46px;left:50%;transform:translateX(-50%);z-index:100;background:#fff;color:#202124;border:1px solid #dce1e5;border-radius:18px;padding:8px 16px;box-shadow:0 3px 12px #0002}
+.om-pull-refresh[hidden]{display:none}
+.om-status-details{table-layout:auto;min-width:0}
+.om-status-details thead th{white-space:nowrap;overflow-wrap:normal;width:auto!important;font-size:11px}
+.om-status-details td{white-space:nowrap;overflow-wrap:normal}
+.om-status-details th:first-child{width:auto}
+.om .om-kpi-title>span{white-space:nowrap}
+.om-settings-surface{position:fixed;inset:40px 0 0;overflow-y:auto;overflow-x:hidden;background:#f4f7f6;color:#202124;padding:16px}
+.om-settings-page{max-width:880px;margin:0 auto;font:14px/1.5 Arial,sans-serif}
+.om-settings-page header{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.om-settings-page h1{font-size:23px;margin:0}.om-settings-page h2{font-size:17px;margin:0 0 6px}.om-settings-page h3{font-size:14px;margin:0 0 8px}
+.om-settings-page section{padding:20px;margin:0 0 14px;border:1px solid #e0e5e8;border-radius:12px;background:#fff}
+.om-settings-page p{font-size:13px;color:#68737c;margin:6px 0 14px}
+.om-settings-page label{display:flex;flex-direction:column;gap:6px;font-weight:600;max-width:360px}
+.om-settings-page input{font-size:16px;max-width:100%;width:100%;padding:10px;border:1px solid #cbd2d9;border-radius:7px}
+.om-settings-page input:focus-visible{outline:2px solid #1a73e8;outline-offset:1px}
+.settings-option-columns{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.settings-option-columns>div{min-width:0}.settings-add{display:flex;gap:6px;margin-bottom:12px}.settings-add input{min-width:0}
+.om-settings-page .om-platform-option{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #edf0f2}
+.om-settings-page .om-platform-option span{flex:1;overflow-wrap:anywhere}
+.om-settings-page .om-platform-option button{border:0;background:none;color:#68737c;cursor:pointer;font-size:12px}
+.om-settings-page .om-action{color:#243a4c;border:1px solid #cbd2d9;background:#fff;border-radius:7px;padding:9px 12px;white-space:nowrap}
+.om-settings-page .settings-save{background:#1a73e8;color:white;border-color:#1a73e8;margin-bottom:20px}
+.om-settings-page #settings-logo-preview{width:64px;height:64px;object-fit:contain;border:1px solid #e0e5e8;border-radius:10px;margin:6px 0 12px}
+.om-settings-page #settings-logo-preview[hidden]{display:none}
+.om-settings-page #settings-logo-remove{margin-top:10px}
+.om-settings-page .settings-account{border-color:#edd7d9}
+.om-settings-page #settings-confirm{padding:12px;background:#fff5f5;border-radius:8px}
+.om-settings-page #settings-confirm[hidden]{display:none}
+@media(max-width:599.98px){.om-settings-surface{padding:10px}.om-settings-page section{padding:14px}.settings-option-columns{grid-template-columns:1fr;gap:18px}.om-status-details thead th{font-size:10px}.om .om-kpi .om-kpi-title{font-size:10px;gap:4px}}
+html[data-om-theme=dark]{color-scheme:dark}
+html[data-om-theme=dark] body.order-workspace,html[data-om-theme=dark] .om-settings-surface{background:#14181d;color:#e8eaed}
+html[data-om-theme=dark] .om .om-head,html[data-om-theme=dark] .om .om-kpi,html[data-om-theme=dark] .om .om-panel,html[data-om-theme=dark] .om-profile-menu,html[data-om-theme=dark] .om-kpi-details,html[data-om-theme=dark] .om-settings-page section,html[data-om-theme=dark] .om-dialog{background:#20262d;color:#e8eaed;border-color:#3b434d}
+html[data-om-theme=dark] .om .om-kpi>strong,html[data-om-theme=dark] .om .om-kpi-title,html[data-om-theme=dark] .om h1,html[data-om-theme=dark] .om h2,html[data-om-theme=dark] .om h3,html[data-om-theme=dark] .om .om-head .om-site-brand,html[data-om-theme=dark] .om-profile-menu button{color:#e8eaed}
+html[data-om-theme=dark] .om p,html[data-om-theme=dark] .om-settings-page p{color:#aeb8c3}
+html[data-om-theme=dark] .om input,html[data-om-theme=dark] .om select,html[data-om-theme=dark] .om textarea,html[data-om-theme=dark] .om .sheet-tools,html[data-om-theme=dark] .om-settings-page .om-action{background:#252d36;color:#e8eaed;border-color:#525c68}
+html[data-om-theme=dark] .om .sheet-table td{background:#252d36;color:#e8eaed;border-color:#414b56}
+html[data-om-theme=dark] .om .sheet-table th{background:#384451;color:#e8eaed}
+html[data-om-theme=dark] .om-detail-pairs>div:hover,html[data-om-theme=dark] .om-status-details tbody tr:hover{background:#2c3540}
+html[data-om-theme=dark] .om .negative,html[data-om-theme=dark] .om-kpi-details .negative{color:#ff8c98}
+
+.om .om-kpi-title>span{flex:1;min-width:0;white-space:nowrap}
