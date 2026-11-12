@@ -573,3 +573,9 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 @media(max-width:600px){.om .platform-color-control{width:auto!important;min-width:90px}.om .settings-add>input{flex-basis:100%}.om .om-platform-option .platform-option-colors{flex-basis:100%}}
 .om .platform-color-control .sheet-reference-icon{flex:none!important;width:18px!important;min-width:18px;max-width:18px}
 .om .platform-color-control .platform-color-code{flex:none!important}
+.om .om-detail-pairs-heading{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #e1e5e9;font:700 12px Arial,sans-serif}
+.om .platform-color-control{width:28px!important;min-width:28px!important;height:28px;padding:4px!important;border:0!important;border-radius:3px!important;background:transparent;color:#444746;box-shadow:none}
+.om .platform-color-control:hover{background:#e8eaed}
+.om .platform-color-control i{bottom:2px;left:5px;right:5px;height:3px;border-radius:0}
+.om .platform-color-control:focus-visible{outline:1px solid #80868b;outline-offset:-1px}
+@media(max-width:600px){.om .om-platform-option .platform-option-colors{flex-basis:auto}}
