@@ -154,3 +154,18 @@
 .om .om-expense-editing .om-expense-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 10px}
 .om .om-expense-editing .om-expense-fields textarea{height:64px;min-height:44px}
 }
+
+/* Single-line expense identifier and centered secondary fields. */
+.om .om-expense-table .om-expense-record{padding-left:6px}
+.om .om-expense-table .om-expense-record td:nth-child(1){display:none}
+.om .om-expense-table .om-expense-record td:nth-child(n+3):nth-child(-n+7){text-align:center}
+.om .om-expense-table .om-expense-record td:before{white-space:nowrap}
+@media(max-width:540px){
+.om .om-kpis{width:calc(var(--workspace-view-width,100vw) - 2px);grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(6,auto)}
+.om .om-kpis>[data-kpi=period]{grid-area:1/1}.om .om-kpis>[data-kpi=expense]{grid-area:1/2}
+.om .om-kpis>[data-kpi=cost]{grid-area:2/1}.om .om-kpis>[data-kpi=revenue]{grid-area:2/2}
+.om .om-kpis>[data-kpi=count]{grid-area:3/1}.om .om-kpis>[data-kpi=net]{grid-area:3/2}
+.om .om-kpis>[data-kpi=gross]{grid-area:4/1}.om .om-kpis>[data-kpi=tax]{grid-area:4/2}
+.om .om-kpis>[data-kpi=avgOrder]{grid-area:5/1}.om .om-kpis>[data-kpi=avgProfit]{grid-area:5/2}
+.om .om-kpis>[data-kpi=margin]{grid-area:6/1}.om .om-kpis>[data-kpi=avgDaily]{grid-area:6/2}
+}
