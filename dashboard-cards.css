@@ -528,3 +528,9 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 .om .sheet-select-frame .sheet-chip-arrow{flex:none;margin:0;color:inherit}
 .om .sheet-chip.sheet-select-frame.empty{display:flex;width:auto;background:transparent!important;color:#6b7881!important;border:1px solid #d4d9dd;justify-content:flex-end}
 .om .sheet-select-frame.empty:hover{border-color:#8e9ba5}
+/* Equal selected/empty dimensions: 88% of the former empty frame. */
+.om .sheet-chip.sheet-select-frame,.om .sheet-chip.sheet-select-frame.empty{width:calc(88% - 5.28px);display:inline-flex;border:1px solid transparent}
+.om .sheet-chip.sheet-select-frame.empty{border-color:#d4d9dd}
+.om .sheet-select-frame .sheet-selected-value>span{text-align:center}
+.om .order-filter-trigger>svg:first-child{width:0;height:0;flex:none;border:4px solid transparent;border-top-color:#879198;border-bottom:0;overflow:hidden;fill:none;stroke:none}
+.om .order-filter-trigger .filter-arrow{border-top-color:#879198}
