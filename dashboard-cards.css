@@ -348,3 +348,14 @@ html[data-om-theme=dark] .om-detail-pairs>div:hover,html[data-om-theme=dark] .om
 html[data-om-theme=dark] .om .negative,html[data-om-theme=dark] .om-kpi-details .negative{color:#ff8c98}
 
 .om .om-kpi-title>span{flex:1;min-width:0;white-space:nowrap}
+html[data-om-theme=dark] .om .om-canvas,html[data-om-theme=dark] .om .om-main{background:#14181d}
+html[data-om-theme=dark] .om .om-month-trigger,html[data-om-theme=dark] .om .om-progress-row,html[data-om-theme=dark] .om .sheet-tools button,html[data-om-theme=dark] .om .sheet-tools input,html[data-om-theme=dark] .om #om-expenses{color:#e8eaed}
+html[data-om-theme=dark] .om svg text[fill="#72817d"]{fill:#aeb8c3}
+html[data-om-theme=dark] .om .om-donut-total,html[data-om-theme=dark] .om .om-profit-value{fill:#e8eaed}
+html[data-om-theme=dark] .om .om-loss-value{fill:#ff8c98}
+html[data-om-theme=dark] .om svg line[stroke="#e4ebe7"]{stroke:#414b56}
+html[data-om-theme=dark] .om .om-progress-row:hover{background:#2c3540}
+html[data-om-theme=dark] .om .om-month-menu,html[data-om-theme=dark] .om .sheet-popover,html[data-om-theme=dark] .om .sheet-format-pop,html[data-om-theme=dark] .om .sheet-menu{background:#252d36;color:#e8eaed;border-color:#525c68}
+html[data-om-theme=dark] .om .om-month-menu button,html[data-om-theme=dark] .om .sheet-format-pop button,html[data-om-theme=dark] .om .sheet-menu button{color:#e8eaed}
+html[data-om-theme=dark] .om .sheet-mobile-editor{background:#20262d;border-color:#525c68}
+html[data-om-theme=dark] .om .sheet-mobile-editor label{color:#e8eaed}

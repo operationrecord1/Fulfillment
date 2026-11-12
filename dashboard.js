@@ -96,7 +96,7 @@ async function travel(redo){if(investor||session.running||!await flush())return;
 const sessionKeys=e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey||e.target.closest('input,textarea,select,[contenteditable=true]'))return;const key=e.key.toLowerCase();if(key==='z'||key==='y'){e.preventDefault();e.stopPropagation();travel(key==='y'||e.shiftKey);}};host.addEventListener('keydown',sessionKeys,true);
 const profileMenu=host.querySelector('.om-profile-menu');
 profileMenu.innerHTML='<button type="button" id="om-preferences" aria-expanded="false">Preferences</button><div id="om-theme-choices" hidden><button type="button" data-theme-choice="light">Light</button><button type="button" data-theme-choice="dark">Dark</button><button type="button" data-theme-choice="system">System</button></div><button type="button" id="om-settings-nav">Settings</button><button type="button" id="om-signout">Log out</button>';
-const themeKey='fulfillment-theme:'+user.id,systemTheme=matchMedia('(prefers-color-scheme: dark)');let theme=localStorage.getItem(themeKey)||'system';
+const themeKey='fulfillment-theme:'+user.id,systemTheme=matchMedia('(prefers-color-scheme: dark)');let theme=localStorage.getItem(themeKey)||'light';
 function applyTheme(){document.documentElement.dataset.omTheme=theme==='system'?(systemTheme.matches?'dark':'light'):theme;profileMenu.querySelectorAll('[data-theme-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.themeChoice===theme)));}
 applyTheme();systemTheme.addEventListener('change',applyTheme);
 profileMenu.querySelector('#om-preferences').onclick=e=>{const choices=profileMenu.querySelector('#om-theme-choices');choices.hidden=!choices.hidden;e.currentTarget.setAttribute('aria-expanded',String(!choices.hidden));};
