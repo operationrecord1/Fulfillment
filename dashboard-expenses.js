@@ -14,7 +14,7 @@ window.openExpenseManager=function({state,dialog,save,remove},editing=null){
  const form=d.querySelector('form'),dates=form.elements.date,error=d.querySelector('#om-dialog-error');
  const amount=form.elements.amount;amount.addEventListener('beforeinput',e=>{if(e.data&&/[^0-9.]/.test(e.data))e.preventDefault();});amount.addEventListener('input',()=>{amount.value=DashboardSession.amountText(amount.value);});
 
- d.classList.add('om-expense-dialog');
+ d.classList.add('om-expense-dialog');d.classList.toggle('om-expense-editing',Boolean(editing));
 
  const note=form.elements.note,counter=d.querySelector('#om-note-count');
  const countNote=()=>{const length=note.value.length;counter.hidden=length<41;counter.textContent=Math.max(0,50-length)+' characters remaining';};
