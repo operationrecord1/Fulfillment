@@ -204,6 +204,8 @@
 .om-status-details{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
 .om-status-details th,.om-status-details td{padding:10px 3px;border-bottom:1px solid #e7e7e7;text-align:center;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .om-status-details th:first-child{width:29%;text-align:left;font-weight:400}.om-status-details th:nth-child(2){width:14%}.om-status-details th:nth-child(3){width:34%}.om-status-details th:nth-child(4){width:23%}
+.om-status-details thead th strong{font-weight:700}
+.om-revenue-details th:first-child{width:58%;font-weight:700}.om-revenue-details th:nth-child(2){width:42%}.om-revenue-details tbody th:first-child{font-weight:400}
 .om-status-details tbody tr:hover,.om-detail-pairs>div:hover{background:#f7f7f7}
 .om-kpi-details .negative{color:#bd2638}
 .om-detail-money{display:inline-grid;grid-template-columns:8px 9px minmax(0,1fr);width:100%;font-variant-numeric:tabular-nums;text-align:right}
@@ -574,8 +576,8 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 .om .platform-color-control .sheet-reference-icon{flex:none!important;width:18px!important;min-width:18px;max-width:18px}
 .om .platform-color-control .platform-color-code{flex:none!important}
 .om .om-detail-pairs-heading{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #e1e5e9;font:700 12px Arial,sans-serif}
-.om .platform-color-control{width:28px!important;min-width:28px!important;height:28px;padding:4px!important;border:0!important;border-radius:3px!important;background:transparent;color:#444746;box-shadow:none}
-.om .platform-color-control:hover{background:#e8eaed}
+.om .platform-color-control{width:28px!important;min-width:28px!important;height:28px;padding:4px!important;border:1px solid #d9dee3!important;border-radius:5px!important;background:#fff;color:#444746;box-shadow:0 1px 2px #2021240a;transition:background-color .15s,border-color .15s,box-shadow .15s}
+.om .platform-color-control:hover{background:#f7f8f9;border-color:#aeb7c0!important;box-shadow:0 1px 3px #20212414}
 .om .platform-color-control i{bottom:2px;left:5px;right:5px;height:3px;border-radius:0}
 .om .platform-color-control:focus-visible{outline:1px solid #80868b;outline-offset:-1px}
 @media(max-width:600px){.om .om-platform-option .platform-option-colors{flex-basis:auto}}
