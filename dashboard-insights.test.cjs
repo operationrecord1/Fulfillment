@@ -14,3 +14,5 @@ const unsetRows=[row(1,'U',10,4,''),row(2,'',3,1,'')];const unset=I.statusBreakd
 
 assert.match(I.details('count',a,rows,[],false,15),/>-\$5\.00<\/span>/);
 assert.match(I.details('count',a,rows,[],false,15),/>\$9\.00<\/span>/);
+
+assert.equal(C.statusLabel('Buyer Cancelled'),'Cancelled');assert.equal(I.statusBreakdown([row(1,'C',10,2,'Buyer Cancelled')])[0].status,'Cancelled');

@@ -1,6 +1,7 @@
 (function(root){
 'use strict';
-const statuses=['Pending','Processed','Delivered','Label Created','Buyer Cancelled','Refunded','OOS','Alert'];
+const statusLabel=value=>/^buyer cancel(?:led)?$/i.test(value||'')?'Cancelled':value;
+const statuses=['Pending','Processed','Delivered','Label Created','Cancelled','Refunded','OOS','Alert'];
 const columns=[['order_id','Order ID'],['quantity','Quantity','number'],['earning','Order Earning','money'],['purchase_id','Purchase ID'],['supplier','Supplier Reference'],['note','Note'],['platform','Platform','select'],['tracking','Tracking'],['secondary_tracking','Secondary Tracking'],['status','Order Status','select'],['product_cost','Product Cost','money'],['shipping_cost','Shipping Cost','money'],['additional_cost','Additional Cost','money'],['gross','Gross Profit','computed'],['margin','Profit Margin','computed'],['id','Order Unique ID','computed'],['date','Order Date','date']];
 const investorFields=new Set(['order_id','quantity','earning','status','product_cost','shipping_cost','additional_cost','gross','margin','date']);
 const present=v=>v!==''&&v!==null&&v!==undefined;
@@ -40,5 +41,5 @@ function aggregate(rows,expenses,investor=false,taxPercentage=15){
  return {groups:gs,count,revenue,cost,gross,expense,tax,net:gross-expense-tax,margin:margins.length?margins.reduce((a,b)=>a+b,0)/margins.length:0,avgOrder:count?Math.round(revenue/count):0,avgProfit:count?Math.round(gross/count):0,avgDaily:daily.size?count/daily.size:0,sizes,points:[...daily].sort(([a],[b])=>a.localeCompare(b))};
 }
 function duplicates(rows,fields=['order_id','purchase_id']){const marks=new Set();for(const key of fields){const runs=new Map();let prev='',month=null,position=null;for(const r of rows){const value=r.data[key]||'';if(value){if(!runs.has(value))runs.set(value,[]);if(value!==prev||month!==r.month||(r.position!==undefined&&position!==null&&r.position!==position+1))runs.get(value).push([]);runs.get(value).at(-1).push(r);}prev=value;month=r.month;position=r.position??null;}for(const run of runs.values())if(run.length>1)run.flat().forEach(r=>marks.add(r.id||r._key));}return marks;}
-const api={statuses,columns,investorFields,present,cents,link,groups,aggregate,duplicates};root.OrderCore=api;if(typeof module!=='undefined')module.exports=api;
+const api={statusLabel,statuses,columns,investorFields,present,cents,link,groups,aggregate,duplicates};root.OrderCore=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

@@ -268,3 +268,23 @@
 .om-status-details{min-width:310px}
 @media(max-width:350px){.om-status-details{min-width:280px;font-size:11px}}
 @media(max-width:350px){.om-status-details{min-width:0;font-size:10px}.om-status-details th,.om-status-details td{padding:8px 2px}.om-status-details th:nth-child(2){white-space:nowrap}.om-status-details .om-detail-percent,.om-status-details .om-margin-heading{width:auto}}
+
+/* Header stays attached to the viewport while the shared sheet scrolls. */
+.om .om-head{position:sticky;left:0;top:0;z-index:50;width:var(--workspace-view-width,calc(100vw - 14px));max-width:100%;background:#f4f7f6}
+.om .om-head>.om-profile{position:absolute;right:12px;left:auto;top:12px}
+.om .om-kpi .om-kpi-title{font-weight:700;font-size:13px;gap:8px;line-height:17px}
+.om .om-kpi .om-kpi-icon{flex-basis:26px;width:26px;height:26px;padding:2px}
+.om .om-kpi-title svg{width:22px;height:22px;stroke-width:1.55}
+@media(max-width:599.98px){
+ .om .om-head{background:#fff}
+ .om .om-kpi .om-kpi-title{font-size:11px;gap:5px;line-height:14px}
+ .om .om-kpi-title svg{width:20px;height:20px}
+ .om .om-kpi .om-kpi-icon{flex-basis:24px;width:24px;height:24px}
+ .om-kpi-details{padding:18px 14px;max-height:calc(100dvh - 32px);border-radius:14px}
+ .om-kpi-details::backdrop{background:#17212b38;backdrop-filter:blur(3px)}
+ .om-details-heading{margin-bottom:14px}
+ .om-detail-pairs>div{padding:10px 0}
+ .om-status-details{min-width:0}
+}
+body.workspace-pending #info-view{visibility:hidden}
+body.workspace-pending{background:#f4f7f6}
