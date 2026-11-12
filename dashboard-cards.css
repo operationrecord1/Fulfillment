@@ -571,3 +571,5 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 .om .platform-new-colors,.om .platform-option-colors{flex-wrap:wrap}
 .om .om-platform-option{flex-wrap:wrap}
 @media(max-width:600px){.om .platform-color-control{width:auto!important;min-width:90px}.om .settings-add>input{flex-basis:100%}.om .om-platform-option .platform-option-colors{flex-basis:100%}}
+.om .platform-color-control .sheet-reference-icon{flex:none!important;width:18px!important;min-width:18px;max-width:18px}
+.om .platform-color-control .platform-color-code{flex:none!important}
