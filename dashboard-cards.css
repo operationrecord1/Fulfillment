@@ -204,7 +204,7 @@
 .om-status-details{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
 .om-status-details th,.om-status-details td{padding:10px 3px;border-bottom:1px solid #e7e7e7;text-align:center;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .om-status-details th:first-child{width:29%;text-align:left;font-weight:400}.om-status-details th:nth-child(2){width:14%}.om-status-details th:nth-child(3){width:34%}.om-status-details th:nth-child(4){width:23%}
-.om-status-details thead th strong{font-weight:700}
+.om-status-details thead th strong{font-weight:700!important}
 .om-revenue-details th:first-child{width:58%;font-weight:700}.om-revenue-details th:nth-child(2){width:42%}.om-revenue-details tbody th:first-child{font-weight:400}
 .om-status-details tbody tr:hover,.om-detail-pairs>div:hover{background:#f7f7f7}
 .om-kpi-details .negative{color:#bd2638}
