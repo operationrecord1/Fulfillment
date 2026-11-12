@@ -498,3 +498,4 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 /* Period typography matches the Total Orders value at every breakpoint. */
 .om .om-period-card .om-month-trigger,.om .om-period-card:has(option[value="all"]:checked) .om-month-trigger{color:#111;font-size:clamp(23px,1.7vw,30px);font-weight:650;line-height:1.2;font-variant-numeric:tabular-nums}
 @media(max-width:600px){.om .om-period-card .om-month-trigger,.om .om-period-card:has(option[value="all"]:checked) .om-month-trigger{font-size:clamp(20px,5.5vw,26px)}}
+.om .om-profile-menu{border-radius:4px}.om .om-profile-menu button{padding-left:30px!important;padding-right:30px!important;border-radius:0}
