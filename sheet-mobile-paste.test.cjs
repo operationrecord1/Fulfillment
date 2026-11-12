@@ -17,3 +17,5 @@ touch.touchPointer(down);listeners.get('pointermove')({pointerId:1,clientX:20,cl
 touch.touchPointer(down);listeners.get('pointercancel')({pointerId:1});assert.equal(listeners.size,0);
 console.log('PASS: 1000-row paste + 20 blank rows, one undo checkpoint, atomic invalid paste, touch double-tap, swipe and cancel');
 
+
+context.window.matchMedia=()=>({matches:true});touch.touchPointer(down);listeners.get('pointerup')({pointerId:1});assert.equal(touch.opened,2);console.log('PASS: mobile single tap starts the editor without waiting for double tap');

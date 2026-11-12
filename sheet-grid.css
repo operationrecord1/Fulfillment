@@ -11,3 +11,9 @@
 @media(max-width:700px){.om.om-sidebar-collapsed{display:grid;grid-template-columns:45px minmax(0,1fr)}.om.om-sidebar-collapsed .om-side{display:flex;position:sticky;top:0;height:100vh;flex-direction:column;flex-wrap:nowrap;padding:12px 2px;align-items:center}.om-sidebar-collapsed .om-side button{width:39px}.om-sidebar-collapsed .om-side .om-logout{margin-top:auto}.om.om-sidebar-collapsed .om-main{padding:16px 8px}.om-sidebar-collapsed .om-brand span{padding:4px 8px}.sheet-scroll{height:440px}.om .sheet-grid{margin-left:-8px;margin-right:-8px}.sheet-tools span{max-width:150px;overflow:hidden;white-space:nowrap}.sheet-formula .sheet-name{width:65px!important}}
 
 .om .sheet-table td{touch-action:manipulation}.om .sheet-table textarea.sheet-editor{touch-action:auto}
+
+.om .sheet-mobile-editor{position:fixed;left:0;right:0;top:0;z-index:1000;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px max(8px,env(safe-area-inset-right)) 8px max(8px,env(safe-area-inset-left));background:#fff;border-bottom:1px solid #c4c7c5;box-shadow:0 2px 8px #0002;box-sizing:border-box}
+.om .sheet-mobile-editor label{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px;font:11px Arial,sans-serif;color:#526574}
+.om .sheet-mobile-editor textarea.sheet-mobile-input{position:static;width:100%;height:40px;min-height:40px;resize:none;font:16px Arial,sans-serif;padding:9px;border:1px solid #1a73e8;border-radius:4px;box-sizing:border-box;color:#202124;background:#fff;user-select:text;touch-action:auto}
+.om .sheet-mobile-editor button{height:40px;padding:0 14px;border:1px solid #c4c7c5;border-radius:5px;background:#edf3fa;color:#174ea6}
+.om .sheet-mobile-error{flex-basis:100%;color:#b42332;font-size:12px}.om .sheet-mobile-error:empty{display:none}
