@@ -519,10 +519,12 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-e
 .om .platform-color-picker{width:36px!important;min-width:36px;flex:0 0 36px;height:32px;padding:3px;border:1px solid #d4d9dd;border-radius:4px;cursor:pointer}.om .platform-color-dot{width:14px;height:14px;flex:none;border:1px solid #d4d9dd;border-radius:3px}.om .om-platform-option{gap:8px}.om .sheet-header-text{white-space:normal;user-select:text}
 @media(min-width:1080px){.om .quiet-outline{max-height:none;overflow:visible;padding:5px 0}.om .quiet-outline [role=listbox]{overflow:visible;max-height:none}.om .quiet-outline [role=option]{min-height:29px;padding:3px 8px;margin:1px 0}.om .quiet-outline .sheet-clear-selection{min-height:28px;padding:5px 9px}.om .quiet-outline .sheet-chip{padding:3px 7px}}
 
-/* Stable widths for selected and unselected dropdowns. */
-.om .sheet-chip.sheet-select-frame{width:var(--select-width);box-sizing:border-box;flex-shrink:0}
-.om .sheet-select-frame .sheet-selected-value{flex:1;min-width:0;justify-content:flex-start}.om .sheet-select-frame .sheet-selected-value>span{flex:1;text-align:center}.om .sheet-select-frame .status-symbol{flex:none}
-.om .sheet-chip.sheet-select-frame.empty{display:inline-flex;width:var(--select-width);border:1px solid #d4d9dd;background:#fff!important;color:#6b7881!important;padding:1px 5px;justify-content:flex-end}.om .sheet-select-frame.empty:hover{border-color:#8e9ba5}
-
-/* Restore the original Quiet Outline white outer frame. */
-.om .sheet-chip.sheet-select-frame{display:flex;width:auto;max-width:calc(100% - 6px);border:1px solid #d4d9dd;border-radius:5px;background:#fff!important;color:#6b7881!important;padding:1px 4px;margin:2px 3px;height:22px;min-height:22px;gap:4px;justify-content:space-between}.om .sheet-select-frame .sheet-selected-value{display:inline-flex;align-items:center;gap:4px;flex:0 1 auto;border-radius:4px;padding:1px 4px;min-width:0;justify-content:center;}.om .sheet-select-frame .sheet-selected-value>span{flex:0 1 auto}.om .sheet-select-frame .sheet-chip-arrow{margin-left:auto}.om .sheet-chip.sheet-select-frame.empty{display:flex;width:auto;background:#fff!important;border:1px solid #d4d9dd;justify-content:flex-end}
+/* One colored control encloses the status icon, label, and arrow. */
+.om .sheet-chip.sheet-select-frame{display:inline-flex;width:var(--select-width);max-width:calc(100% - 6px);box-sizing:border-box;flex-shrink:0;border:0;border-radius:4px;padding:1px 5px;margin:2px 3px;gap:4px;height:22px;min-height:22px}
+.om .sheet-select-frame .sheet-selected-value{display:inline-flex;align-items:center;flex:1;min-width:0;padding:0;gap:4px;background:transparent;justify-content:flex-start}
+.om .sheet-select-frame .sheet-selected-value>span{flex:1;min-width:0;text-align:left}
+.om .sheet-select-frame.select-platform .sheet-selected-value>span{text-align:center}
+.om .sheet-select-frame .status-symbol{flex:none}
+.om .sheet-select-frame .sheet-chip-arrow{flex:none;margin:0;color:inherit}
+.om .sheet-chip.sheet-select-frame.empty{display:flex;width:auto;background:transparent!important;color:#6b7881!important;border:1px solid #d4d9dd;justify-content:flex-end}
+.om .sheet-select-frame.empty:hover{border-color:#8e9ba5}
