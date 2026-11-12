@@ -33,6 +33,15 @@ const dailyResize=new ResizeObserver(entries=>{if(Math.floor(entries[0].contentR
 const $=id=>document.getElementById(id);if(account){$('om-account').append(account);account.hidden=false;}
 const cleanup=()=>{if(location.hash.split('/')[0]!=='#workspace'){disposed=true;document.body.classList.remove('order-workspace');window.removeEventListener('hashchange',cleanup);window.removeEventListener('beforeunload',unload);clearInterval(poll);clearTimeout(saveTimer);clearTimeout(prefTimer);pullEvents.abort();gridResize.disconnect();grid.destroy();headerResize.disconnect();insights.destroy();disposeChartTips();dailyResize.disconnect();titleResize.disconnect();}};
 const unload=e=>{if(dirty||busy||grid.editor||prefDirty){e.preventDefault();e.returnValue='';}};window.addEventListener('hashchange',cleanup);window.addEventListener('beforeunload',unload);
+let signingOut=false;
+async function signOutWorkspace(event){
+ if(signingOut)return;
+ signingOut=true;
+ const button=event?.currentTarget;if(button)button.disabled=true;
+ try{if(!await flush())return;await logout();session.clear();}
+ catch{feedback('Could not log out. Check your connection and try again.',true);}
+ finally{signingOut=false;if(button)button.disabled=false;}
+}
 function feedback(text,error=false){if(disposed)return;$('om-save').textContent=error?text:'';$('om-save').hidden=!error;$('om-save').classList.toggle('error',error);$('om-retry').hidden=!error||!dirty;}
 async function rpc(action,payload){const {data,error}=await client.rpc('order_workspace',{action,payload});if(error)throw new Error(error.message||'Could not save. Please try again.');return data;}
 function rowsForPeriod(){return state.rows.filter(r=>state.month==='all'||r.month===state.month).sort((a,b)=>a.month-b.month||a.position-b.position||String(a.id||a._key).localeCompare(String(b.id||b._key)));}
@@ -83,7 +92,7 @@ if(!section){pop.innerHTML+='<div class="filter-categories">'+[['all','All Order
 pop.querySelector('[data-close]').onclick=()=>{grid.closePopup();categoryButton.focus({preventScroll:true});};const rect=categoryButton.getBoundingClientRect();grid.showPopup(pop,rect.right-248,rect.bottom+6);grid.popupAnchor=categoryButton;categoryButton.setAttribute('aria-expanded','true');};pop.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape'){grid.closePopup();categoryButton.focus({preventScroll:true});}});draw();};
 paintFilter();filterSlot.before($('om-save'));
 $('om-search').addEventListener('input',e=>{state.search=e.target.value.toLowerCase();renderTable(rowsForPeriod());});
-$('om-retry').onclick=async()=>{if(await flush())render();};host.querySelector('.om-logout').onclick=async()=>{if(await flush()){session.clear();await logout();}};
+$('om-retry').onclick=async()=>{if(await flush())render();};host.querySelector('.om-logout').onclick=signOutWorkspace;
 function dialog(title,html){const d=$('om-dialog');d.classList.remove('om-expense-dialog');d.innerHTML='<header><h2>'+title+'</h2><button class="om-action" id="om-close" aria-label="Close dialog">×</button></header>'+html;$('om-close').onclick=()=>d.close();d.showModal();return d;}
 let settingsPage=null;
 function closeSettings(){reportPage?.remove();reportPage=null;settingsPage?.remove();settingsPage=null;viewport.hidden=false;history.replaceState(null,'','#workspace');}
@@ -100,7 +109,7 @@ const profileMenu=host.querySelector('.om-profile-menu');
 profileMenu.innerHTML=(investor?'':'<button type="button" id="om-settings-nav">Settings</button>')+'<button type="button" id="om-signout">Log Out</button>';
 document.documentElement.dataset.omTheme='light';localStorage.removeItem('fulfillment-theme:'+user.id);
 if(!investor)profileMenu.querySelector('#om-settings-nav').onclick=async()=>{if(!await flush())return;profileMenu.hidePopover();openSettings();};
-profileMenu.querySelector('#om-signout').onclick=async()=>{if(await flush()){session.clear();await logout();}};
+profileMenu.querySelector('#om-signout').onclick=signOutWorkspace;
 
 const pullEvents=new AbortController(),pullHint=document.createElement('div');pullHint.className='om-pull-refresh';pullHint.hidden=true;pullHint.setAttribute('role','status');host.querySelector('.om').append(pullHint);let pullStart=null,pullDistance=0,refreshing=false;
 host.addEventListener('touchstart',e=>{pullStart=null;pullDistance=0;if(window.innerWidth>=600||settingsPage||refreshing||viewport.scrollTop>1||e.touches.length!==1||$('om-dialog').open||grid.editor||e.target.closest('input,textarea,select,a'))return;pullHint.dataset.phase='pull';pullHint.style.setProperty('--pull-y','-44px');const t=e.touches[0];pullStart={x:t.clientX,y:t.clientY};},{passive:true,capture:true,signal:pullEvents.signal});

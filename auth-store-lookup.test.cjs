@@ -1,0 +1,7 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const source=fs.readFileSync('index.html','utf8'),start=source.indexOf('    async function checkStore(name){'),end=source.indexOf('    storeInput.addEventListener',start);
+const create=new Function('getSupabaseClient','storeCheck','let storeLookupSequence=0,checkedStoreName="",checkedStoreExists=false;'+source.slice(start,end)+'return {checkStore,invalidate:()=>storeLookupSequence++,state:()=>({checkedStoreName,checkedStoreExists})};');
+(async()=>{const pending=[],node={textContent:'',className:'',classList:{add(){}}},lookup=create(()=>({functions:{invoke:()=>new Promise(resolve=>pending.push(resolve))}}),node);
+const old=lookup.checkStore('Old Store'),current=lookup.checkStore('New Store');pending[1]({data:{exists:true,store_name:'New Store'}});assert.equal(await current,true);pending[0]({data:{exists:false}});assert.equal(await old,false);assert.equal(lookup.state().checkedStoreName,'New Store');assert.match(node.textContent,/New Store/);
+const stale=lookup.checkStore('Other Store');lookup.invalidate();pending[2]({error:Error('Network')});await stale;assert.equal(lookup.state().checkedStoreName,'New Store');assert.match(node.textContent,/Checking store/);
+assert.ok(source.includes('storeLookupSequence++;clearTimeout(storeCheckTimer);'));assert.ok(source.includes('storeInput.addEventListener("input",()=>{\n      storeLookupSequence++;'));console.log('PASS: late store lookup success/failure cannot replace a newer input or role choice');})();

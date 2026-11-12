@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const source=fs.readFileSync('index.html','utf8');
+const start=source.indexOf('    const rawHash=location.hash.slice(1);');
+const end=source.indexOf('    if(callbackPending)return;',start);
+assert.ok(start>=0&&end>start);
+const inspect=new Function('location',source.slice(start,end)+'return {legacyAuthCallback,hasAuthTokens,authFlow};');
+for(const hash of ['#error=access_denied&error_code=otp_expired&error_description=Expired','#error_description=Expired','#access_token=token&type=recovery','#type=invite&access_token=token','#refresh_token=token&access_token=token&type=recovery'])assert.equal(inspect({hash,search:''}).legacyAuthCallback,true,hash);
+assert.equal(inspect({hash:'',search:'?code=callback'}).legacyAuthCallback,true);
+for(const hash of ['','#sign-in','#workspace/settings','#activate?token_hash=abc&type=invite'])assert.equal(inspect({hash,search:''}).legacyAuthCallback,false,hash);
+console.log('PASS: expired auth links route to callback error handling, token order is independent, ordinary routes remain unchanged');
