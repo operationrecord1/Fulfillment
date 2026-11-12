@@ -403,3 +403,12 @@ html[data-om-theme=dark] .om .sheet-search-slot input{background:#252d36;color:#
 @keyframes om-refresh-spin{to{transform:rotate(325deg)}}
 @media(prefers-reduced-motion:reduce){.om .om-pull-refresh[data-phase=loading]::before{animation-duration:1.5s}}
 .om .sheet-mobile-editor .sheet-mobile-input:focus-visible{outline:1px solid #1a73e8;outline-offset:0}
+html[data-om-theme=dark] .om-settings-page>header{background:transparent;color:#e8eaed} html[data-om-theme=dark] .om-settings-page>header h1{color:#e8eaed}
+html[data-om-theme=dark] .om .om-expense-dialog>header{background:#20262d;color:#e8eaed}
+html[data-om-theme=dark] .om .om-expense-fields label,html[data-om-theme=dark] .om .om-date-field>span{color:#cbd3dc}
+html[data-om-theme=dark] .om .om-date-trigger,html[data-om-theme=dark] .om #om-date-options,html[data-om-theme=dark] .om #om-date-options button,html[data-om-theme=dark] .om .om-expense-actions button{background:#20262d;color:#e8eaed;border-color:#525c68}
+html[data-om-theme=dark] .om #om-date-options button:hover,html[data-om-theme=dark] .om #om-date-options button[aria-selected=true]{background:#344153}
+html[data-om-theme=dark] .om .om-expense-table .om-expense-record,html[data-om-theme=dark] .om .om-expense-table .om-expense-record td{background:#20262d;color:#e8eaed;border-color:#525c68}
+html[data-om-theme=dark] .om .om-expense-table .om-expense-record td:before{color:#b5c0cc}
+html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-edit-expense]{color:#b5cfff;border-color:#525c68}
+html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-expense]{color:#ff9aa6;background:transparent;border-color:#525c68}
