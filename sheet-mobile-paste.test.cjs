@@ -51,3 +51,13 @@ for(const [key,label,type] of core.columns){
 for(const key of ['gross','margin','id']){const g=Object.create(prototype);Object.assign(g,{editable:true,cols:[{key,type:'computed'}],selection:{r:1,c:0},raw:()=>42});g.fillDrag({pointerId:10});assert.equal(listeners.size,0);}
 console.log('PASS: all editable fields fill down, zero values, links, one undo snapshot, computed fields locked');
 const emptyLink=Object.create(prototype);Object.assign(emptyLink,{cols:[{key:'order_id'}],rows:[{position:1,data:{order_id:'',order_url:'https://example.com'}}],formats:{1:{order_id:{href:'https://example.com'}}}});assert.equal(emptyLink.linkDetails(1,0),null);emptyLink.rows[0].data.order_id='ID';emptyLink.editable=true;emptyLink.bounds=()=>({r1:1,r2:1,c1:0,c2:0});emptyLink.checkpoint=()=>{};emptyLink.closePopup=()=>{};emptyLink.changed=()=>{};emptyLink.clear();assert.equal(emptyLink.formats[1].order_id.href,undefined);assert.equal(emptyLink.rows[0].data.order_url,'');assert.equal(emptyLink.linkDetails(1,0),null);prototype.keydown.call({}, {isComposing:true,key:'Enter'});console.log('PASS: clear removes link metadata, empty text cannot preview a URL, composing keys bypass spreadsheet shortcuts');
+
+// Accepted digits dismiss a warning; rejected characters keep it visible.
+for(const [key,label,type] of [['quantity','Quantity','number'],['earning','Order Earning','money'],['date','Order Date','date']]){
+ const handlers={},editor={value:'',selectionStart:0,selectionEnd:0,addEventListener(k,fn){handlers[k]=fn},setSelectionRange(){}};
+ const g=Object.create(prototype);Object.assign(g,{editor,cols:[{key,label,type}],editCell:{r:1,c:0},raw:()=>'',warnInput(message){this.warningText=message},clearInputWarning(){this.warningText=null}});g.guardEditor(0);
+ let prevented=false;handlers.beforeinput({data:'a',preventDefault(){prevented=true}});assert(prevented);assert.equal(g.warningText,label+' Accepts Digits Only.');
+ editor.value='5';handlers.input({});assert.equal(g.warningText,null);
+ g.warningText='Still visible';editor.value='';handlers.input({});assert.equal(g.warningText,'Still visible');
+}
+console.log('PASS: field-specific warnings clear on valid digits, but not empty input');
