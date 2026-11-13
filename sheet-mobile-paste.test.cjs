@@ -32,8 +32,21 @@ context.window.getSelection=()=>({isCollapsed:false,anchorNode:{parentElement:{c
 headerGrid.clipboardEvent({target:headerTarget,preventDefault(){throw Error('Native header copying was blocked');}},false);
 console.log('PASS: header text and touch header select entire column, preserve native text selection and copy');
 const fillGrid=Object.create(prototype),fillRows=[1,2,3].map(position=>({position,data:{order_id:'ORDER-'+position,platform:position===1?'Amazon':'AutoDS'}}));
-Object.assign(fillGrid,{selection:{r:1,c:0,er:1,ec:0,kind:'cell'},cols:[{key:'platform'}],rows:fillRows,slots:[1,3],platforms:['Amazon','AutoDS'],year:2026,month:11,raw:()=> 'Amazon',canEdit:()=>true,paint(){},scroll:{scrollTop:0,getBoundingClientRect:()=>({top:0,bottom:500})},checkpoint(){this.checkpoints=(this.checkpoints||0)+1;},assign(row,c,value){row.data.platform=value;},changed(){this.didChange=true;},select(){}});
+Object.assign(fillGrid,{selection:{r:1,c:0,er:1,ec:0,kind:'cell'},cols:[{key:'platform'}],rows:fillRows,formats:{},slots:[1,3],platforms:['Amazon','AutoDS'],year:2026,month:11,raw:()=> 'Amazon',canEdit:()=>true,paint(){},scroll:{scrollTop:0,getBoundingClientRect:()=>({top:0,bottom:500})},checkpoint(){this.checkpoints=(this.checkpoints||0)+1;},assign(row,c,value){row.data.platform=value;},changed(){this.didChange=true;},select(){}});
 document.elementFromPoint=()=>({closest:()=>({dataset:{r:'3',c:'0'}})});
-fillGrid.fillPlatformDrag({pointerId:8});listeners.get('pointermove')({pointerId:8,clientX:30,clientY:100});listeners.get('pointerup')({pointerId:8});
+fillGrid.fillDrag({pointerId:8});listeners.get('pointermove')({pointerId:8,clientX:30,clientY:100});listeners.get('pointerup')({pointerId:8});
 assert.equal(fillRows[2].data.platform,'Amazon');assert.equal(fillRows[1].data.platform,'AutoDS');assert.equal(fillGrid.checkpoints,1);assert.equal(fillGrid.didChange,true);assert.equal(listeners.size,0);
 console.log('PASS: platform fill copies selected value into visible destination rows, preserves filtered rows, and records one undo checkpoint');
+// Fill applies only to editable fields, preserves zero and links, and is undoable as one action.
+for(const [key,label,type] of core.columns){
+ if(type==='computed')continue;
+ const index=core.columns.findIndex(c=>c[0]===key),value=key==='date'?'2026-11-12':type==='number'||type==='money'?0:key==='platform'?'Amazon':key==='status'?'Delivered':'SOURCE';
+ const g=Object.create(prototype);Object.assign(g,{editable:true,year:2026,month:11,rows:[{position:1,data:{order_id:'ID1',[key]:value}},{position:2,data:{order_id:'ID2'}}],cols:core.columns.map(([key,label,type])=>({key,label,type})),formats:{1:{[key]:{href:'https://example.com/order'}}},slots:[1,2,3],selection:{r:1,c:index,er:1,ec:index},platforms:['Amazon'],paint(){},scroll:{scrollTop:0,getBoundingClientRect:()=>({top:0,bottom:500})},checkpoint(){this.before={rows:structuredClone(this.rows),formats:structuredClone(this.formats)};this.checkpoints=(this.checkpoints||0)+1;},changed(){},select(){}});
+ document.elementFromPoint=()=>({closest:()=>({dataset:{r:'3',c:String(index)}})});
+ g.fillDrag({pointerId:9});listeners.get('pointermove')({pointerId:9,clientX:30,clientY:100});listeners.get('pointerup')({pointerId:9});
+ assert.equal(g.rows[1].data[key],value,key);assert.equal(g.formats[2][key].href,'https://example.com/order');assert.equal(g.checkpoints,1);
+ if(type==='select')assert.equal(g.rows.length,2);else assert.equal(g.rows[2].data[key],value);
+ assert.equal(g.before.rows[1].data[key],key==='order_id'?'ID2':undefined);assert.equal(listeners.size,0);
+}
+for(const key of ['gross','margin','id']){const g=Object.create(prototype);Object.assign(g,{editable:true,cols:[{key,type:'computed'}],selection:{r:1,c:0},raw:()=>42});g.fillDrag({pointerId:10});assert.equal(listeners.size,0);}
+console.log('PASS: all editable fields fill down, zero values, links, one undo snapshot, computed fields locked');
