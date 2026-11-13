@@ -84,3 +84,7 @@
 .receipt-viewer-download[hidden]{display:none!important}.receipt-viewer-download svg{width:18px;height:18px;fill:currentColor;flex:none}.receipt-viewer .receipt-viewer-download:hover{background:#37424c;border-color:#37424c}
 .receipt-viewer button:focus-visible,.receipt-viewer a:focus-visible{outline:2px solid #94a5b5;outline-offset:2px}
 @media(max-width:599.98px){.om .om-expense-table .om-expense-record td:nth-child(5){display:block;vertical-align:top;padding:5px}.om .om-expense-table .om-expense-record td:nth-child(5):before{height:13px;line-height:13px;margin:0 0 3px;display:block}.om .om-expense-record a.receipt-attachment{height:23px;min-height:0;padding:2px;width:100%;font:10px/16px Arial,sans-serif;gap:0}.om .om-expense-record a.receipt-attachment span{white-space:nowrap}.om .om-expense-record a.receipt-attachment svg{display:none}}
+/* Keep the receipt top layer stable during hover and dismissal. */
+.receipt-viewer{isolation:isolate;animation:none;transition:none}
+.receipt-viewer::backdrop{backdrop-filter:none;-webkit-backdrop-filter:none;animation:none;transition:none}
+.receipt-viewer .receipt-viewer-close,.receipt-viewer .receipt-viewer-close:hover,.receipt-viewer .receipt-viewer-close:active{animation:none;transition:none;transform:none;filter:none;box-shadow:none}
