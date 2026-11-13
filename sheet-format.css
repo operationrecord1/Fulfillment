@@ -79,3 +79,6 @@
 .om .sheet-table tbody tr[data-row]>td,.om .sheet-table tbody tr[data-row]>.sheet-rownum{height:var(--sheet-row-height,28px);vertical-align:middle}
 .om .sheet-table tbody tr[data-row] .sheet-cell-value{max-height:calc(var(--sheet-row-height,28px) - 6px);box-sizing:border-box;overflow:hidden;padding-top:0;padding-bottom:0}
 .om .sheet-table tbody tr[data-row] .sheet-chip.sheet-select-frame{display:flex;margin-top:0;margin-bottom:0;max-height:calc(var(--sheet-row-height,28px) - 6px);min-height:0}
+
+/* Rejected cell input never changes the grid geometry or traps focus. */
+.sheet-input-warning{position:fixed;z-index:10000;top:48px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);box-sizing:border-box;display:flex;align-items:center;gap:16px;padding:12px 14px;border:1px solid #efb5b5;border-radius:6px;background:#fff1f1;color:#942c2c;font:13px/1.5 Arial,sans-serif;box-shadow:0 3px 12px #0001}.sheet-input-warning button{flex:none;border:0;background:transparent;color:inherit;width:28px;height:28px;font-size:22px;cursor:pointer}.sheet-input-warning button:hover{background:#f8dddd}
