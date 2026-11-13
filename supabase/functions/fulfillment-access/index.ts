@@ -1,3 +1,4 @@
+import { shell, acknowledgementEmail, approvalEmail, ownerEmail as ownerNotification } from "./email-layout.mjs";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const cors = {
@@ -16,10 +17,6 @@ const fromAddress = Deno.env.get("FULFILLMENT_FROM_EMAIL") ?? "Fulfillment <no-r
 const ownerEmail = Deno.env.get("FULFILLMENT_ADMIN_EMAIL") ?? "operationrecord1@gmail.com";
 
 function esc(v: string) { return v.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]!)); }
-function shell(title: string, body: string) {
-  return '<!doctype html><html lang="en"><body style="margin:0;padding:0;background:#f5f6f5;font-family:Arial,Helvetica,sans-serif;color:#202420"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f6f5"><tr><td align="center" style="padding:32px 16px"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;background:#fff;border:1px solid #e7eae7;border-radius:12px"><tr><td style="padding:32px 32px 0"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="width:34px;height:34px;border-radius:8px;background:#27856a;color:#fff;text-align:center;font-weight:700;font-size:20px">F</td><td style="padding-left:10px;font-size:17px;font-weight:700;letter-spacing:-.3px">Fulfillment</td></tr></table></td></tr><tr><td style="padding:28px 32px 0"><h1 style="margin:0 0 14px;font-size:26px;line-height:1.2;letter-spacing:-.5px;color:#202420">' + title + '</h1>' + body + '<p style="margin:26px 0 0;color:#808984;font-size:11px;line-height:1.5">Fulfillment account services</p></td></tr><tr><td style="padding:20px 16px;color:#8b938e;text-align:center;font-size:11px;line-height:1.5">This is an automated message from Fulfillment.</td></tr></table></td></tr></table></body></html>';
-}
-function button(label:string, href:string) { return '<a href="' + esc(href) + '" style="display:inline-block;margin-top:8px;background:#202020;color:#fff;text-decoration:none;padding:12px 18px;border-radius:8px;font-weight:bold">' + esc(label) + '</a>'; }
 async function sendMail(to:string, subject:string, htmlContent:string) {
   const key=Deno.env.get("BREVO_API_KEY"); if(!key)return false;
   const response=await fetch("https://api.brevo.com/v3/smtp/email",{method:"POST",headers:{"api-key":key,"accept":"application/json","content-type":"application/json"},body:JSON.stringify({sender:{name:"Fulfillment",email:fromAddress.match(/<([^>]+)>/)?.[1]??fromAddress},to:[{email:to}],subject,htmlContent})});
@@ -92,7 +89,6 @@ async function handleAccessStatus(rec:any,old:any){
   }
   const passwordLink=appUrl+"/#activate?token_hash="+encodeURIComponent(tokenHash)+"&type="+linkType;
   const roleLabel=role==="staff"?"Employee":"Investor";
-  const storeText=store?'<p style="font-size:15px;line-height:1.7">Your approved store is <strong>'+esc(store.name)+'</strong>. Your access is view-only.</p>':"";
   const {error:profileError}=await admin.from("profiles").upsert({user_id:account.id,email:r.email,display_name:r.full_name,role,is_active:true,store_id:store?.id??profile?.store_id??null,updated_at:new Date().toISOString()},{onConflict:"user_id"});
   const rollback=async()=>{
     await admin.from("profiles").update({is_active:false,updated_at:new Date().toISOString()}).eq("user_id",account.id);
@@ -102,7 +98,7 @@ async function handleAccessStatus(rec:any,old:any){
   if(profileError){if(created)await admin.auth.admin.deleteUser(account.id);await revertStatus("access_requests",rec.id);throw profileError;}
   let sent=false;
   try{
-    sent=await sendMail(r.email,"Your Fulfillment access is approved",shell("Your access is approved",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+', your <strong>'+roleLabel+'</strong> account is approved.</p>'+storeText+'<p style="font-size:15px;line-height:1.7">'+(role==="investor"?"Your account has view-only access to the approved store.":"On your first sign-in, enter your store name to connect your workspace.")+'</p><p style="font-size:15px;line-height:1.7">Use the secure link below to set your password. After setting it, sign in with this email and password. If the link expires, use <a href="'+esc(appUrl+"/#forgot-password")+'" style="color:#146b55;font-weight:700">Forgot Password</a> to request another one.</p>'+button("Set password",passwordLink)));
+    sent=await sendMail(r.email,"Your Fulfillment access is approved",approvalEmail(r.full_name,roleLabel,store?.name,passwordLink));
   }catch(e){await rollback();throw e;}
   if(!sent){await rollback();return;}
 }
@@ -118,9 +114,8 @@ async function handleDeletionStatus(rec:any,old:any){
 }
 async function notifyRequest(r:any){
   const label=r.requested_role==="staff"?"Employee":"Investor";
-  const store=r.store_name?' for <strong>'+esc(r.store_name)+'</strong>':"";
-  const applicant=shell("We received your access request",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+',</p><p style="font-size:15px;line-height:1.7">Your request for <strong>'+label+'</strong> access'+store+' is pending owner review. We’ll email you when the owner makes a decision.</p><p style="font-size:15px;line-height:1.7">No password is needed to apply. If approved, your approval email will include a secure link to set one.</p>');
-  const owner=shell("New access request",'<p style="font-size:15px;line-height:1.7"><strong>'+esc(r.full_name)+'</strong> ('+esc(r.email)+') requested <strong>'+label+'</strong>'+ (r.store_name?' access to '+esc(r.store_name):'')+'.</p><p style="font-size:13px;color:#63727c">Request ID: '+r.id+'. Review in Supabase Table Editor.</p>');
+  const applicant=acknowledgementEmail(r.full_name,label,r.store_name);
+  const owner=ownerNotification(r,label);
   const a=await sendMail(r.email,"We received your Fulfillment access request",applicant);
   if(!a)return {email_sent:false,owner_notified:false};
   const b=await sendMail(ownerEmail,"New Fulfillment access request",owner);
