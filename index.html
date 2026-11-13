@@ -268,6 +268,8 @@ body.info-open .info-view{display:block}
   </div>
 </section>
 
+<link rel="stylesheet" href="public-site.css?v=1">
+<script src="public-site.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
@@ -621,6 +623,7 @@ body.info-open .info-view{display:block}
     "releases":{title:"Releases",deck:"Product updates and service changes from Fulfillment.",html:'<div class="info-hero"><span class="info-kicker">Product updates</span><h1>Releases</h1><p>Release notes will be listed here as updates are published.</p></div><div class="release-empty"><div class="info-icon" aria-hidden="true">↗</div><h2>No release notes published yet</h2><p>For questions about an update or to request release announcements, contact the Fulfillment team.</p><a class="public-signin" href="mailto:releases@fulfillment.site?subject=Fulfillment%20release%20updates">Contact the release team <span aria-hidden="true">↗</span></a></div><div class="info-callout"><p>Need help with something currently available?</p><a href="#faq">Visit FAQ ↗</a></div>'}
   };
 
+  Object.assign(infoPages, window.FulfillmentPublic?.pages || {});
   infoPages["forgot-password"]={title:"Reset password",html:'<div class="auth-card"><h1>Reset your password</h1><p class="auth-subtitle">Enter your account email to receive a reset link.</p><form class="auth-form" id="recovery-form"><div class="auth-field"><label for="recovery-email">Email address</label><input id="recovery-email" type="email" autocomplete="email" maxlength="254" required></div><button class="auth-submit" type="submit">Send reset link</button><p class="auth-status" role="status" aria-live="polite"></p></form><div class="auth-links"><a href="#sign-in">Back to sign in</a></div></div>'};
   function enhanceAuth(key){
     const isAuth=["sign-in","request-access","forgot-password","set-password"].includes(key);
