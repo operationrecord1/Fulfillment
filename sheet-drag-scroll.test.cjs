@@ -4,3 +4,15 @@ g.host={addEventListener(k,f){listeners.set(k,f)},removeEventListener(k){listene
 const tick=t=>{const [id,fn]=frames.entries().next().value;frames.delete(id);fn(t)};
 g.dragTrack({pointerId:1,clientX:100,clientY:200},p=>{updates++;assert(p.clientY<=647);assert(p.clientY>=22)},()=>ended++,()=>cancelled++);assert(captured);listeners.get('pointermove')({pointerId:1,clientX:100,clientY:900,buttons:1});tick(16);const first=g.scroll.scrollTop;tick(32);assert(g.scroll.scrollTop>first,'stationary outside pointer must keep scrolling');listeners.get('pointermove')({pointerId:1,clientX:100,clientY:-200,buttons:1});const before=g.scroll.scrollTop;tick(48);assert(g.scroll.scrollTop<before);listeners.get('pointerup')({pointerId:1});assert.equal(ended,1);assert.equal(frames.size,0);assert.equal(listeners.size,0);assert(!captured);
 g.dragTrack({pointerId:2,clientX:100,clientY:200},()=>{},()=>ended++,()=>cancelled++);assert(!listeners.has('window:blur'));assert(!listeners.has('lostpointercapture'));listeners.get('pointercancel')({pointerId:2});assert.equal(cancelled,1);assert.equal(frames.size,0);assert.equal(listeners.size,0);console.log('PASS: continuous stationary/outside edge scroll, upward reversal, pointer capture, release/cancel cleanup; focus loss does not stop the loop');
+
+// Outside browser events may omit the pressed-button mask. Keep the active
+// gesture until release/cancel, or a zero-button move back inside the viewport.
+g.dragTrack({pointerId:3,pointerType:'mouse',clientX:100,clientY:200},()=>{},()=>ended++,()=>cancelled++);
+listeners.get('pointermove')({pointerId:3,clientX:100,clientY:699,buttons:1});
+listeners.get('pointerout')({pointerId:3,clientX:100,clientY:700,relatedTarget:null});
+listeners.get('pointermove')({pointerId:3,clientX:100,clientY:760,buttons:0});
+const outsideStart=g.scroll.scrollTop;tick(100);tick(116);assert(g.scroll.scrollTop>outsideStart);assert(g.stopDrag);
+listeners.get('window:mouseup')({button:0});assert.equal(ended,2);assert.equal(frames.size,0);assert.equal(listeners.size,0);
+g.dragTrack({pointerId:4,clientX:100,clientY:200},()=>{},()=>ended++,()=>cancelled++);
+listeners.get('pointermove')({pointerId:4,clientX:100,clientY:300,buttons:0});assert.equal(cancelled,2);assert.equal(frames.size,0);
+console.log('PASS: outside zero-button events retain scrolling; mouse release fallback and released-pointer reentry stop it');
