@@ -16,3 +16,7 @@ listeners.get('window:mouseup')({button:0});assert.equal(ended,2);assert.equal(f
 g.dragTrack({pointerId:4,clientX:100,clientY:200},()=>{},()=>ended++,()=>cancelled++);
 listeners.get('pointermove')({pointerId:4,clientX:100,clientY:300,buttons:0});assert.equal(cancelled,2);assert.equal(frames.size,0);
 console.log('PASS: outside zero-button events retain scrolling; mouse release fallback and released-pointer reentry stop it');
+
+g.table={querySelector:()=>({getBoundingClientRect:()=>({bottom:150})})};g.scroll.scrollTop=500;
+g.dragTrack({pointerId:5,clientX:100,clientY:300},()=>{},()=>{},()=>{});
+listeners.get('pointermove')({pointerId:5,clientX:100,clientY:120,buttons:1});tick(200);const sticky=g.scroll.scrollTop;tick(216);assert(g.scroll.scrollTop<sticky,'pointer over sticky header must continuously scroll upward');listeners.get('pointerup')({pointerId:5});console.log('PASS: upward scroll starts above visible rows, including sticky-header area');
