@@ -594,3 +594,18 @@ html[data-om-theme=dark] .om-settings-page input:focus,html[data-om-theme=dark] 
 .om .target-totals .report-metric{flex:1 1 110px}
 .om .report-target .target-form{overflow-y:auto;overscroll-behavior:contain}
 @media(max-width:599px){.om .report-metric strong{font-size:clamp(16px,4vw,22px)}}
+/* Grow report space before wrapping large values; never clip financial amounts. */
+.om .om-monthly-report{box-sizing:border-box;width:100%;min-width:0}
+.om .om-monthly-report [data-back],.om .om-settings-page #settings-back{color:#28333e;background:#fff;border-color:#dce2e8;box-shadow:none}
+.om .om-monthly-report [data-back]:hover,.om .om-settings-page #settings-back:hover{color:#1f2933;background:#eef1f3;border-color:#cbd2d9}
+.om .om-monthly-report[data-fit="1"] .report-grid,.om .om-monthly-report[data-fit="2"] .report-grid,.om .om-monthly-report[data-fit="3"] .report-grid{gap:4px}
+.om .om-monthly-report[data-fit="2"],.om .om-monthly-report[data-fit="3"]{max-width:none;padding-left:5px;padding-right:5px}
+.om .om-monthly-report[data-fit="3"] .report-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--report-needed,300px)),1fr))}
+.om .om-monthly-report[data-fit="3"] .report-pair{grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--metric-min,120px)),1fr))}
+.om .om-monthly-report[data-fit="3"] .report-metric strong{white-space:normal;overflow-wrap:anywhere}
+.om .report-grid>section,.om .report-pair>div,.om .target-totals,.om .target-totals .report-metric{box-sizing:border-box;min-width:0;max-width:100%}
+.om .report-grid p,.om .report-grid h2,.om .report-grid h3{overflow-wrap:anywhere}
+.om .target-ring strong{display:block;max-width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere;text-align:center;line-height:1.1}
+.om .target-ring>div{padding:6px;box-sizing:border-box}
+.om .om-settings-surface:has(>.om-monthly-report[data-fit="2"]),.om .om-settings-surface:has(>.om-monthly-report[data-fit="3"]){padding-left:0;padding-right:0}
+@media(max-width:599px){.om .om-monthly-report[data-fit] .report-grid{grid-template-columns:1fr}}
