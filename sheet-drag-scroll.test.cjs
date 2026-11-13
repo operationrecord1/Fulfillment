@@ -20,3 +20,9 @@ console.log('PASS: outside zero-button events retain scrolling; mouse release fa
 g.table={querySelector:()=>({getBoundingClientRect:()=>({bottom:150})})};g.scroll.scrollTop=500;
 g.dragTrack({pointerId:5,clientX:100,clientY:300},()=>{},()=>{},()=>{});
 listeners.get('pointermove')({pointerId:5,clientX:100,clientY:120,buttons:1});tick(200);const sticky=g.scroll.scrollTop;tick(216);assert(g.scroll.scrollTop<sticky,'pointer over sticky header must continuously scroll upward');listeners.get('pointerup')({pointerId:5});console.log('PASS: upward scroll starts above visible rows, including sticky-header area');
+
+// The thead scrolls away, while its th remains sticky. Hit-testing the
+// non-sticky thead sends upward selection into the toolbar instead of a row.
+g.table={querySelector:selector=>({getBoundingClientRect:()=>({bottom:selector==='thead th'?150:-500})})};g.scroll.scrollTop=700;let endpointY=0;
+g.dragTrack({pointerId:6,clientX:100,clientY:300},event=>{endpointY=event.clientY;assert(event.clientY>150,'upward selection must target below sticky column labels');},()=>{},()=>{});
+listeners.get('pointermove')({pointerId:6,clientX:100,clientY:-50,buttons:1});tick(300);tick(316);assert(endpointY>150);listeners.get('pointerup')({pointerId:6});console.log('PASS: upward range endpoint hits visible body rows below sticky th, not scrolled-away thead');
