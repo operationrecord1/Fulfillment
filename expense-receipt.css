@@ -37,3 +37,11 @@
 .receipt-preview header button:hover{background:#edf3fa;border-color:#bacbdb;color:#253746}.receipt-preview header button:focus-visible{outline:2px solid #bacbdb;outline-offset:2px}
 @media(max-width:480px){.receipt-preview header,.receipt-preview footer{padding:12px}.receipt-preview-body{padding:12px}.receipt-preview{width:calc(100vw - 16px)}}
 .om .om-expense-record a.receipt-attachment,.om .om-expense-record a.receipt-attachment:visited{color:#34434f!important;text-decoration:none}
+/* Fit the complete image inside the viewport without upscaling or scrollbars. */
+.receipt-preview{max-height:calc(100dvh - 24px);max-width:calc(100vw - 16px);overflow:hidden}
+.receipt-preview-body{padding:0;overflow:hidden;background:#f6f8fa;display:flex;align-items:center;justify-content:center}
+.receipt-preview-body img{display:block;flex:none;max-width:100%;max-height:none;object-fit:contain;margin:0}
+.receipt-preview-body iframe{height:calc(100dvh - 164px);max-height:65dvh;display:block}
+.receipt-preview header,.receipt-preview footer{box-sizing:border-box;flex-shrink:0}
+.receipt-preview .receipt-download:before{content:'';width:20px;height:20px;flex:none;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 2h6v9h4l-7 7-7-7h4zM4 21h16v2H4z'/%3E%3C/svg%3E") center/contain no-repeat}
+@media(max-width:480px){.receipt-preview{border-left:0;border-right:0}.receipt-preview-body{padding:0;background:transparent}}
