@@ -61,3 +61,5 @@ for(const [key,label,type] of [['quantity','Quantity','number'],['earning','Orde
  g.warningText='Still visible';editor.value='';handlers.input({});assert.equal(g.warningText,'Still visible');
 }
 console.log('PASS: field-specific warnings clear on valid digits, but not empty input');
+
+const emptyCleanup=Object.create(prototype);Object.assign(emptyCleanup,{rows:[{position:1,data:{platform:'Amazon',status:'Delivered'}},{position:2,data:{quantity:0,platform:'Amazon'}}],formats:{},options:{onChange(rows){assert.equal(rows.length,1);assert.equal(rows[0].position,2)}},render(){},say(){}});emptyCleanup.changed();assert.equal(emptyCleanup.rows.length,1);console.log('PASS: removing all inputs removes selected dropdowns while preserving zero input');

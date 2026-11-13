@@ -1,0 +1,7 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const source=fs.readFileSync('dashboard.js','utf8');const code=source.slice(source.indexOf('function navigateWorkspace('),source.indexOf('function openSettings('));
+let location={hash:'#workspace'},entries=[{hash:'#workspace',state:null}],index=0,visible='orders',cleared=0;
+const history={get state(){return entries[index].state},pushState(state,unused,hash){entries.splice(++index);entries.push({hash,state});location.hash=hash},replaceState(state,unused,hash){entries[index]={hash,state};location.hash=hash},back(){if(index>0){location.hash=entries[--index].hash;nav.syncWorkspaceRoute()}}};
+const nav=new Function('history','location','clearWorkspaceSurfaces','openSettings','openReport','disposed',code+'return {navigateWorkspace,backWorkspace,syncWorkspaceRoute};')(history,location,()=>{visible='orders';cleared++},()=>visible='settings',()=>visible='target',false);
+nav.navigateWorkspace('#workspace/settings');nav.syncWorkspaceRoute();assert.equal(visible,'settings');nav.navigateWorkspace('#workspace/target');nav.syncWorkspaceRoute();assert.equal(visible,'target');nav.backWorkspace();assert.equal(visible,'settings');nav.backWorkspace();assert.equal(visible,'orders');assert.equal(location.hash,'#workspace');
+location.hash='#workspace/settings';history.replaceState(null,'',location.hash);nav.backWorkspace();assert.equal(location.hash,'#workspace');assert.equal(visible,'orders');console.log('PASS: nested workspace Back restores previous screen; direct settings fallback stays signed in');

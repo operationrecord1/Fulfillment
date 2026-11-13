@@ -3,7 +3,8 @@
 const editable=windowSafeCore();
 function windowSafeCore(){return root.OrderCore|| (typeof require==='function'?require('./dashboard-core.js'):null);}
 const nonempty=data=>Object.values(data).some(v=>v!==''&&v!==null&&v!==undefined);
-function rowCount(rows){return Math.max(0,...rows.filter(r=>nonempty(r.data)).map(r=>r.position))+20;}
+function hasInput(data){return editable.columns.some(([key,,type])=>type!=='computed'&&type!=='select'&&data?.[key]!==null&&data?.[key]!==undefined&&String(data[key]).trim()!=='');}
+function rowCount(rows,pageSize=Infinity){const last=Math.max(0,...rows.filter(r=>hasInput(r.data)).map(r=>r.position));if(!last)return 20;const tail=last+20;if(!Number.isFinite(pageSize)||pageSize<1)return tail;return last%pageSize===0?tail:Math.min(tail,Math.ceil(last/pageSize)*pageSize);}
 function parseTSV(text){
  const rows=[[]];let value='',quoted=false;
  for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quoted&&text[i+1]==='"'){value+='"';i++;}else if(quoted||!value)quoted=!quoted;else value+=c;}
@@ -25,5 +26,5 @@ function normalize(field,value,year,month,platforms){
 }
 function insert(rows,at,count=1){return rows.map(r=>({...r,position:r.position>=at?r.position+count:r.position}));}
 function remove(rows,from,to){const n=to-from+1;return rows.filter(r=>r.position<from||r.position>to).map(r=>({...r,position:r.position>to?r.position-n:r.position}));}
-const api={nonempty,rowCount,parseTSV,toTSV,normalize,insert,remove};root.SheetModel=api;if(typeof module!=='undefined')module.exports=api;
+const api={nonempty,hasInput,rowCount,parseTSV,toTSV,normalize,insert,remove};root.SheetModel=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

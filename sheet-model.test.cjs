@@ -9,3 +9,9 @@ assert.equal(C.groups(rows).length,2);assert.equal(C.duplicates(rows).size,2);as
 assert.equal(C.groups(rows.map((r,i)=>({...r,position:i+1}))).length,1);
 assert.equal(C.duplicates(rows,['purchase_id']).size,0);assert.equal(C.duplicates(rows,['order_id']).size,2);
 console.log('PASS: sparse rows, insert/delete, blank tail, TSV roundtrip, validation, duplicate groups and protected fields');
+
+for(const size of [50,100,200])for(const [last,expected] of [[0,20],[10,30],[size-12,size],[size-1,size],[size,size+20],[size+1,size+21],[size*2,size*2+20]])assert.equal(S.rowCount(last?[{position:last,data:{order_id:'A'}}]:[],size),expected);
+assert.equal(S.hasInput({platform:'Amazon',status:'Delivered',order_url:'https://example.com'}),false);
+assert.equal(S.hasInput({quantity:0}),true);assert.equal(S.hasInput({note:'text'}),true);assert.equal(S.hasInput({note:'  '}),false);
+assert.equal(S.rowCount([{position:90,data:{platform:'Amazon'}}],50),20);
+console.log('PASS: pagination blank tail caps at page boundaries until last row is populated; dropdown-only rows are empty');
