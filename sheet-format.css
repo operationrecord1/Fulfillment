@@ -58,3 +58,19 @@
 .om .sheet-filter-menu button[aria-selected=true]{background:#e8eaed}
 .om .sheet-grid:focus-visible{outline:none}
 .om .sheet-tools :focus-visible,.om .sheet-popover :focus-visible,.om .sheet-format-pop :focus-visible{outline:1px solid #80868b;outline-offset:-1px;box-shadow:none}
+
+/* Compact link inputs share one visual language for insert and edit. */
+.om .sheet-link-editor{max-width:calc(100vw - 16px);box-sizing:border-box}
+.om .sheet-link-editor form{display:grid;gap:8px;min-width:0}
+.om .sheet-link-editor .sheet-link-field{display:flex;align-items:center;gap:14px;min-width:0;height:32px;margin:0;padding:0 10px;border:1px solid #80868b;border-radius:4px;background:#fff;box-sizing:border-box}
+.om .sheet-link-editor .sheet-link-text{margin-right:60px}
+.om .sheet-link-editor .sheet-link-field:focus-within{border-color:#1a73e8;box-shadow:inset 0 0 0 1px #1a73e8}
+.om .sheet-link-editor .sheet-link-field svg,.om .sheet-link-editor .sheet-link-suggestion svg{width:16px;height:16px;flex:0 0 16px;fill:none;stroke:#5f6368;stroke-width:1.7}
+.om .sheet-link-editor .sheet-link-field input{width:100%;min-width:0;height:30px;margin:0;padding:0;border:0!important;outline:0!important;box-shadow:none!important;background:transparent;font:13px Arial,sans-serif;color:#202124;border-radius:0;white-space:nowrap}
+.om .sheet-link-editor .sheet-link-url-row{display:grid;grid-template-columns:minmax(0,1fr) 52px;align-items:center;gap:8px}
+.om .sheet-link-editor .sheet-link-url-row button{width:52px;height:32px;padding:0;margin:0;border:0;border-radius:4px;background:transparent;color:#06f;font:500 13px Arial,sans-serif}
+.om .sheet-link-editor .sheet-link-url-row button:hover{background:#f1f3f4}
+.om .sheet-link-editor .sheet-link-suggestion{display:flex;align-items:center;gap:14px;min-width:0;padding:6px 4px 6px 2px;color:#1155cc;font:13px Arial,sans-serif;text-decoration:none;border-radius:4px}
+.om .sheet-link-editor .sheet-link-suggestion[hidden]{display:none}
+.om .sheet-link-editor .sheet-link-suggestion span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.om .sheet-link-editor .sheet-link-suggestion:hover{background:#f1f3f4}
