@@ -74,3 +74,8 @@
 .om .sheet-link-editor .sheet-link-suggestion[hidden]{display:none}
 .om .sheet-link-editor .sheet-link-suggestion span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .om .sheet-link-editor .sheet-link-suggestion:hover{background:#f1f3f4}
+
+/* Keep row content inside its assigned height, including pasted multiline text. */
+.om .sheet-table tbody tr[data-row]>td,.om .sheet-table tbody tr[data-row]>.sheet-rownum{height:var(--sheet-row-height,28px);vertical-align:middle}
+.om .sheet-table tbody tr[data-row] .sheet-cell-value{max-height:calc(var(--sheet-row-height,28px) - 6px);box-sizing:border-box;overflow:hidden;padding-top:0;padding-bottom:0}
+.om .sheet-table tbody tr[data-row] .sheet-chip.sheet-select-frame{display:flex;margin-top:0;margin-bottom:0;max-height:calc(var(--sheet-row-height,28px) - 6px);min-height:0}
