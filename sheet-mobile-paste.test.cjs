@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),crypto=require('node:crypto');
 const core=require('./dashboard-core'),model=require('./sheet-model'),formats=require('./sheet-format-model');
 const listeners=new Map(),document={addEventListener:(key,fn)=>listeners.set(key,fn),removeEventListener:(key,fn)=>{if(listeners.get(key)===fn)listeners.delete(key);}};
-const context={window:{OrderCore:core,SheetModel:model,SheetFormatModel:formats},structuredClone,crypto,document,Date};vm.runInNewContext(fs.readFileSync('sheet-grid.js','utf8'),context);
+const context={window:{OrderCore:core,SheetModel:model,SheetFormatModel:formats,addEventListener(){},removeEventListener(){}},requestAnimationFrame:()=>1,cancelAnimationFrame(){},innerWidth:1280,innerHeight:800,structuredClone,crypto,document,Date};vm.runInNewContext(fs.readFileSync('sheet-grid.js','utf8'),context);
 const prototype=context.window.OrderSheetGrid.prototype;
 const grid=Object.create(prototype);
 Object.assign(grid,{editable:true,year:2026,month:11,rows:[],cols:core.columns.map(([key,label,type])=>({key,label,type})),selection:{r:1,c:0,er:1,ec:0},platforms:['Amazon'],formats:{},commitEditor:()=>true,checkpoint(){this.checkpoints=(this.checkpoints||0)+1;},changed(){this.count=model.rowCount(this.rows);},select(){},say(message){throw Error(message)}});
