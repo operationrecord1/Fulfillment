@@ -36,3 +36,4 @@
 .receipt-preview header button:before,.receipt-preview header button:after{content:'';position:absolute;left:50%;top:50%;width:13px;height:1.5px;background:currentColor;transform:translate(-50%,-50%) rotate(45deg)}.receipt-preview header button:after{transform:translate(-50%,-50%) rotate(-45deg)}
 .receipt-preview header button:hover{background:#edf3fa;border-color:#bacbdb;color:#253746}.receipt-preview header button:focus-visible{outline:2px solid #bacbdb;outline-offset:2px}
 @media(max-width:480px){.receipt-preview header,.receipt-preview footer{padding:12px}.receipt-preview-body{padding:12px}.receipt-preview{width:calc(100vw - 16px)}}
+.om .om-expense-record a.receipt-attachment,.om .om-expense-record a.receipt-attachment:visited{color:#34434f!important;text-decoration:none}
