@@ -639,3 +639,12 @@ html[data-om-theme=dark] .om-settings-page input:focus,html[data-om-theme=dark] 
 .om .report-pair p{margin:0;line-height:16px}
 .om .report-target>p{font-size:13px;line-height:18px;margin:0 0 8px}
 .om .report-target .target-ring{width:150px;height:150px}
+
+/* Consistent title/helper spacing and top-aligned period labels. */
+.om .report-grid>section:not(.report-target)>h2{margin-bottom:5px;min-height:22px}
+.om .report-target-title{height:22px;min-height:22px;margin-bottom:5px}
+.om .report-target-title button{height:22px;padding:0 9px;line-height:22px}
+.om .report-grid>section>p,.om .report-grid>section:not(.report-target)>p{min-height:32px;line-height:16px;margin:0 0 12px}
+.om .report-pair{align-items:start}
+.om .report-pair>div{align-content:start;grid-template-rows:23px 20px 70px auto}
+.om .report-target .target-ring{margin-top:0}
