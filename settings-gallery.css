@@ -118,7 +118,8 @@ body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
 .om .settings-redesign .settings-account .settings-section-body{padding-top:23px}
 @media(max-width:780px){.om .settings-redesign .settings-account .settings-section-body{padding-top:0}.om .settings-redesign .settings-account-row{gap:12px}}
 .om .settings-redesign .settings-identity-row{grid-template-columns:minmax(0,1fr);gap:26px}
-.om .settings-redesign #om-settings-form{border:1px solid;border-color:#e1e4e8 #bdc3cb #aeb6c0 #d8dde3;box-shadow:inset 0 2px 0 #fff,inset 2px 0 0 #fff,inset -2px 0 0 #e9ecf0,inset 0 -2px 0 #e2e6eb,1px 1px 0 #cdd2d9,2px 2px 0 #e0e4e9,0 3px 3px -1px #25304426}
+.om .settings-redesign #om-settings-form{border:1px solid #e1e4e8;box-shadow:0 0 8px 1px #25304418;background:#fff}
 .om .settings-redesign .settings-add .platform-color-control .sheet-reference-icon{transform:scale(1.25);transform-origin:center}
 .om .settings-redesign .settings-add>[data-add]{border:1px solid #dce0e5!important;background:linear-gradient(#fff,#f7f8fa);box-shadow:inset 0 1px 0 #fff,0 1px 2px #202b3a10;color:#454c55}
 .om .settings-redesign .settings-add>[data-add]:hover{border-color:#cbd1d8!important;background:#eef0f3;box-shadow:0 1px 2px #202b3a10}
+.om .settings-redesign #settings-logo-pick,.om .settings-redesign #settings-logo-pick:hover{display:grid;place-items:center;cursor:default;background:#f6f7f9;box-shadow:none;transition:none}
