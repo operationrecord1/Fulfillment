@@ -663,3 +663,7 @@ html[data-om-theme=dark] .om-settings-page input:focus,html[data-om-theme=dark] 
 /* Balance target circle and comparison order counts in both reporting modes. */
 .om .report-target .target-ring{position:relative;top:-16px}
 .om .report-pair .report-order-count{position:relative;top:8px}
+
+/* Align yearly month headings with order cells and preserve the frozen gutter. */
+.om .sheet-table .sheet-month-heading .sheet-month-title{padding-left:3px}
+.om .sheet-table .sheet-month-heading .sheet-month-gutter{position:sticky;left:0;z-index:3;padding:0;background:#f8fafd;border-right:1px solid #c4c7c5}
