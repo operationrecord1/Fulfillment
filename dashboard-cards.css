@@ -631,3 +631,11 @@ html[data-om-theme=dark] .om-settings-page input:focus,html[data-om-theme=dark] 
 .om .target-totals .report-metric+ .report-metric{border-left:1px solid #edf0f2;padding-left:12px}
 .om .report-target:after{content:'';display:block;height:42px;flex:none}
 @media(max-width:599px){.om .report-grid{grid-auto-rows:1fr}}
+
+/* Match each comparison heading, helper and period row. */
+.om .report-grid>section:not(.report-target)>p{min-height:32px;line-height:16px;margin:0 0 12px}
+.om .report-pair>div{grid-template-rows:23px 20px auto auto}
+.om .report-pair h3{margin:0;line-height:17px}
+.om .report-pair p{margin:0;line-height:16px}
+.om .report-target>p{font-size:13px;line-height:18px;margin:0 0 8px}
+.om .report-target .target-ring{width:150px;height:150px}
