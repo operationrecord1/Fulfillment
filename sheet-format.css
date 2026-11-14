@@ -57,6 +57,10 @@
 .om .sheet-filter-menu button{display:block;width:100%;padding:8px 12px;text-align:left;white-space:nowrap;font:13px Arial,sans-serif}
 .om .sheet-filter-menu button[aria-selected=true]{background:#e8eaed}
 .om .sheet-grid:focus-visible{outline:none}
+.om .sheet-color-palette .sheet-color-reset{align-items:center;gap:8px;padding-inline:4px;font:400 14px/20px Roboto,RobotoDraft,Helvetica,Arial,sans-serif;color:#1f1f1f}
+.om .sheet-color-reset .sheet-reference-icon{width:18px;height:18px}
+/* Reduce the 82px desktop Filter control by 14%, with equal side padding. */
+@media(min-width:1080px){.om .sheet-tools .sheet-filter-slot .sheet-filter-button{min-width:70.52px;padding-inline:4.26px}}
 .om .sheet-tools :focus-visible,.om .sheet-popover :focus-visible,.om .sheet-format-pop :focus-visible{outline:1px solid #80868b;outline-offset:-1px;box-shadow:none}
 
 /* Compact link inputs share one visual language for insert and edit. */
