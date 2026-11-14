@@ -240,7 +240,7 @@
 .om-status-details .om-detail-money{width:var(--profit-width,8ch);max-width:100%;grid-template-columns:1ch 1ch minmax(0,1fr);text-align:left;white-space:nowrap}
 .om-status-details .om-detail-money>span:first-child{text-align:right}
 .om-margin-heading{display:inline-block;width:7ch;text-align:right}
-.om-detail-percent{display:inline-grid;grid-template-columns:1fr 1ch;width:7ch;text-align:right;white-space:nowrap}
+.om-detail-percent{display:inline-grid;grid-template-columns:minmax(0,1fr) max-content;width:7ch;text-align:right;white-space:nowrap}
 .om .om-expense-table .om-expense-record td:nth-child(8),.om .om-expense-table .om-expense-record td:nth-child(9){border-left:0!important;border-right:0!important}
 .om .om-expense-table [data-edit-expense],.om .om-expense-table [data-delete-expense]{border-left:0;border-right:0}
 @media(max-width:599.98px){
