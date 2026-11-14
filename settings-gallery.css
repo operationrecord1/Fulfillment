@@ -1,67 +1,100 @@
-/* Gallery 01 composition, with the side-by-side identity fields from 05. */
-body.order-workspace .om[data-surface=settings]>.om-head{height:62px;padding-inline:max(24px,calc((100vw - 1060px)/2));border-bottom:1px solid #eceef0;justify-content:flex-start;background:#fff}
-.om[data-surface=settings]>.om-head>:is(.om-store-mark,.om-profile,.om-report-nav){display:none!important}
-.om[data-surface=settings]>.om-head>div:not(.om-profile){margin:0;flex:1}
-.om[data-surface=settings]>.om-head h1{font:600 14px/1.5 Arial,sans-serif;letter-spacing:0;color:#4b5058;text-align:left;overflow-wrap:anywhere}
-.om[data-surface=settings] .om-settings-surface{inset:62px 0 0;padding:34px 24px 48px;background:#fff}
-.om .om-settings-page.settings-redesign{max-width:1060px;padding:0;border:0;border-radius:0;box-shadow:none;background:#fff;color:#34383f}
-.om .settings-redesign>header{display:block;border:0;margin:0 0 26px;padding:0;min-height:0}
-.om .settings-redesign>header h1{margin:0;text-align:left;font:600 clamp(27px,3vw,34px)/1.2 Arial,sans-serif;letter-spacing:-1px;color:#4b5058}
-.om .settings-redesign #om-settings-form{display:block;margin:0;padding:0;border:1px solid #e0e3e7;border-radius:14px;background:#fff;box-shadow:0 2px 5px #202b3a0d,0 12px 32px #202b3a12,0 28px 64px #202b3a08}
-.om .settings-redesign #om-settings-form>section{display:grid;grid-template-columns:180px minmax(0,1fr);gap:28px;margin:0 32px;padding:28px 0;border:0;border-bottom:1px solid #e9ebee;border-radius:0;background:#fff}
-.om .settings-redesign #om-settings-form>section:first-child{padding-top:30px}
-.om .settings-redesign .settings-section-heading h2{font-size:15px;line-height:23px;font-weight:600;margin:0;color:#414750}
-.om .settings-redesign .settings-section-heading p{font-size:12px;line-height:1.65;margin:6px 0 0;color:#7a8088}
+/* A single settings surface: quiet depth, aligned controls, no header/footer bands. */
+body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
+.om[data-surface=settings] .om-settings-surface{inset:0;padding:24px clamp(12px,3vw,45px) 48px;background:#fff;scrollbar-gutter:stable both-edges}
+.om .om-settings-page.settings-redesign{width:100%;max-width:none;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:#fff;color:#34383f;--settings-inset:clamp(24px,2.5vw,48px);--settings-control:44px}
+.om .settings-redesign .settings-context{display:flex;justify-content:flex-end;align-items:center;min-height:30px;margin:0 0 20px}
+.om .settings-redesign .settings-store-tag{display:block;max-width:100%;padding:7px 13px;border:1px solid #e8eaed;border-radius:7px;background:#fafbfc;box-shadow:inset 0 1px 0 #fff,0 1px 3px #202b3a06;font:600 13px/1.5 Arial,sans-serif;color:#5a6069;overflow-wrap:anywhere;text-align:right}
+.om .settings-redesign #om-settings-form{display:block;margin:0;padding:0;border:1px solid #e1e4e8;border-radius:16px;background:#fff;box-shadow:0 1px 2px #202b3a0a,0 5px 12px #202b3a08,0 20px 44px -12px #202b3a24,0 40px 80px -32px #202b3a1a}
+.om .settings-redesign #om-settings-form>section{display:grid;grid-template-columns:clamp(168px,14vw,224px) minmax(0,1fr);gap:clamp(24px,3vw,56px);margin:0 var(--settings-inset);padding:30px 0;border:0;border-bottom:1px solid #eceef1;border-radius:0;background:#fff}
+.om .settings-redesign #om-settings-form>section:first-child{padding-top:36px;padding-bottom:34px}
+.om .settings-redesign .settings-section-heading h2{font:600 16px/24px Arial,sans-serif;margin:0;color:#3e454e;letter-spacing:-.15px}
+.om .settings-redesign .settings-section-heading p{font:12px/1.7 Arial,sans-serif;margin:7px 0 0;color:#858b94}
 .om .settings-redesign .settings-section-body{min-width:0}
-.om .settings-redesign .settings-identity-row{display:grid;grid-template-columns:112px minmax(0,1fr);gap:22px;align-items:center}
-.om .settings-redesign .settings-logo-group{display:flex;align-items:flex-start;flex-direction:column;gap:12px;min-width:0}
-.om .settings-redesign .settings-logo-control{display:block;margin:0}
-.om .settings-redesign #settings-logo-pick{width:68px;height:68px}
-.om .settings-redesign #settings-logo-remove{margin:0;padding:5px 7px;min-height:30px;font-size:11px}
-.om .settings-redesign .settings-logo-help{display:block;color:#858b93;font:11px/1.6 Arial,sans-serif;margin-top:14px}
-.om .settings-redesign label,.om .settings-redesign .settings-platform-label{font-size:12px;font-weight:500;color:#505761;max-width:none;gap:8px}
+.om .settings-redesign .settings-identity-row{display:grid;grid-template-columns:minmax(320px,.9fr) minmax(240px,1.1fr);gap:clamp(28px,3vw,56px);align-items:center}
+.om .settings-redesign .settings-logo-group{display:flex;align-items:center;gap:20px;min-width:0}
+.om .settings-redesign #settings-logo-pick{flex:0 0 80px;width:80px;height:80px;border:1px solid #e0e4e8;background:#f6f7f9;box-shadow:inset 0 1px 0 #fff,0 3px 8px #202b3a0a;transition:background-color .15s,box-shadow .15s}
+.om .settings-redesign #settings-logo-pick:hover{background:#eef0f3;box-shadow:0 0 0 3px #f0f2f4}
+.om .settings-redesign #settings-logo-pick #settings-logo-preview{inset:0;width:100%;height:100%;object-fit:contain}
+.om .settings-redesign .settings-avatar-edit{display:grid;place-items:center;right:-2px;bottom:-2px;width:23px;height:23px;line-height:1;border:2px solid #fff;background:#eef0f3;color:#5d6672;font-size:16px;box-shadow:0 1px 3px #202b3a12}
+.om .settings-redesign .settings-logo-details{min-width:0}
+.om .settings-redesign .settings-logo-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.om .settings-redesign .settings-logo-actions button{display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:42px;margin:0;padding:10px 15px;border:1px solid #dce0e5;border-radius:8px;font:500 13px/20px Arial,sans-serif;white-space:nowrap;transition:background-color .15s,border-color .15s,color .15s}
+.om .settings-redesign #settings-logo-upload{background:linear-gradient(#fff,#fafbfc);color:#464d57;box-shadow:0 1px 2px #202b3a0c,inset 0 1px 0 #fff}
+.om .settings-redesign #settings-logo-upload:hover{background:#f0f2f4;border-color:#cbd1d8}
+.om .settings-redesign .settings-upload svg{flex:none;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.om .settings-redesign #settings-logo-remove{margin:0;background:#fff;color:#777d86;box-shadow:none}
+.om .settings-redesign #settings-logo-remove:hover{background:#fff1f1;color:#b42332;border-color:#b42332}
+.om .settings-redesign .settings-logo-help{display:block;color:#8a9098;font:11px/1.6 Arial,sans-serif;margin-top:10px}
+.om .settings-redesign label,.om .settings-redesign .settings-platform-label{font-size:12px;font-weight:500;color:#5b626c;max-width:none;gap:9px}
 .om .settings-redesign .settings-store-field{display:flex;min-width:0}
-.om .settings-redesign .settings-store-field small{font:11px/1.6 Arial,sans-serif;color:#858b93}
-.om .settings-redesign input{height:43px;min-height:43px;padding:10px 12px;border:1px solid #dce0e5;border-radius:7px;font:14px Arial,sans-serif;background:#fff;color:#353c45;box-shadow:none;transition:background-color .15s}
+.om .settings-redesign .settings-store-field small{font:11px/1.6 Arial,sans-serif;color:#8a9098}
+.om .settings-redesign input{height:var(--settings-control);min-height:var(--settings-control);padding:11px 14px;border:1px solid #dce0e5;border-radius:8px;font:14px Arial,sans-serif;background:#fff;color:#353c45;box-shadow:inset 0 1px 2px #202b3a03,0 1px 2px #202b3a03;transition:background-color .15s}
 .om .settings-redesign input:focus,.om .settings-redesign input:focus-visible{outline:0!important;border-color:#dce0e5!important;background:#f4f5f6!important;box-shadow:none!important}
-.om .settings-redesign input::placeholder{color:#90969d}
-.om .settings-redesign .settings-platform-label{display:block;margin:0 0 8px}
-.om .settings-redesign .settings-add{display:flex;align-items:center;flex-wrap:nowrap;gap:9px;margin-bottom:16px}
+.om .settings-redesign input::placeholder{color:#969ca4}
+.om .settings-redesign .settings-option-columns{display:grid;grid-template-columns:minmax(0,1fr);max-width:none}
+.om .settings-redesign .settings-platform-label{display:block;margin:0 0 9px}
+.om .settings-redesign .settings-add{display:flex;align-items:center;flex-wrap:nowrap;gap:10px;margin-bottom:16px}
 .om .settings-redesign .settings-add>input{flex:1 1 140px;min-width:0;width:0;max-width:none}
-.om .settings-redesign .platform-new-colors{flex:none}
-.om .settings-redesign .settings-add>[data-add]{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;min-width:66px;margin:0;padding:5px 10px;font-size:12px;border-radius:6px;background:#fff;border:1px solid #dce0e5;color:#555d67;white-space:nowrap}
-.om .settings-redesign .settings-add>[data-add]>span{font-size:18px;line-height:1;font-weight:400}
+.om .settings-redesign .platform-new-colors,.om .settings-redesign .platform-option-colors{display:flex;align-items:center;gap:8px;flex:none}
+.om .settings-redesign .platform-color-control{width:var(--settings-control)!important;min-width:var(--settings-control)!important;height:var(--settings-control);padding:8px 8px 12px!important;border-color:#dce0e5!important;border-radius:8px!important;background:linear-gradient(#fff,#fafbfc);box-shadow:0 1px 2px #202b3a08}
+.om .settings-redesign .platform-color-control:hover{background:#f1f3f5;border-color:#dce0e5!important;box-shadow:0 1px 2px #202b3a08}
+.om .settings-redesign .platform-color-control:focus{background:#f1f3f5}
+.om .settings-redesign .platform-color-control:focus-visible{outline:1px solid #aab1bb;outline-offset:2px}
+.om .settings-redesign .platform-color-control i{bottom:6px;left:9px;right:9px;height:3px;border-radius:1px}
+.om .settings-redesign .platform-color-control .sheet-reference-icon{width:20px!important;min-width:20px!important;max-width:20px;height:20px}
+.om .settings-redesign .settings-add>[data-add]{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:var(--settings-control)!important;min-height:var(--settings-control)!important;min-width:88px;margin:0;padding:10px 16px!important;font:500 13px/20px Arial,sans-serif;border-radius:8px;background:linear-gradient(#fff,#fafbfc);border:1px solid #dce0e5;color:#525a65;white-space:nowrap;box-shadow:0 1px 2px #202b3a08;transition:background-color .15s}
+.om .settings-redesign .settings-add>[data-add]>span{font-size:19px;line-height:1;font-weight:400}
 .om .settings-redesign .settings-add>[data-add]:hover{background:#f1f3f5}
-.om .settings-redesign .om-platform-option{min-height:48px;padding:10px 12px;border:1px solid #e8ebee;border-radius:7px;margin:0 0 8px}
-.om .settings-redesign .settings-platform-help{font-size:11px;line-height:1.6;margin:12px 0 0;color:#858b93}
+.om .settings-redesign .om-platform-option{min-height:66px;padding:10px 12px;gap:14px;border:1px solid #e7eaee;border-radius:9px;margin:0 0 8px;box-shadow:0 1px 2px #202b3a03;flex-wrap:wrap;justify-content:flex-start}
+.om .settings-redesign .om-platform-option .platform-option-colors{flex-basis:auto}
+.om .settings-redesign .om-platform-option .platform-option-label{flex:0 1 auto;min-width:0;max-width:100%;overflow-wrap:anywhere}
+.om .settings-redesign .om-platform-option .platform-remove{margin-left:auto;padding:9px 11px;border-radius:6px;font-size:12px}
+.om .settings-redesign .settings-platform-help{font-size:11px;line-height:1.7;margin:12px 0 0;color:#8a9098}
 .om .settings-redesign .settings-tax-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
 .om .settings-redesign .settings-tax-field{width:150px;flex:none}
 .om .settings-redesign .settings-tax-field>span{position:relative;display:block}
 .om .settings-redesign .settings-tax-field input{padding-right:35px;width:100%}
 .om .settings-redesign .settings-tax-field i{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-style:normal;color:#89909a;pointer-events:none}
 .om .settings-redesign .settings-tax-row p{font-size:12px;margin:20px 0 0;color:#858b93}
-.om .settings-redesign .settings-account .settings-section-body>p{font-size:12px;margin:0 0 14px;line-height:1.7}
-.om .settings-redesign #settings-delete{font-size:12px;min-height:39px;border-color:#e2d5d5;color:#8f5555;border-radius:7px;padding:9px 13px}
-.om .settings-redesign #om-settings-form>section.settings-account{border-bottom:0}
-.om .settings-redesign .settings-savebar{position:static;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 32px;margin:0;border:0;border-top:1px solid #e7eaed;border-radius:0 0 14px 14px;background:#fafbfc;color:#616975;width:100%;height:auto;box-shadow:none}
-.om .settings-redesign #om-settings-error{font:12px/1.6 Arial,sans-serif;max-width:430px;margin:0;overflow-wrap:anywhere;color:#78808a}
+.om .settings-redesign .settings-account-row{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.om .settings-redesign .settings-account-row>p{font-size:12px;margin:0;line-height:1.7;flex:1 1 240px;max-width:420px}
+.om .settings-redesign #settings-delete{display:inline-flex;align-items:center;justify-content:center;font-size:12px;min-height:44px;border-color:#e6dcdc;color:#8b5b5f;border-radius:8px;padding:11px 16px;white-space:normal;flex:none;max-width:100%;box-shadow:0 1px 2px #202b3a05}
+.om .settings-redesign #settings-delete:hover{background:#fff1f1;color:#b42332;border-color:#b42332}
+.om .settings-redesign #om-settings-form>section.settings-account{border-bottom:0;padding-bottom:20px}
+.om .settings-redesign #settings-deletion-status:empty{display:none}
+.om .settings-redesign .settings-savebar{position:static;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px var(--settings-inset) 30px;margin:0;border:0;border-radius:0 0 16px 16px;background:transparent;color:#7d848d;width:100%;height:auto;box-shadow:none}
+.om .settings-redesign #om-settings-error{font:12px/1.6 Arial,sans-serif;max-width:560px;margin:0;overflow-wrap:anywhere;color:#858b94}
 .om .settings-redesign #om-settings-error[data-state=error]{color:#b42332}
-.om .settings-redesign #om-settings-error[data-state=success]{color:#426751}
-.om .settings-redesign .settings-save-actions{display:flex;gap:8px;flex:none}
-.om .settings-redesign .settings-save-actions button{margin:0;min-height:40px;padding:10px 17px;border-radius:7px;font-size:13px;white-space:nowrap}
-.om .settings-redesign #settings-discard{border-color:transparent;background:transparent;color:#747b84}
-.om .settings-redesign #settings-discard:hover{background:#eceff2;color:#424a54}
-.om .settings-redesign .settings-save{background:#25292f;border-color:#25292f;color:#fff}
-.om .settings-redesign .settings-save:hover{background:#40464e;border-color:#40464e}
-.om .settings-delete-dialog{width:450px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);overflow:auto;box-sizing:border-box;padding:28px;border:1px solid #e0e3e7;border-radius:14px;background:#fff;color:#414750;box-shadow:0 24px 80px #1c263333}
+.om .settings-redesign #om-settings-error[data-state=success]{color:#858b94}
+.om .settings-redesign .settings-save-actions{display:flex;gap:10px;flex:none}
+.om .settings-redesign .settings-save-actions button{margin:0;min-height:44px;padding:11px 21px;border-radius:8px;font:500 13px/20px Arial,sans-serif;white-space:nowrap;transition:background-color .15s,border-color .15s,color .15s}
+.om .settings-redesign #settings-discard{border-color:transparent;background:transparent;color:#7b828c;box-shadow:none}
+.om .settings-redesign #settings-discard:hover{background:#f1f3f5;color:#454d58}
+.om .settings-redesign .settings-save{background:#292e35;border-color:#292e35;color:#fff;box-shadow:0 2px 3px #202b3a12,inset 0 1px 0 #ffffff14}
+.om .settings-redesign .settings-save:hover{background:#414750;border-color:#414750}
+.om .settings-redesign .om-action:focus-visible{outline:1px solid #aab1bb;outline-offset:3px}
+.om .settings-delete-dialog{width:480px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);overflow:auto;box-sizing:border-box;padding:30px;border:1px solid #e3e5e9;border-radius:16px;background:#fff;color:#414750;box-shadow:0 4px 12px #202b3a0a,0 24px 80px #1c26332e}
 .om .settings-delete-dialog::backdrop{background:#202a3659}
-.om .settings-delete-dialog h2{font-size:20px;line-height:1.3;margin:0 0 12px}
-.om .settings-delete-dialog p{font-size:13px;line-height:1.7;margin:0 0 18px;color:#787f89}
-.om .settings-delete-dialog label{display:flex;flex-direction:column;gap:8px}
-.om .settings-delete-dialog input{width:100%}
-.om .settings-delete-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:20px}
-.om .settings-delete-actions button{font-size:13px;padding:9px 13px;min-height:40px}
+.om .settings-delete-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px}
+.om .settings-delete-symbol{display:grid;place-items:center;width:46px;height:46px;border:1px solid #efdddd;border-radius:12px;background:#fff6f6;color:#a46469;box-shadow:inset 0 1px 0 #fff,0 2px 4px #7a232308}
+.om .settings-delete-symbol svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.om .settings-delete-dialog .settings-delete-close{display:grid;place-items:center;flex:none;min-height:34px;width:34px;height:34px;padding:0;border:1px solid #e2e5e9;border-radius:6px;background:#fff;color:#858b94;box-shadow:none;transform:none}
+.om .settings-delete-dialog .settings-delete-close:hover{background:#eef0f3;color:#424a55;border-color:#e2e5e9;transform:none}
+.om .settings-delete-close svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+.om .settings-delete-dialog h2{font:600 21px/1.35 Arial,sans-serif;letter-spacing:-.4px;margin:0 0 12px;color:#3e454e}
+.om .settings-delete-dialog p{font-size:13px;line-height:1.7;margin:0 0 24px;color:#858b94}
+.om .settings-delete-dialog label{display:block;font:12px/1.6 Arial,sans-serif;color:#69717c}
+.om .settings-delete-dialog label strong{font-weight:600;color:#444b55}
+.om .settings-delete-dialog input{display:block;width:100%;margin-top:9px;height:46px;font-size:14px;letter-spacing:.3px}
+.om .settings-delete-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:24px}
+.om .settings-delete-actions button{font-size:13px;padding:11px 17px;min-height:44px;border-radius:8px}
+.om .settings-delete-dialog #settings-confirm-delete{color:#a4454e;border-color:#e5c7cb;background:#fff5f6}
+.om .settings-delete-dialog #settings-confirm-delete:hover:enabled{color:#982532;border-color:#c7737c;background:#ffecee}
 .om .settings-delete-dialog #settings-delete-error{margin:12px 0 0;color:#b42332}
+.om .settings-delete-dialog #settings-delete-error:empty{display:none}
 .om .settings-delete-dialog button:disabled{opacity:.45;cursor:default}
-@media(max-width:780px){.om .settings-redesign #om-settings-form>section{grid-template-columns:1fr;gap:18px;margin-inline:24px;padding-block:25px}.om .settings-redesign .settings-savebar{padding:22px 24px}.om .settings-redesign .settings-section-heading p{max-width:none}}
-@media(max-width:480px){body.order-workspace .om[data-surface=settings]>.om-head{padding-inline:20px}.om[data-surface=settings] .om-settings-surface{padding:26px 14px 32px}.om .settings-redesign>header{padding-inline:6px;margin-bottom:22px}.om .settings-redesign #om-settings-form>section{margin-inline:20px;gap:16px}.om .settings-redesign .settings-identity-row{grid-template-columns:86px minmax(0,1fr);gap:13px}.om .settings-redesign #settings-logo-remove{font-size:10px;padding:5px}.om .settings-redesign input{font-size:16px}.om .settings-redesign .settings-add{flex-wrap:wrap;gap:8px}.om .settings-redesign .settings-add>input{flex:1 1 100%;width:100%}.om .settings-redesign .settings-savebar{align-items:flex-start;flex-direction:column;padding:20px}.om .settings-redesign .settings-save-actions{width:100%}.om .settings-redesign .settings-save{flex:1}.om .settings-redesign .settings-tax-row{gap:8px}.om .settings-redesign .settings-tax-row p{margin-top:0}.om .settings-delete-dialog{padding:22px}}
+@media(max-width:1180px){.om .settings-redesign .settings-identity-row{grid-template-columns:minmax(0,1fr);gap:24px}.om .settings-redesign .settings-store-field{max-width:none}}
+@media(max-width:780px){.om[data-surface=settings] .om-settings-surface{padding:18px 20px 32px;scrollbar-gutter:auto}.om .settings-redesign{--settings-inset:24px}.om .settings-redesign .settings-context{margin-bottom:18px}.om .settings-redesign #om-settings-form>section{grid-template-columns:1fr;gap:22px;padding-block:26px}.om .settings-redesign #om-settings-form>section:first-child{padding-top:28px}.om .settings-redesign .settings-section-heading p{max-width:none}.om .settings-redesign .settings-savebar{gap:18px}.om .settings-redesign .settings-account-row{gap:16px}.om .settings-redesign .settings-account-row>p{flex-basis:100%;max-width:none}}
+@media(max-width:480px){.om[data-surface=settings] .om-settings-surface{padding:14px 12px 28px}.om .om-settings-page.settings-redesign{--settings-inset:18px}.om .settings-redesign #om-settings-form{border-radius:12px}.om .settings-redesign .settings-store-tag{font-size:12px;padding:6px 10px}.om .settings-redesign #om-settings-form>section{gap:18px;padding-block:24px}.om .settings-redesign .settings-logo-group{gap:12px}.om .settings-redesign #settings-logo-pick{flex-basis:58px;width:58px;height:58px}.om .settings-redesign .settings-logo-actions{gap:6px}.om .settings-redesign .settings-logo-actions button{padding:9px 9px;min-height:40px;font-size:12px;gap:6px}.om .settings-redesign .settings-upload svg{width:15px;height:15px}.om .settings-redesign .settings-logo-help{font-size:10px;margin-top:8px}.om .settings-redesign input{font-size:16px}.om .settings-redesign .settings-add{flex-wrap:wrap;gap:10px}.om .settings-redesign .settings-add>input{flex:1 1 100%;width:100%}.om .settings-redesign .settings-add>[data-add]{margin-left:auto}.om .settings-redesign .om-platform-option{gap:8px;padding:10px}.om .settings-redesign .om-platform-option .platform-remove{padding:8px 4px;font-size:11px}.om .settings-redesign .settings-savebar{align-items:flex-start;flex-direction:column;padding:16px var(--settings-inset) 24px}.om .settings-redesign .settings-save-actions{width:100%;justify-content:flex-end}.om .settings-redesign .settings-save{flex:1}.om .settings-redesign .settings-tax-row{gap:8px}.om .settings-redesign .settings-tax-row p{margin-top:0}.om .settings-delete-dialog{padding:22px}.om .settings-delete-dialog h2{font-size:20px}.om .settings-delete-dialog input{font-size:16px}.om .settings-delete-actions button{padding-inline:12px}}
+@media(max-width:360px){.om .settings-redesign #settings-logo-pick{flex-basis:52px;width:52px;height:52px}.om .settings-redesign .settings-logo-group{gap:10px}.om .settings-redesign .settings-logo-actions button{padding-inline:7px}.om .settings-redesign .om-platform-option{gap:6px;padding:8px!important}}
+@media(prefers-reduced-motion:reduce){.om .settings-redesign *{transition:none!important}}

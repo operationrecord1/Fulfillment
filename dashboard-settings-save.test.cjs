@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const source=fs.readFileSync('dashboard-settings.js','utf8');
 const start=source.indexOf(' form.onsubmit=async e=>{'),end=source.indexOf('\n if(readonly)',start);
 function setup({saveError=false,renameError=false}={}){
- const calls=[],controls=[{disabled:false}],context={form:{elements:{tax_percentage:{value:'15'}},querySelectorAll:()=>controls},readonly:false,reading:false,platformBusy:false,settingsSaving:false,nameInput:{value:' New Store ',focus(){}},msg:{dataset:{}},closeColors(){},platformLock(){},lists:[['Amazon']],platformColors:{},platformTextColors:{},logo:'',options:{revision:3},storeName:'Old Store',save:async data=>{calls.push(['save',data]);if(saveError)throw Error('Save failed');return{revision:4};},renameStore:async(name,previous)=>{calls.push(['rename',name,previous]);if(renameError)throw Error('Name unavailable');return name;}};
+ const calls=[],controls=[{disabled:false}],context={form:{elements:{tax_percentage:{value:'15'}},querySelectorAll:()=>controls},readonly:false,reading:false,platformBusy:false,settingsSaving:false,storeTag:{textContent:'Old Store'},nameInput:{value:' New Store ',focus(){}},msg:{dataset:{}},closeColors(){},platformLock(){},lists:[['Amazon']],platformColors:{},platformTextColors:{},logo:'',options:{revision:3},storeName:'Old Store',save:async data=>{calls.push(['save',data]);if(saveError)throw Error('Save failed');return{revision:4};},renameStore:async(name,previous)=>{calls.push(['rename',name,previous]);if(renameError)throw Error('Name unavailable');return name;}};
  vm.createContext(context);vm.runInContext(source.slice(start,end),context);return{context,calls,controls};
 }
 (async()=>{
