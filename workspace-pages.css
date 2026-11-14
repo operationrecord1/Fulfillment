@@ -1,0 +1,46 @@
+/* Unified white workspace pages. Interactive controls stay still on hover. */
+body.order-workspace .om>.om-head>.om-store-mark{display:grid;place-items:center;padding:0;border:1px solid #e4e7e9;border-radius:7px;width:28px;min-width:28px;height:28px;background:#f6f7f8;color:#59616b;font:700 14px Arial,sans-serif;cursor:pointer;transition:background .15s,border-color .15s}
+body.order-workspace .om>.om-head>.om-store-mark:hover{background:#e9ecef;border-color:#cdd2d7}
+.om .om-report-nav[hidden]{display:none!important}
+body.order-workspace .om:is([data-surface=settings],[data-surface=target])>.om-head{height:64px;min-height:64px;padding:0 clamp(16px,2.4vw,40px);gap:12px;border-bottom:0;background:#fff;color:#444b54}
+.om:is([data-surface=settings],[data-surface=target]) .om-head h1{font-size:14px;color:#444b54;letter-spacing:0}
+.om:is([data-surface=settings],[data-surface=target]) .om-head .om-profile-trigger{width:34px;height:34px;border-color:#e0e3e6;box-shadow:none}
+.om:is([data-surface=settings],[data-surface=target]) .om-profile-menu{top:56px}
+.om .om-settings-surface{inset:64px 0 0;padding:12px clamp(16px,2.4vw,40px) 40px;background:#fff;color:#343a42;scrollbar-gutter:stable;overscroll-behavior:contain}
+.om .om-settings-page,.om .om-monthly-report{width:100%;max-width:1600px;margin:0 auto;min-width:0;font-family:Arial,sans-serif;color:#343a42}
+.om .om-monthly-report{padding:0}
+.om .om-settings-page{padding:28px 32px;border:1px solid #e2e5e8;border-radius:10px;background:#fff;box-shadow:0 2px 5px #202b3a0a,0 8px 28px #202b3a08}
+.om .om-settings-page>header,.om .om-monthly-report>header{position:static;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;width:100%;height:auto;min-height:48px;padding:0 0 24px;margin:0 0 28px;background:none;border:0;border-bottom:1px solid #e5e7ea;box-shadow:none}
+.om .om-settings-page>header h1,.om .om-monthly-report>header h1{order:2;margin:0 0 0 auto;color:#565d66;font-size:clamp(24px,2.3vw,32px);font-weight:700;line-height:1.2;letter-spacing:-.6px;text-align:right}
+.om .om-monthly-report>header label{order:1;margin:0;position:relative;max-width:100%}
+.om .om-monthly-report>header label[hidden]{display:none}
+.om .report-period-control:after{content:'';position:absolute;right:16px;top:50%;width:7px;height:7px;border-right:1.5px solid #939ba4;border-bottom:1.5px solid #939ba4;transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.om .om-monthly-report .report-period-control select{appearance:none;max-width:100%;height:42px;min-width:190px;padding:0 42px 0 16px;border:1px solid #e1e4e8;border-radius:7px;background:#fff;color:#4c535c;font:500 14px Arial,sans-serif;box-shadow:0 2px 5px #202b3a0c;cursor:pointer;transition:background .15s,border-color .15s}
+.om .om-monthly-report .report-period-control select:hover{background:#f4f5f6;border-color:#cdd2d8}
+.om .om-monthly-report .report-grid{gap:22px;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}
+.om .om-monthly-report .report-grid>section{padding:24px 22px;border:1px solid #e2e5e9;border-radius:12px;background:#fff;box-shadow:0 2px 5px #202b3a0a,0 8px 28px #202b3a08;color:#343a42}
+.om .om-monthly-report .report-grid h2{font-size:16px;font-weight:600;color:#49515b}
+.om .om-monthly-report .report-pair h3{color:#555e68}
+.om .om-monthly-report .report-metric strong{color:#252a31}
+.om .om-monthly-report .negative strong,.om .om-monthly-report strong.negative{color:#b42332}
+.om .om-monthly-report .report-target-title button{display:grid;place-items:center;width:34px;height:30px;padding:0;border:1px solid #e5e7eb;border-radius:6px;background:#f9fafb;color:#737c86;transition:background .15s}
+.om .om-monthly-report .report-target-title button:hover{background:#eceff2}
+.om .om-monthly-report .target-form{border-radius:12px}
+.om .om-settings-page section{margin:0;padding:26px 0;border:0;border-bottom:1px solid #e5e7ea;border-radius:0;background:transparent;box-shadow:none}
+.om .om-settings-page #om-settings-form>section:first-child{padding-top:0}
+.om .om-settings-page h2{font-size:16px;line-height:24px;color:#4c545e;font-weight:600;margin:0 0 6px}
+.om .om-settings-page h3{color:#59616b;font-weight:600}
+.om .om-settings-page p{color:#79818a;line-height:1.6;max-width:740px}
+.om .om-settings-page .settings-option-columns{grid-template-columns:minmax(0,1fr);max-width:760px}
+.om .om-settings-page .settings-add{align-items:center;flex-wrap:wrap;gap:10px}
+.om .om-settings-page .settings-add>input{flex:1 1 180px;max-width:480px}
+.om .om-settings-page input{border-radius:5px;border-color:#dfe3e7;background:#fff;color:#434b55;font-size:14px;min-height:40px}
+.om .om-settings-page label{font-size:13px;color:#59616b;max-width:480px}
+.om .om-settings-page .om-platform-option{padding:12px 0;border-color:#edf0f2}
+.om .om-settings-page .settings-save{margin:4px 0 20px}
+.om .om-settings-page .settings-account{border-bottom:0;padding-bottom:0}
+.om .om-settings-page .settings-logo-control{align-items:center}
+.om .om-settings-page .om-action{max-width:100%;white-space:normal}
+.om .workspace-navigation-error{padding:16px;color:#b42332;background:#fff5f5;border:1px solid #f0d5d8;border-radius:6px}
+@media(max-width:1100px){.om .om-monthly-report .report-grid{grid-template-columns:1fr;max-width:680px;margin-inline:auto;gap:20px}.om .om-monthly-report .report-grid>section{padding:24px}.om .om-monthly-report .report-metric strong{font-size:26px}}
+@media(max-width:599px){body.order-workspace .om:is([data-surface=settings],[data-surface=target])>.om-head{padding-inline:14px;gap:8px}.om:is([data-surface=settings],[data-surface=target]) .om-head h1{font-size:12px}.om .om-settings-surface{padding:8px 14px 28px}.om .om-settings-page{padding:22px 18px;border-radius:8px}.om .om-settings-page>header,.om .om-monthly-report>header{margin-bottom:22px;padding-bottom:20px;gap:14px}.om .om-monthly-report>header h1{flex:1 1 100%;order:0}.om .om-monthly-report>header label{margin-left:auto}.om .om-monthly-report .report-grid>section{padding:22px 16px}.om .om-settings-page section{padding-block:22px}.om .om-monthly-report .report-grid{grid-auto-rows:auto}.om .om-monthly-report .report-metric strong{font-size:22px}}
