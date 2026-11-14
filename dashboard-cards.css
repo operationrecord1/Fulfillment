@@ -667,3 +667,11 @@ html[data-om-theme=dark] .om-settings-page input:focus,html[data-om-theme=dark] 
 /* Align yearly month headings with order cells and preserve the frozen gutter. */
 .om .sheet-table .sheet-month-heading .sheet-month-title{padding-left:3px}
 .om .sheet-table .sheet-month-heading .sheet-month-gutter{position:sticky;left:0;z-index:3;padding:0;background:#f8fafd;border-right:1px solid #c4c7c5}
+
+/* Center report content within equal halves without changing vertical tracks. */
+.om .report-pair{column-gap:0}
+.om .report-pair>div{padding-inline:8px;text-align:center}
+.om .report-pair .report-metric{text-align:center}
+.om .report-pair .report-order-count strong{padding-left:0!important}
+.om .target-totals{column-gap:0;grid-template-columns:repeat(2,minmax(0,1fr));text-align:center}
+.om .target-totals .report-metric,.om .target-totals .report-metric+.report-metric{padding-inline:8px;text-align:center}
