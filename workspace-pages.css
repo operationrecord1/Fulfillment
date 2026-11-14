@@ -1,4 +1,5 @@
 /* Unified white workspace pages. Interactive controls stay still on hover. */
+body.order-workspace .pub-footer{display:none!important}
 body.order-workspace .om>.om-head>.om-store-mark{display:grid;place-items:center;padding:0;border:1px solid #e4e7e9;border-radius:7px;width:28px;min-width:28px;height:28px;background:#f6f7f8;color:#59616b;font:700 14px Arial,sans-serif;cursor:pointer;transition:background .15s,border-color .15s}
 body.order-workspace .om>.om-head>.om-store-mark:hover{background:#e9ecef;border-color:#cdd2d7}
 .om .om-report-nav[hidden]{display:none!important}
