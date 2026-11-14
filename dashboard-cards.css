@@ -661,5 +661,5 @@ html[data-om-theme=dark] .om-settings-page input:focus,html[data-om-theme=dark] 
 .om .target-totals{margin-top:0;grid-template-columns:repeat(2,minmax(0,1fr))}
 
 /* Balance target circle and comparison order counts in both reporting modes. */
-.om .report-target .target-ring{position:relative;top:-8px}
+.om .report-target .target-ring{position:relative;top:-16px}
 .om .report-pair .report-order-count{position:relative;top:8px}
