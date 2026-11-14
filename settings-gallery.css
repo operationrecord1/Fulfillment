@@ -98,3 +98,22 @@ body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
 @media(max-width:480px){.om[data-surface=settings] .om-settings-surface{padding:14px 12px 28px}.om .om-settings-page.settings-redesign{--settings-inset:18px}.om .settings-redesign #om-settings-form{border-radius:12px}.om .settings-redesign .settings-store-tag{font-size:12px;padding:6px 10px}.om .settings-redesign #om-settings-form>section{gap:18px;padding-block:24px}.om .settings-redesign .settings-logo-group{gap:12px}.om .settings-redesign #settings-logo-pick{flex-basis:58px;width:58px;height:58px}.om .settings-redesign .settings-logo-actions{gap:6px}.om .settings-redesign .settings-logo-actions button{padding:9px 9px;min-height:40px;font-size:12px;gap:6px}.om .settings-redesign .settings-upload svg{width:15px;height:15px}.om .settings-redesign .settings-logo-help{font-size:10px;margin-top:8px}.om .settings-redesign input{font-size:16px}.om .settings-redesign .settings-add{flex-wrap:wrap;gap:10px}.om .settings-redesign .settings-add>input{flex:1 1 100%;width:100%}.om .settings-redesign .settings-add>[data-add]{margin-left:auto}.om .settings-redesign .om-platform-option{gap:8px;padding:10px}.om .settings-redesign .om-platform-option .platform-remove{padding:8px 4px;font-size:11px}.om .settings-redesign .settings-savebar{align-items:flex-start;flex-direction:column;padding:16px var(--settings-inset) 24px}.om .settings-redesign .settings-save-actions{width:100%;justify-content:flex-end}.om .settings-redesign .settings-save{flex:1}.om .settings-redesign .settings-tax-row{gap:8px}.om .settings-redesign .settings-tax-row p{margin-top:0}.om .settings-delete-dialog{padding:22px}.om .settings-delete-dialog h2{font-size:20px}.om .settings-delete-dialog input{font-size:16px}.om .settings-delete-actions button{padding-inline:12px}}
 @media(max-width:360px){.om .settings-redesign #settings-logo-pick{flex-basis:52px;width:52px;height:52px}.om .settings-redesign .settings-logo-group{gap:10px}.om .settings-redesign .settings-logo-actions button{padding-inline:7px}.om .settings-redesign .om-platform-option{gap:6px;padding:8px!important}}
 @media(prefers-reduced-motion:reduce){.om .settings-redesign *{transition:none!important}}
+/* Compact saved options; only the new-option toolbar uses spacious hover targets. */
+.om .settings-redesign .settings-store-tag{padding:0;border:0;background:none;box-shadow:none}
+.om .settings-redesign .settings-avatar-edit{display:none;pointer-events:none}
+.om .settings-redesign .om-platform-option{min-height:48px;border-radius:7px;gap:8px;box-shadow:none}
+.om .settings-redesign .om-platform-option .platform-option-colors{gap:4px}
+.om .settings-redesign .om-platform-option .platform-color-control{width:28px!important;min-width:28px!important;height:28px;padding:4px!important;border:1px solid #d9dee3!important;border-radius:5px!important;background:#fff;box-shadow:0 1px 2px #2021240a}
+.om .settings-redesign .om-platform-option .platform-color-control i{bottom:2px;left:5px;right:5px;border-radius:0}
+.om .settings-redesign .om-platform-option .platform-color-control .sheet-reference-icon{width:18px!important;min-width:18px!important;max-width:18px;height:18px}
+.om .settings-redesign .om-platform-option .platform-color-control:hover{background:#f7f8f9;border-color:#aeb7c0!important}
+.om .settings-redesign .om-platform-option .platform-remove{padding:6px 8px}
+.om .settings-redesign .settings-add .platform-color-control,.om .settings-redesign .settings-add>[data-add]{border-color:transparent!important;background:transparent;box-shadow:none;font-weight:600;color:#454c55}
+.om .settings-redesign .settings-add>[data-add]>span{font-weight:600}
+.om .settings-redesign .settings-add .platform-color-control:hover,.om .settings-redesign .settings-add>[data-add]:hover{background:#f1f3f5;border-color:transparent!important;box-shadow:none}
+.om .settings-redesign .settings-account-row{justify-content:flex-start;align-items:center;gap:22px}
+.om .settings-redesign .settings-account-row>p{order:2;flex:1 1 220px}
+.om .settings-redesign #settings-delete{order:1;min-height:39px;padding:9px 13px;border-radius:7px;border-color:#e2d5d5;color:#8f5555;box-shadow:none}
+.om .settings-redesign #settings-delete:hover{background:#fff1f1;color:#b42332;border-color:#b42332}
+.om .settings-redesign .settings-account .settings-section-body{padding-top:23px}
+@media(max-width:780px){.om .settings-redesign .settings-account .settings-section-body{padding-top:0}.om .settings-redesign .settings-account-row{gap:12px}}
