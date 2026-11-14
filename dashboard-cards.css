@@ -648,3 +648,14 @@ html[data-om-theme=dark] .om-settings-page input:focus,html[data-om-theme=dark] 
 .om .report-pair{align-items:start}
 .om .report-pair>div{align-content:start;grid-template-rows:23px 20px 70px auto}
 .om .report-target .target-ring{margin-top:0}
+
+/* Shared monthly/yearly metric baselines without a trailing helper row. */
+.om .report-grid>section{min-height:0}
+.om .report-grid>section:not(.report-target)>h2{margin-bottom:3px}
+.om .report-target-title{margin-bottom:3px}
+.om .report-grid>section>p,.om .report-grid>section:not(.report-target)>p{min-height:26px;margin-bottom:12px}
+.om .report-pair{flex:none}
+.om .report-pair>div{grid-template-rows:23px 20px 108px auto}
+.om .report-grid>section:first-child:after,.om .report-target:after{display:none}
+.om .report-target .target-ring{margin:0 auto 12px}
+.om .target-totals{margin-top:0;grid-template-columns:repeat(2,minmax(0,1fr))}
