@@ -610,19 +610,24 @@ html[data-om-theme=dark] .om-settings-page input:focus,html[data-om-theme=dark] 
 .om .om-settings-surface:has(>.om-monthly-report[data-fit="2"]),.om .om-settings-surface:has(>.om-monthly-report[data-fit="3"]){padding-left:0;padding-right:0}
 @media(max-width:599px){.om .om-monthly-report[data-fit] .report-grid{grid-template-columns:1fr}}
 
-/* Shared tracks align count and profit across all target cards. */
-.om .report-grid>section{display:grid;grid-template-rows:36px 154px auto 32px;align-content:start}
-.om .report-grid>section>h2,.om .report-target-title{grid-row:1;margin:0;align-self:start}
-.om .report-pair{grid-row:2 / 4;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
-.om .report-pair>div{display:grid;grid-template-rows:154px 64px minmax(72px,auto);align-content:start}
-.om .report-period-intro{align-self:end;min-width:0;padding-bottom:20px}
-.om .report-period-intro h3{line-height:18px;min-height:18px}
-.om .report-period-intro p{line-height:16px;margin:5px 0 0}
-.om .report-metric{margin:0;padding:8px 0;gap:5px;justify-content:flex-start}
-.om .report-grid>section>small{grid-row:4;align-self:end;margin:0;line-height:14px}
-.om .report-target-intro{grid-row:2;text-align:center;min-width:0}
-.om .report-target-intro>p{margin:0 0 6px;line-height:16px}
-.om .report-target-intro .target-ring{width:120px;height:120px;margin:0 auto;padding:7px}
-.om .target-totals{grid-row:3;display:grid;grid-template-columns:1fr;grid-template-rows:64px minmax(72px,auto);text-align:center;gap:0}
-.om .target-totals .report-metric{margin:0;padding:8px 0}
+/* Compact comparison cards with side-by-side target totals. */
+.om .report-grid{align-items:stretch}
+.om .report-grid>section{display:flex;flex-direction:column;min-height:300px}
+.om .report-grid>section>h2{margin:0 0 12px;line-height:22px}
+.om .report-pair{flex:1;align-items:end;grid-template-columns:repeat(2,minmax(0,1fr))}
+.om .report-pair>div{display:grid;grid-template-rows:auto auto auto;align-content:end}
+.om .report-pair h3{line-height:17px;margin:0 0 6px}
+.om .report-pair p{line-height:16px;margin:0 0 4px}
+.om .report-metric{margin:12px 0 0;gap:5px}
+.om .report-grid>section>p{margin:0 0 12px;line-height:16px}
+.om .report-grid>section>small{margin:12px 0 0;line-height:15px;min-height:30px}
+.om .report-grid>section:first-child:after{content:'';display:block;height:42px;flex:none}
+.om .report-target-title{align-items:start;min-height:22px;margin-bottom:4px}
+.om .report-target>p{margin:0 0 8px;line-height:16px;text-align:left}
+.om .report-target .target-ring{width:130px;height:130px;margin:4px auto 12px;flex:none}
+.om .target-totals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:auto;text-align:left;align-items:start}
+.om .target-totals .report-metric{margin:0;min-width:0}
+.om .target-totals .report-order-count strong{padding-left:0!important}
+.om .target-totals .report-metric+ .report-metric{border-left:1px solid #edf0f2;padding-left:12px}
+.om .report-target:after{content:'';display:block;height:42px;flex:none}
 @media(max-width:599px){.om .report-grid{grid-auto-rows:1fr}}
