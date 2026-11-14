@@ -44,7 +44,7 @@ body.order-workspace .om[data-surface=settings]>.om-head{height:62px;padding-inl
 .om .settings-redesign #settings-delete{font-size:12px;min-height:39px;border-color:#e2d5d5;color:#8f5555;border-radius:7px;padding:9px 13px}
 .om .settings-redesign #om-settings-form>section.settings-account{border-bottom:0}
 .om .settings-redesign .settings-savebar{position:static;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 32px;margin:0;border:0;border-top:1px solid #e7eaed;border-radius:0 0 14px 14px;background:#fafbfc;color:#616975;width:100%;height:auto;box-shadow:none}
-.om .settings-redesign #om-settings-error{font:12px/1.6 Arial,sans-serif;max-width:430px;margin:0;overflow-wrap:anywhere}
+.om .settings-redesign #om-settings-error{font:12px/1.6 Arial,sans-serif;max-width:430px;margin:0;overflow-wrap:anywhere;color:#78808a}
 .om .settings-redesign #om-settings-error[data-state=error]{color:#b42332}
 .om .settings-redesign #om-settings-error[data-state=success]{color:#426751}
 .om .settings-redesign .settings-save-actions{display:flex;gap:8px;flex:none}
