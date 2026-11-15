@@ -698,4 +698,4 @@ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed 
 }
 
 /* Profile menu: 15px outer-to-icon inset and 22px icon-to-label spacing. */
-.om .om-profile-menu button{padding-left:7px!important;padding-right:15px!important;gap:22px!important;align-items:center!important}
+.om .om-profile-menu button{padding-left:14px!important;padding-right:15px!important;gap:22px!important;align-items:center!important}
