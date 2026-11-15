@@ -1,6 +1,6 @@
 /* A single settings surface: quiet depth, aligned controls, no header/footer bands. */
 body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
-.om[data-surface=settings] .om-settings-surface{inset:0;padding:24px clamp(12px,3vw,45px) 48px;background:#fff;scrollbar-gutter:stable both-edges}
+.om[data-surface=settings] .om-settings-surface{inset:0;padding:24px clamp(12px,3vw,45px) 48px;background:#f4f7fa;scrollbar-gutter:stable both-edges}
 .om .om-settings-page.settings-redesign{width:100%;max-width:none;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:#fff;color:#34383f;--settings-inset:clamp(24px,2.5vw,48px);--settings-control:44px}
 .om .settings-redesign .settings-context{display:flex;justify-content:flex-end;align-items:center;min-height:30px;margin:0 0 20px}
 .om .settings-redesign .settings-store-tag{display:block;max-width:100%;padding:7px 13px;border:1px solid #e8eaed;border-radius:7px;background:#fafbfc;box-shadow:inset 0 1px 0 #fff,0 1px 3px #202b3a06;font:600 13px/1.5 Arial,sans-serif;color:#5a6069;overflow-wrap:anywhere;text-align:right}
