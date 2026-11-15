@@ -148,3 +148,14 @@ body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
 .om .settings-redesign .settings-save-actions .settings-save{width:109.89px}
 
 @media(max-width:480px){.om .settings-redesign .settings-logo-help{transform:translateY(-4px)}}
+
+/* Unified platform composer: retain the 44px field height. */
+.om .settings-redesign .settings-add{height:44px;min-height:44px;padding:3px;gap:6px;flex-wrap:nowrap;border:1px solid #dce0e5;border-radius:8px;background:#fff;box-sizing:border-box}
+.om .settings-redesign .settings-add>input{height:36px;min-height:36px;flex:1 1 0;width:0;padding:0 10px;border:0;border-radius:5px;box-shadow:none;background:transparent}
+.om .settings-redesign .settings-add .platform-new-colors{gap:5px}
+.om .settings-redesign .settings-add .platform-color-control{width:32px!important;min-width:32px!important;height:34px;padding:4px 5px 8px!important;border:1px solid #e2e6ea!important;border-radius:5px!important;background:#f5f7f9;box-shadow:0 1px 3px #2530441a,inset 0 1px 0 #fff}
+.om .settings-redesign .settings-add .platform-color-control:hover{background:#e9edf1;box-shadow:0 1px 3px #25304424;border-color:#cdd5dd!important}
+.om .settings-redesign .settings-add .platform-color-control .sheet-reference-icon{width:18px!important;min-width:18px!important;height:18px;transform:none}
+.om .settings-redesign .settings-add .platform-color-control i{bottom:4px;left:6px;right:6px}
+.om .settings-redesign .settings-add>[data-add]{height:36px!important;min-height:36px!important;min-width:70px;padding:0 12px!important;margin:0;border-radius:5px;border:1px solid #dce0e5!important;background:linear-gradient(#fff,#f0f3f6);box-shadow:0 1px 2px #25304412;flex:none}
+@media(max-width:480px){.om .settings-redesign .settings-add{gap:4px}.om .settings-redesign .settings-add>input{font-size:13px;padding-inline:6px}.om .settings-redesign .settings-add .platform-new-colors{gap:4px}.om .settings-redesign .settings-add>[data-add]{min-width:56px;padding-inline:8px!important;gap:4px}}
