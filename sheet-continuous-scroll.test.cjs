@@ -11,17 +11,12 @@ function fixture(){
  return {grid,document,root,scroll,host,frames,wheel,tick,click,setClock(value){clock=value}};
 }
 {
- const f=fixture();f.wheel();assert.equal(f.frames.size,0,'native wheel is untouched while pointer is inside');assert.equal(f.scroll.options.wheel.passive,true);
- f.root.events.pointerleave({clientY:701});f.tick(0);const before=f.scroll.scrollTop;f.tick(16);assert(Math.abs(f.scroll.scrollTop-before-320*.016)<1e-8);f.tick(32);assert(f.scroll.scrollTop>before);
- f.root.events.pointerenter();assert.equal(f.frames.size,0);f.root.events.pointerleave({clientY:701});assert.equal(f.frames.size,0,'reentry clears stale wheel continuation');
- f.wheel(-40);f.root.events.pointerleave({clientY:-1});f.tick(48);const up=f.scroll.scrollTop;f.tick(64);assert(f.scroll.scrollTop<up);f.document.events.keydown({key:'Escape'});assert.equal(f.frames.size,0);
- f.root.events.pointerleave({clientY:-1});assert.equal(f.frames.size,0,'Escape prevents old wheel input restarting');f.grid.continuousScrollCleanup();
+ const f=fixture();f.wheel();assert.equal(f.frames.size,0);
+ f.root.events.pointerleave({clientY:701,buttons:0});assert.equal(f.frames.size,0,"leaving after wheel must not start automatic scrolling");
+ f.wheel(-40);f.root.events.pointerleave({clientY:-1,buttons:0});assert.equal(f.frames.size,0,"upward wheel also stops with native input");
+ f.setClock(4000);f.root.events.pointerleave({clientY:701,buttons:0});assert.equal(f.scroll.scrollTop,2000);
 }
-{
- const f=fixture();f.wheel();f.setClock(2600);f.root.events.pointerleave({clientY:701});assert.equal(f.frames.size,0,'old wheel activity cannot create a new scroll session');
- f.wheel(1,{deltaMode:1});f.root.events.pointerleave({clientY:701});f.tick(0);const before=f.scroll.scrollTop;f.tick(16);assert(Math.abs(f.scroll.scrollTop-before-224*.016)<1e-8,'line-mode wheel deltas are normalized');f.click(0);assert.equal(f.frames.size,0);
-}
-console.log('PASS: native wheel behavior, outside continuation, direction and stale-session cancellation');
+console.log('PASS: wheel never creates unsolicited continuation on pointer exit');
 {
  const f=fixture();f.click(1);f.document.events.pointermove({clientY:300});f.tick(0);const before=f.scroll.scrollTop;f.tick(16);assert(Math.abs(f.scroll.scrollTop-before-304*.016)<1e-8);
  f.root.events.pointerleave({clientY:200});const at=f.scroll.scrollTop;f.tick(32);assert(Math.abs(f.scroll.scrollTop-at+304*.016)<1e-8,'middle auto-scroll uses the same origin-distance curve outside');
@@ -33,11 +28,6 @@ console.log('PASS: symmetric middle-button movement, neutral zone and click canc
  const f=fixture();let wheelCalls=0,cancelled=0;f.grid.dragWheel=()=>wheelCalls++;f.grid.stopDrag=()=>cancelled++;
  f.wheel();assert.equal(wheelCalls,1);f.root.events.pointerleave({clientY:701});assert.equal(f.frames.size,0,'wheel cannot start another controller during an active range drag');
  f.document.hidden=true;f.document.events.visibilitychange();assert.equal(cancelled,1);assert.equal(f.frames.size,0);
-}
-{
- const f=fixture();let top=0;Object.defineProperty(f.scroll,'scrollTop',{get:()=>top,set:value=>{top=Math.max(0,value)}});
- f.wheel(-40);f.root.events.pointerleave({clientY:-1});f.tick(0);f.tick(16);assert.equal(f.frames.size,0,'reaching the scroll boundary stops the loop');
- f.wheel();f.root.events.pointerleave({clientY:701});f.host.isConnected=false;f.tick(32);assert.equal(f.frames.size,0,'detached host stops the loop');
 }
 console.log('PASS: one controller during drag, hidden-page cleanup and scroll-boundary stop');
 

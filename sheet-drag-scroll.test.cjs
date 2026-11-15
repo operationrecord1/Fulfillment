@@ -62,10 +62,10 @@ console.log('PASS: pointer coordinates survive exit; frame coalescing and final 
  for(let time=32;time<=160;time+=16)f.tick(time);assert.equal(f.grid.scroll.scrollTop,before+100,'edge scrolling waits for wheel gesture to settle');f.tick(176);assert(f.grid.scroll.scrollTop>before+100,'edge scrolling resumes after native wheel ends');f.stop();
 }
 {
- const f=fixture();let cancelled=0,ended=0;f.start(()=>{},()=>ended++,()=>cancelled++);f.move(760,150,0);f.tick(0);const before=f.grid.scroll.scrollTop;f.tick(16);assert(f.grid.scroll.scrollTop>before,'outside zero button events preserve an active drag');
+ const f=fixture();let cancelled=0,ended=0;f.start(()=>{},()=>ended++,()=>cancelled++);f.move(760,150,0);assert.equal(cancelled,1);assert.equal(f.frames.size,0,'released button outside must stop drag');f.start(()=>{},()=>ended++,()=>cancelled++);
  f.listeners.get('window:mouseup')({button:0});assert.equal(ended,1);assert.equal(f.frames.size,0);assert.equal(f.listeners.size,0);
- f.start(()=>{},()=>ended++,()=>cancelled++);f.move(300,150,0);assert.equal(cancelled,1);assert.equal(f.frames.size,0);
- f.start(()=>{},()=>ended++,()=>cancelled++);f.listeners.get('pointercancel')({pointerId:1});assert.equal(cancelled,2);assert(!f.captured);assert.equal(f.grid.dragWheel,null);
+ f.start(()=>{},()=>ended++,()=>cancelled++);f.move(300,150,0);assert.equal(cancelled,2);assert.equal(f.frames.size,0);
+ f.start(()=>{},()=>ended++,()=>cancelled++);f.listeners.get('pointercancel')({pointerId:1});assert.equal(cancelled,3);assert(!f.captured);assert.equal(f.grid.dragWheel,null);
 }
 console.log('PASS: exclusive native wheel ownership, stationary outside continuation and complete release/cancel cleanup');
 

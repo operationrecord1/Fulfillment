@@ -180,12 +180,13 @@ class SheetGrid{
   const start=kind=>{mode=kind;if(!frame){last=null;remainder=0;direction=0;observedTop=this.scroll.scrollTop;frame=requestAnimationFrame(tick);}};
   const middleVelocity=y=>Math.abs(y-origin)<12?0:Math.sign(y-origin)*Math.min(900,(Math.abs(y-origin)-12)*8);
   this.scroll.addEventListener('wheel',e=>{if(e.target.closest('input,textarea,select,.sheet-popover,dialog')||e.ctrlKey||(e.deltaY===0&&!e.deltaX))return;stop();if(this.dragWheel){this.dragWheel();return;}if(e.deltaY===0)return;const unit=e.deltaMode===1?28:e.deltaMode===2?this.scroll.clientHeight||innerHeight:1;wheelAt=Date.now();wheelVelocity=Math.sign(e.deltaY)*Math.min(900,Math.max(180,Math.abs(e.deltaY)*unit*8));},{passive:true,signal});
-  const leave=e=>{if(this.stopDrag)return;if(mode==='middle'){if(Number.isFinite(e.clientY))velocity=middleVelocity(e.clientY);return;}if(Date.now()-wheelAt<1500&&wheelVelocity){velocity=wheelVelocity;start('wheel');}};
+  const leave=e=>{if(this.stopDrag)return;if(mode==='middle'){if(Number.isFinite(e.clientY))velocity=middleVelocity(e.clientY);return;}/* Native wheel input never starts a continuing scroll session. */};
   document.documentElement.addEventListener('pointerleave',leave,{signal});
   document.documentElement.addEventListener('pointerenter',()=>{if(mode==='wheel')stop();},{signal});
   document.addEventListener('pointermove',e=>{if(mode==='middle')velocity=middleVelocity(e.clientY);},{signal});
   document.addEventListener('pointerdown',e=>{this.stopDrag?.();if(mode==='middle'){stop();e.preventDefault();e.stopPropagation();return;}stop();if(e.button===1&&this.host.contains(e.target)&&!e.target.closest('a,input,textarea,select,button')){e.preventDefault();e.stopPropagation();origin=e.clientY;this.host.style.cursor='ns-resize';start('middle');}},{capture:true,signal});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){stop();this.stopDrag?.();}},{signal});
+  window.addEventListener?.('blur',()=>{stop();this.stopDrag?.();},{signal});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();this.stopDrag?.();}},{signal});
   this.continuousScrollCleanup=()=>{stop();events.abort();};
  }
@@ -234,13 +235,13 @@ class SheetGrid{
    }
    frame=requestAnimationFrame(tick);
   };
-  const cleanup=()=>{if(!active)return;active=false;cancelAnimationFrame(frame);document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',cancel);document.removeEventListener('pointerout',leave);window.removeEventListener('mouseup',mouseUp);if(capture?.hasPointerCapture?.(id))capture.releasePointerCapture(id);if(this.dragWheel===wheel)this.dragWheel=null;this.stopDrag=null;};
+  const cleanup=()=>{if(!active)return;active=false;cancelAnimationFrame(frame);document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',cancel);document.removeEventListener('pointerout',leave);window.removeEventListener('mouseup',mouseUp);window.removeEventListener('blur',cancel);capture?.removeEventListener?.('lostpointercapture',cancel);if(capture?.hasPointerCapture?.(id))capture.releasePointerCapture(id);if(this.dragWheel===wheel)this.dragWheel=null;this.stopDrag=null;};
   const cancel=ev=>{if(ev?.pointerId!==undefined&&ev.pointerId!==id)return;cleanup();onCancel();};
-  const move=ev=>{if(ev.pointerId!==id)return;if(ev.buttons===0&&ev.clientX>=0&&ev.clientX<innerWidth&&ev.clientY>=0&&ev.clientY<innerHeight){cancel(ev);return;}moved=true;x=ev.clientX;y=ev.clientY;dirty=true;};
+  const move=ev=>{if(ev.pointerId!==id)return;if(ev.buttons===0){cancel(ev);return;}moved=true;x=ev.clientX;y=ev.clientY;dirty=true;};
   const leave=ev=>{if(ev.pointerId!==id||ev.relatedTarget||!moved)return;if(Number.isFinite(ev.clientX))x=ev.clientX;if(Number.isFinite(ev.clientY))y=ev.clientY;dirty=true;};
   const finish=ev=>{if(moved){if(Number.isFinite(ev.clientX))x=ev.clientX;if(Number.isFinite(ev.clientY))y=ev.clientY;update();}cleanup();onEnd(ev);};
   const up=ev=>{if(ev.pointerId===id)finish(ev);};const mouseUp=ev=>{if(e.pointerType!=='touch'&&ev.button===0)finish(ev);};
-  this.stopDrag=()=>cancel();document.addEventListener('pointermove',move,{passive:true});document.addEventListener('pointerup',up);document.addEventListener('pointercancel',cancel);document.addEventListener('pointerout',leave);window.addEventListener('mouseup',mouseUp);try{capture?.setPointerCapture?.(id);}catch{}frame=requestAnimationFrame(tick);
+  this.stopDrag=()=>cancel();document.addEventListener('pointermove',move,{passive:true});document.addEventListener('pointerup',up);document.addEventListener('pointercancel',cancel);document.addEventListener('pointerout',leave);window.addEventListener('mouseup',mouseUp);window.addEventListener('blur',cancel);capture?.addEventListener?.('lostpointercapture',cancel);try{capture?.setPointerCapture?.(id);}catch{}frame=requestAnimationFrame(tick);
  }
  fillDrag(e){
   const previous={...this.selection},{r,c}=this.activeCell(),value=this.raw(r,c);if(!this.canEdit(r,c))return;let end=r;
