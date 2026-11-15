@@ -696,3 +696,6 @@ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed 
 .om .om-kpis>[data-kpi=avgOrder]{grid-area:1/5}.om .om-kpis>[data-kpi=avgProfit]{grid-area:2/5}
 .om .om-kpis>[data-kpi=margin]{grid-area:1/6}.om .om-kpis>[data-kpi=avgDaily]{grid-area:2/6}
 }
+
+/* Profile menu: 15px outer-to-icon inset and 22px icon-to-label spacing. */
+.om .om-profile-menu button{padding-left:7px!important;padding-right:15px!important;gap:22px!important;align-items:center!important}
