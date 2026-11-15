@@ -140,3 +140,9 @@ body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
 .om .settings-redesign .settings-logo-actions button{height:39px;min-height:39px;padding:9px 13px;font-size:12px;line-height:19px;border-radius:7px}
 .om .settings-redesign #settings-logo-pick:hover{background:#eef0f3;box-shadow:0 0 0 3px #e8ebef,0 3px 7px #2530441c}
 @media(max-width:480px){.om .settings-redesign .settings-logo-group{column-gap:12px}.om .settings-redesign .settings-logo-actions{gap:6px}.om .settings-redesign .settings-logo-actions button{padding-inline:9px}}
+
+/* Lift file guidance without moving the logo actions; reduce save controls by 15%. */
+.om .settings-redesign .settings-logo-help{transform:translateY(-12px)}
+.om .settings-redesign .settings-save-actions button{box-sizing:border-box;height:37.4px;min-height:37.4px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.om .settings-redesign .settings-save-actions #settings-discard{width:74.87px}
+.om .settings-redesign .settings-save-actions .settings-save{width:109.89px}
