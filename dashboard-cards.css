@@ -675,3 +675,6 @@ html[data-om-theme=dark] .om-settings-page input:focus,html[data-om-theme=dark] 
 .om .report-pair .report-order-count strong{padding-left:0!important}
 .om .target-totals{column-gap:0;grid-template-columns:repeat(2,minmax(0,1fr));text-align:center}
 .om .target-totals .report-metric,.om .target-totals .report-metric+.report-metric{padding-inline:8px;text-align:center}
+
+/* Status only: trim 2.5px from the left and 1.5px from the right. */
+.om .sheet-chip.sheet-select-frame.select-status{width:calc(100% - 12px);max-width:calc(100% - 12px);margin-left:6.5px;margin-right:5.5px;padding-left:2.5px;padding-right:3.5px}
