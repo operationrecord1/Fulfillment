@@ -86,3 +86,9 @@
 
 /* Rejected cell input never changes the grid geometry or traps focus. */
 .sheet-input-warning{position:fixed;z-index:10000;top:48px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);box-sizing:border-box;display:flex;align-items:center;gap:16px;padding:12px 14px;border:1px solid #efb5b5;border-radius:6px;background:#fff1f1;color:#942c2c;font:13px/1.5 Arial,sans-serif;box-shadow:0 3px 12px #0001}.sheet-input-warning button{flex:none;border:0;background:transparent;color:inherit;width:28px;height:28px;display:grid;place-items:center;padding:0;line-height:1;cursor:pointer}.sheet-input-warning>span{min-width:0;overflow-wrap:anywhere}.sheet-input-warning button svg{display:block;width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}.sheet-input-warning button:hover{background:#f8dddd}
+
+/* Suppress only the column underline for the first displayed page row. */
+.om .sheet-first-row-active .sheet-labels th.sheet-header-selected{box-shadow:none}
+.om .sheet-table td.sheet-has-note:before{content:"";position:absolute;right:1px;top:1px;border-top:6px solid #3c4043;border-left:6px solid transparent;pointer-events:none;z-index:3}
+.sheet-note-popup{position:fixed;z-index:1100;width:218px;max-width:calc(100vw - 16px);height:100px;max-height:calc(100dvh - 16px);background:white;border:1px solid #dadce0;border-radius:3px;box-shadow:0 2px 6px #0003;overflow:hidden;resize:both;user-select:text}
+.om .sheet-note-popup textarea{display:block;box-sizing:border-box;width:100%;height:100%;min-height:0;margin:0;padding:8px;border:0;border-radius:0;background:white;color:#3c4043;font:12px/1.4 Arial,sans-serif;resize:none;outline:none;box-shadow:none;user-select:text}

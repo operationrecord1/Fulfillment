@@ -1,6 +1,6 @@
 (function(root){'use strict';
 const rowNumberWidth=33;
-const referenceWidths={order_id:146,quantity:70,earning:135,purchase_id:146,supplier:131,note:169,platform:131,tracking:105,secondary_tracking:140,status:136,product_cost:101,shipping_cost:101,additional_cost:101,gross:101,margin:101,id:122,date:95};
+const referenceWidths={order_id:141,quantity:70,earning:135,purchase_id:141,supplier:141,note:169,platform:131,tracking:105,secondary_tracking:140,status:136,product_cost:101,shipping_cost:101,additional_cost:101,gross:101,margin:101,id:122,date:95};
 const minimums={order_id:78,quantity:68,earning:65,purchase_id:78,supplier:83,note:38,platform:70,tracking:68,secondary_tracking:82,status:65,product_cost:66,shipping_cost:73,additional_cost:82,gross:49,margin:59,id:60,date:95};
 const weights={note:1.2,product_cost:1.4,shipping_cost:1.4,additional_cost:1.4,gross:1.4,margin:1.4};
 function allocate(columns,preferences,required,available){
