@@ -29,7 +29,7 @@ console.log('PASS: active-cell source, upward/downward fill, link preservation, 
  const f=fixture();f.start();f.move(5);f.end();assert.equal(f.checkpoints,0);assert.equal(f.changes,0,'releasing on the source does not create a data change');
 }
 {
- const f=fixture();f.g.rows[4].data.order_id='';f.start();assert.equal(f.track,undefined,'empty source cannot start fill');
+ for(const endpoint of [2,9]){const f=fixture();f.g.rows[4].data.order_id='';const rows=structuredClone(f.g.rows),formats=structuredClone(f.g.formats);f.start();assert.equal(f.track.axis,'y');f.move(endpoint);f.end();assert.equal(f.g.selection.er,endpoint);assert.deepEqual(f.g.rows,rows);assert.deepEqual(f.g.formats,formats);assert.equal(f.checkpoints,0);assert.equal(f.changes,0);}
 }
 console.log('PASS: cancel restores previous range without data changes, no-op and empty-source guards');
 {

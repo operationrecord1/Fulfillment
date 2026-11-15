@@ -239,10 +239,10 @@ class SheetGrid{
   this.stopDrag=()=>cancel();document.addEventListener('pointermove',move,{passive:true});document.addEventListener('pointerup',up);document.addEventListener('pointercancel',cancel);document.addEventListener('pointerout',leave);window.addEventListener('mouseup',mouseUp);try{capture?.setPointerCapture?.(id);}catch{}frame=requestAnimationFrame(tick);
  }
  fillDrag(e){
-  const previous={...this.selection},{r,c}=this.activeCell(),value=this.raw(r,c);if(String(value)===''||!this.canEdit(r,c))return;let end=r;
+  const previous={...this.selection},{r,c}=this.activeCell(),value=this.raw(r,c);if(!this.canEdit(r,c))return;let end=r;
   this.selection={r,c,er:r,ec:c,kind:'cell'};this.host?.classList?.add('sheet-fill-dragging');
   this.dragTrack(e,ev=>{const target=(ev.cellTarget||document.elementFromPoint(ev.clientX,ev.clientY))?.closest('[data-r]');if(target)end=+target.dataset.r;this.selection.er=end;this.paint();},()=>{
-   this.host?.classList?.remove('sheet-fill-dragging');if(end===r){this.selection=previous;this.paint();return;}const normalized=S.normalize(this.cols[c].key,value,this.year,this.month,this.platforms),href=this.linkDetails(r,c)?.url||'',key=this.cols[c].key;
+   this.host?.classList?.remove('sheet-fill-dragging');if(end===r){this.selection=previous;this.paint();return;}if(String(value)===''){this.select(r,c,end,c,'cell');return;}const normalized=S.normalize(this.cols[c].key,value,this.year,this.month,this.platforms),href=this.linkDetails(r,c)?.url||'',key=this.cols[c].key;
    this.checkpoint();for(const rowIndex of this.slots.filter(index=>index!==r&&index>=Math.min(r,end)&&index<=Math.max(r,end))){if(!this.canEdit(rowIndex,c))continue;const row=this.ensure(this.rows,rowIndex);this.assign(row,c,normalized);window.SheetFormatModel.patch(this.formats,rowIndex,key,{href});}
    this.changed();this.select(r,c,end,c,'cell');
   },()=>{this.host?.classList?.remove('sheet-fill-dragging');this.selection=previous;this.paint();},'y');

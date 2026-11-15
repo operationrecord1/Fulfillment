@@ -21,4 +21,4 @@
 .om .sheet-table td.sheet-active:has(.sheet-fill-handle):after{display:none}
 
 /* Keep the fill cursor stable while crossing cells during a vertical fill. */
-.om .sheet-fill-handle,html:has(.sheet-fill-dragging),html:has(.sheet-fill-dragging) *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 3v14M3 10h14' stroke='white' stroke-width='4'/%3E%3Cpath d='M10 3v14M3 10h14' stroke='black' stroke-width='2'/%3E%3C/svg%3E") 10 10,crosshair!important}
+.om .sheet-fill-handle,html:has(.sheet-fill-dragging),html:has(.sheet-fill-dragging) *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M8 3v10M3 8h10' stroke='white' stroke-width='4'/%3E%3Cpath d='M8 3v10M3 8h10' stroke='black' stroke-width='2'/%3E%3C/svg%3E") 8 8,crosshair!important}
