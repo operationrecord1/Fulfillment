@@ -2,7 +2,7 @@
 const left=new Set(['order_id','purchase_id','supplier','note','tracking','secondary_tracking']);
 const styles={thin:'1px solid',medium:'2px solid',thick:'3px solid',dashed:'1px dashed',dotted:'1px dotted',double:'3px double'};
 const clone=v=>structuredClone(v),hex=v=>/^#[0-9a-f]{6}$/i.test(v);
-function defaults(key){return {fontSize:10,bold:false,italic:false,color:'#202124',fill:'#e7ecef',align:left.has(key)?'left':'center'};}
+function defaults(key){return {fontSize:10,bold:false,italic:false,color:'#202124',fill:'#ffffff',align:left.has(key)?'left':'center'};}
 function get(formats,r,key){return {...defaults(key),...formats[r]?.[key]};}
 function patch(formats,r,key,values){formats[r]||={};formats[r][key]={...formats[r][key],...clone(values)};}
 function shift(formats,from,count,remove=false){const next={};for(const [key,value] of Object.entries(formats)){let r=+key;if(remove&&r>=from&&r<from+count)continue;if(r>=from)r+=remove?-count:count;next[r]=clone(value);}return next;}

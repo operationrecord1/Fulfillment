@@ -92,3 +92,14 @@
 .om .sheet-table td.sheet-has-note:before{content:"";position:absolute;right:1px;top:1px;border-top:6px solid #3c4043;border-left:6px solid transparent;pointer-events:none;z-index:3}
 .sheet-note-popup{position:fixed;z-index:1100;width:218px;max-width:calc(100vw - 16px);height:100px;max-height:calc(100dvh - 16px);background:white;border:1px solid #dadce0;border-radius:3px;box-shadow:0 2px 6px #0003;overflow:hidden;resize:both;user-select:text}
 .om .sheet-note-popup textarea{display:block;box-sizing:border-box;width:100%;height:100%;min-height:0;margin:0;padding:8px;border:0;border-radius:0;background:white;color:#3c4043;font:12px/1.4 Arial,sans-serif;resize:none;outline:none;box-shadow:none;user-select:text}
+
+/* Design 16 surface palette; existing typography and blue selection remain intact. */
+.om:has(.sheet-grid),.om .om-main:has(.sheet-grid),.om .om-canvas:has(.sheet-grid),.om .sheet-tools{background:#f4f7fa}
+.om .sheet-grid,.om .sheet-scroll{background:#fff}
+.om .sheet-table td:not(.sheet-negative):not(.sheet-duplicate),.om .sheet-table .sheet-rownum{background-color:#fff}
+.om .sheet-table td{border-right-color:#dae4ee;border-bottom-color:#dae4ee}
+.om .sheet-table .sheet-labels th,.om .sheet-table .sheet-labels th.sheet-header-selected{background:#e8eff6!important;color:#30465c!important;border-right-color:#dae4ee;border-bottom-color:#dae4ee}
+.om .sheet-table .sheet-rownum.sheet-header-selected{background:#e2edf7!important;color:#2b3e50!important}
+.om .sheet-whole-row .sheet-rownum.sheet-header-selected{background:#1a73e8!important;color:#fff!important}
+.om .sheet-table .sheet-labels th.sheet-header-selected{box-shadow:inset 0 -2px #1a73e8}
+.om .sheet-first-row-active .sheet-labels th.sheet-header-selected{box-shadow:none}
