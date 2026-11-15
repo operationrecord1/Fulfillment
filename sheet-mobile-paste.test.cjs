@@ -37,6 +37,12 @@ document.elementFromPoint=()=>({closest:()=>({dataset:{r:'3',c:'0'}})});
 fillGrid.fillDrag({pointerId:8});listeners.get('pointermove')({pointerId:8,clientX:30,clientY:100});listeners.get('pointerup')({pointerId:8});
 assert.equal(fillRows[2].data.platform,'Amazon');assert.equal(fillRows[1].data.platform,'AutoDS');assert.equal(fillGrid.checkpoints,1);assert.equal(fillGrid.didChange,true);assert.equal(listeners.size,0);
 console.log('PASS: platform fill copies selected value into visible destination rows, preserves filtered rows, and records one undo checkpoint');
+for(const path of [[],[1,2]]){
+ const prior={r:3,c:1,er:1,ec:0,kind:'cell',activeR:2,activeC:0},noop=Object.create(prototype);
+ Object.assign(noop,{selection:structuredClone(prior),cols:[{key:'note'},{key:'supplier'}],raw:()=> 'Source',canEdit:()=>true,paint(){},checkpoint(){throw Error('No-op fill must not create history');},changed(){throw Error('No-op fill must not save');},dragTrack(e,move,end){for(const row of path)move({cellTarget:{closest:()=>({dataset:{r:String(row)}})}});end();}});
+ noop.fillDrag({pointerId:12});assert.equal(JSON.stringify(noop.selection),JSON.stringify(prior),'click-only and return-to-source fill retain the original range and active cell');
+}
+console.log('PASS: no-op fill preserves the selected rectangle and cycled active cell without saving or recording undo');
 // Fill applies only to editable fields, preserves zero and links, and is undoable as one action.
 for(const [key,label,type] of core.columns){
  if(type==='computed')continue;
