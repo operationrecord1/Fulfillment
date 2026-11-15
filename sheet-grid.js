@@ -240,12 +240,12 @@ class SheetGrid{
  }
  fillDrag(e){
   const previous={...this.selection},{r,c}=this.activeCell(),value=this.raw(r,c);if(String(value)===''||!this.canEdit(r,c))return;let end=r;
-  this.selection={r,c,er:r,ec:c,kind:'cell'};
+  this.selection={r,c,er:r,ec:c,kind:'cell'};this.host?.classList?.add('sheet-fill-dragging');
   this.dragTrack(e,ev=>{const target=(ev.cellTarget||document.elementFromPoint(ev.clientX,ev.clientY))?.closest('[data-r]');if(target)end=+target.dataset.r;this.selection.er=end;this.paint();},()=>{
-   if(end===r){this.selection=previous;this.paint();return;}const normalized=S.normalize(this.cols[c].key,value,this.year,this.month,this.platforms),href=this.linkDetails(r,c)?.url||'',key=this.cols[c].key;
+   this.host?.classList?.remove('sheet-fill-dragging');if(end===r){this.selection=previous;this.paint();return;}const normalized=S.normalize(this.cols[c].key,value,this.year,this.month,this.platforms),href=this.linkDetails(r,c)?.url||'',key=this.cols[c].key;
    this.checkpoint();for(const rowIndex of this.slots.filter(index=>index!==r&&index>=Math.min(r,end)&&index<=Math.max(r,end))){if(!this.canEdit(rowIndex,c))continue;const row=this.ensure(this.rows,rowIndex);this.assign(row,c,normalized);window.SheetFormatModel.patch(this.formats,rowIndex,key,{href});}
    this.changed();this.select(r,c,end,c,'cell');
-  },()=>{this.selection=previous;this.paint();},'y');
+  },()=>{this.host?.classList?.remove('sheet-fill-dragging');this.selection=previous;this.paint();},'y');
  }
 
  touchPointer(e){if(e.target===this.editor||this.popup?.contains(e.target)||e.target.closest('.sheet-tools'))return;const cell=e.target.closest('[data-r]');if(!cell)return;const r=+cell.dataset.r,c=+cell.dataset.c,x=e.clientX,y=e.clientY,id=e.pointerId,started=Date.now();let moved=false;
