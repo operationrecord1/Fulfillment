@@ -79,7 +79,7 @@ class SheetGrid{
   }return fallback;
  }
  paintFillHandle(){
-  const {r,c}=this.activeCell(),active=this.selection.kind==='cell'&&this.canEdit(r,c)&&String(this.raw(r,c))!=='',cell=active?this.table.querySelector('[data-r="'+r+'"][data-c="'+c+'"]'):null;
+  const {r,c}=this.activeCell(),active=this.selection.kind==='cell'&&this.canEdit(r,c),cell=active?this.table.querySelector('[data-r="'+r+'"][data-c="'+c+'"]'):null;
   if(this.fillHandle?.parentElement===cell&&cell)return;
   this.fillHandle?.remove();this.fillHandle=null;
   if(cell){const handle=document.createElement('button');handle.type='button';handle.className='sheet-fill-handle';handle.setAttribute('aria-label','Drag to fill '+this.cols[c].label);handle.tabIndex=-1;cell.append(handle);this.fillHandle=handle;}
