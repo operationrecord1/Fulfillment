@@ -129,3 +129,14 @@ body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
 .om .settings-redesign #om-settings-form{--settings-frame-radius:16px;border-radius:var(--settings-frame-radius);background:#fff}
 .om .settings-redesign .settings-savebar{border-radius:0 0 var(--settings-frame-radius) var(--settings-frame-radius)}
 @media(max-width:480px){.om .settings-redesign #om-settings-form{--settings-frame-radius:12px}}
+
+/* Center logo actions against the circle, independently of the helper line. */
+.om .settings-redesign .settings-context{display:none}
+.om .settings-redesign .settings-logo-group{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:20px;row-gap:0;align-items:center}
+.om .settings-redesign .settings-logo-details{display:contents}
+.om .settings-redesign #settings-logo-pick{grid-column:1;grid-row:1}
+.om .settings-redesign .settings-logo-actions{grid-column:2;grid-row:1}
+.om .settings-redesign .settings-logo-help{grid-column:2;grid-row:2;margin-top:0}
+.om .settings-redesign .settings-logo-actions button{height:39px;min-height:39px;padding:9px 13px;font-size:12px;line-height:19px;border-radius:7px}
+.om .settings-redesign #settings-logo-pick:hover{background:#eef0f3;box-shadow:0 0 0 3px #e8ebef,0 3px 7px #2530441c}
+@media(max-width:480px){.om .settings-redesign .settings-logo-group{column-gap:12px}.om .settings-redesign .settings-logo-actions{gap:6px}.om .settings-redesign .settings-logo-actions button{padding-inline:9px}}

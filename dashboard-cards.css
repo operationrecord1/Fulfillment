@@ -705,3 +705,5 @@ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed 
 .om .om-profile-menu .profile-menu-identity{padding:10px 14px;margin-bottom:3px}
 .om .om-profile-menu button{min-height:44px!important;padding-top:8px!important;padding-bottom:8px!important;transition:background-color .15s,color .15s}
 .om .om-profile-menu #om-signout{margin-top:3px}
+
+.om .om-profile-menu .profile-menu-identity{text-align:center}
