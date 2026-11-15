@@ -1,0 +1,21 @@
+/* Porcelain Ledger, design 1: colors only; interaction and geometry stay unchanged. */
+body.order-workspace:has(.om-main:not([hidden])){background:#eef0eb}
+body.order-workspace .info-view:has(.om-main:not([hidden])),.om:has(.om-main:not([hidden])),.om .om-main,.om .om-canvas{background-color:#eef0eb}
+.om .om-head,.om .sheet-tools{background-color:#e8ece3!important}
+.om .sheet-grid,.om .sheet-scroll,.om .sheet-cell-computed{background-color:#f8f9f5}
+.om .sheet-table td{background-color:#f8f9f5;color:#29372e;border-right-color:#d5dcd0;border-bottom-color:#d5dcd0}
+.om .sheet-table td.sheet-negative{background-color:#ffcfca;color:#a61b1b}
+.om .sheet-table td.sheet-duplicate{background-color:#f4cccc}
+.om .sheet-table .sheet-labels th,.om .sheet-table .sheet-letters th,.om .sheet-table .sheet-labels .sheet-corner{background-color:#e8ece3;color:#29372e;border-right-color:#d5dcd0;border-bottom-color:#d5dcd0}
+.om .sheet-table .sheet-rownum{background-color:#f8f9f5;color:#657064;border-color:#d5dcd0}
+.om .sheet-tools input,.om .sheet-formula input,.om .sheet-mobile-editor .sheet-mobile-input{background-color:#f8f9f5;color:#29372e}
+.om .sheet-table td.sheet-active{outline-color:#4a6651}
+.om .sheet-table td.sheet-active:after,.om .sheet-fill-handle,.sheet-resize-col:hover,.sheet-resize-row:hover{background-color:#4a6651}
+.om .sheet-table td.sheet-range-selected{background-image:linear-gradient(#4a665120,#4a665120)}
+.om .sheet-table th.sheet-header-selected,.om .sheet-table .sheet-rownum.sheet-header-selected{background-color:#dde5d9!important;color:#29372e!important}
+.om .sheet-table .sheet-labels th.sheet-header-selected{background-color:#e8ece3!important;color:#29372e!important;box-shadow:inset 0 -2px #4a6651}
+.om .sheet-whole-row .sheet-rownum.sheet-header-selected{background-color:#4a6651!important;color:#fff!important}
+.om .sheet-table textarea.sheet-editor{border-color:#4a6651!important}
+.om .sheet-mobile-editor .sheet-mobile-input{border-color:#4a6651}
+.om .sheet-mobile-editor .sheet-mobile-input:focus-visible,.om .sheet-tools input:focus-visible,.om .sheet-formula input:focus-visible{outline-color:#4a6651}
+.om .sheet-copy-outline,.om .sheet-table td.sheet-copied:before{border-color:#4a6651}
