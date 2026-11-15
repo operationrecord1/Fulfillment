@@ -123,3 +123,9 @@ body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
 .om .settings-redesign .settings-add>[data-add]{border:1px solid #dce0e5!important;background:linear-gradient(#fff,#f7f8fa);box-shadow:inset 0 1px 0 #fff,0 1px 2px #202b3a10;color:#454c55}
 .om .settings-redesign .settings-add>[data-add]:hover{border-color:#cbd1d8!important;background:#eef0f3;box-shadow:0 1px 2px #202b3a10}
 .om .settings-redesign #settings-logo-pick,.om .settings-redesign #settings-logo-pick:hover{display:grid;place-items:center;cursor:default;background:#f6f7f9;box-shadow:none;transition:none}
+
+/* Let the rounded form, rather than its square wrapper, define the surface. */
+.om .om-settings-page.settings-redesign{background:transparent}
+.om .settings-redesign #om-settings-form{--settings-frame-radius:16px;border-radius:var(--settings-frame-radius);background:#fff}
+.om .settings-redesign .settings-savebar{border-radius:0 0 var(--settings-frame-radius) var(--settings-frame-radius)}
+@media(max-width:480px){.om .settings-redesign #om-settings-form{--settings-frame-radius:12px}}
