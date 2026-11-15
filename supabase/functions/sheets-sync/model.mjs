@@ -18,7 +18,7 @@ export function orderLabel(value) {
  if(!present(value))return '';
  const digits=String(value).padStart(8,'0');return 'FL-'+digits.slice(0,-4)+'-'+digits.slice(-4);
 }
-export function projectYear(year, source) {
+export function projectYear(year, source, formats={}) {
  if(!Number.isInteger(year)||year<2000||year>2100)throw Error('Invalid year');
  const rows=source.filter(r=>!r.deleted_at).sort((a,b)=>a.month-b.month||a.position-b.position);
  const seen=new Set(), groups=[];
@@ -42,9 +42,15 @@ export function projectYear(year, source) {
   const value=row.data[key]??'';
   return key==='status'&&/^buyer cancel(?:led)?$/i.test(value)?'Cancelled':value;
  }));
+ const links=rows.map(row=>columns.map(([key])=>{
+  const format=formats[row.month]?.[row.position]?.[key];
+  const href=format&&Object.hasOwn(format,'href')?format.href:row.data[key==='order_id'?'order_url':key==='purchase_id'?'purchase_url':''];
+  if(!present(row.data[key])||!href)return '';
+  try{const url=new URL(href);return ['http:','https:'].includes(url.protocol)?url.href:'';}catch{return '';}
+ }));
  const monthly=months.map((name,i)=>({month:i+1,startColumn:i*26,header:columns.map(([,label])=>name+' · '+label),rows:[]}));
- rows.forEach((row,i)=>monthly[row.month-1].rows.push({position:row.position,values:values[i]}));
- return {year,monthly,yearly:{header:columns.map(([,label])=>label),rows:values},sourceRows:rows.map(r=>({month:r.month,position:r.position}))};
+ rows.forEach((row,i)=>monthly[row.month-1].rows.push({position:row.position,values:values[i],links:links[i]}));
+ return {year,monthly,yearly:{header:columns.map(([,label])=>label),rows:values,links},sourceRows:rows.map(r=>({month:r.month,position:r.position}))};
 }
 // Chunk writes explicitly include blanks, so clearing/deleting rows removes stale cells.
 // RAW values prevent order text beginning with '=' from becoming a formula.
@@ -57,5 +63,16 @@ export function *valueChunks(title,startColumn,header,rows,previousExtent=0,chun
   const end=Math.min(extent,start+chunkSize-1),values=[];
   for(let position=start;position<=end;position++)values.push(byPosition.get(position)||Array(columns.length).fill(''));
   yield {range:safeTitle+'!'+columnName(startColumn)+(start+1),values};
+ }
+}
+
+// Clear missing links too, including deleted tails, without touching adjacent months.
+export function *linkChunks(sheetId,startColumn,rows,previousExtent=0,chunkSize=300){
+ const extent=rows.reduce((n,r)=>Math.max(n,r.position),previousExtent);
+ const byPosition=new Map(rows.map(r=>[r.position,r.links]));
+ for(let start=1;start<=extent;start+=chunkSize){
+  const end=Math.min(extent,start+chunkSize-1),data=[];
+  for(let pos=start;pos<=end;pos++)data.push({values:columns.map((_,c)=>({userEnteredFormat:{textFormat:byPosition.get(pos)?.[c]?{link:{uri:byPosition.get(pos)[c]}}:{}}}))});
+  yield {updateCells:{start:{sheetId,rowIndex:start,columnIndex:startColumn},rows:data,fields:'userEnteredFormat.textFormat.link'}};
  }
 }

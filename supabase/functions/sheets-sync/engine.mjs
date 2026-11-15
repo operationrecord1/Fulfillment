@@ -1,4 +1,4 @@
-import {projectYear,valueChunks} from './model.mjs';
+import {projectYear,valueChunks,linkChunks} from './model.mjs';
 const sheets='https://sheets.googleapis.com/v4/spreadsheets/';
 const drive='https://www.googleapis.com/drive/v3/files';
 export async function mirror(claim,{google,rpc,now=Date.now,budgetMs=85000}){
@@ -23,18 +23,20 @@ export async function mirror(claim,{google,rpc,now=Date.now,budgetMs=85000}){
   if(!id)throw Error('Google spreadsheet ID missing');
   await rpc('bind',{...base,spreadsheet_id:id});
  }
- const projection=projectYear(job.year,rows);
+ const projection=projectYear(job.year,rows,claim.formats);
  const current=Object.fromEntries(projection.monthly.map(m=>[m.month,m.rows.reduce((n,r)=>Math.max(n,r.position),0)]));current.yearly=projection.yearly.rows.length;
  const high=Object.fromEntries(Object.entries(current).map(([key,n])=>[key,Math.max(n,Number(job.extents[key]||0))]));
  const monthlyTitle='Monthly Statement '+job.year,yearlyTitle='Yearly Statement '+job.year;
  const metadata=await google(sheets+id+'?fields=spreadsheetId,properties(title),sheets(properties)');
  const needed=[{title:monthlyTitle,rowCount:Math.max(2001,...Object.values(high).slice(0,12).map(n=>n+1)),columnCount:303},{title:yearlyTitle,rowCount:Math.max(20001,high.yearly+1),columnCount:17}];
+ const sheetIds={};
  const requests=[],allocated=new Set((metadata.sheets||[]).map(s=>s.properties.sheetId));
  if(metadata.properties.title!==target.store_name+' - '+target.serial)requests.push({updateSpreadsheetProperties:{properties:{title:target.store_name+' - '+target.serial},fields:'title'}});
  for(const desired of needed){
   const existing=metadata.sheets?.find(s=>s.properties.title===desired.title)?.properties;
   let sheetId=existing?.sheetId??(job.year*10+(desired.title===monthlyTitle?1:2));
   if(!existing){while(allocated.has(sheetId))sheetId++;allocated.add(sheetId);}
+  sheetIds[desired.title]=sheetId;
   if(!existing)requests.push({addSheet:{properties:{sheetId,title:desired.title,gridProperties:{rowCount:desired.rowCount,columnCount:desired.columnCount,frozenRowCount:1}}}});
   else if(existing.gridProperties.rowCount<desired.rowCount||existing.gridProperties.columnCount<desired.columnCount){
    requests.push({updateSheetProperties:{properties:{sheetId:existing.sheetId,gridProperties:{rowCount:Math.max(existing.gridProperties.rowCount,desired.rowCount),columnCount:Math.max(existing.gridProperties.columnCount,desired.columnCount)}},fields:'gridProperties.rowCount,gridProperties.columnCount'}});
@@ -63,13 +65,17 @@ export async function mirror(claim,{google,rpc,now=Date.now,budgetMs=85000}){
   batch.push(step);size+=length;
  }
  if(batch.length)batches.push(batch);
- steps=batches;
+ steps=batches.map(data=>({kind:'values',data}));
+ for(const m of projection.monthly)for(const request of linkChunks(sheetIds[monthlyTitle],m.startColumn,m.rows,high[m.month]))steps.push({kind:'links',request});
+ for(const request of linkChunks(sheetIds[yearlyTitle],0,projection.yearly.rows.map((values,i)=>({position:i+1,links:projection.yearly.links[i]})),high.yearly))steps.push({kind:'links',request});
  let cursor=job.progress.version===job.version?Number(job.progress.cursor||0):0;
  await rpc('checkpoint',{...base,extents:high,progress:{version:job.version,cursor}});
  for(;cursor<steps.length;cursor++){
   if(now()-started>budgetMs){await rpc('yield',base);return {complete:false,spreadsheet_id:id};}
   await active();
-  await google(sheets+id+'/values:batchUpdate','POST',{valueInputOption:'RAW',data:steps[cursor]});
+  const step=steps[cursor];
+  if(step.kind==='values')await google(sheets+id+'/values:batchUpdate','POST',{valueInputOption:'RAW',data:step.data});
+  else await google(sheets+id+':batchUpdate','POST',{requests:[step.request]});
   await rpc('checkpoint',{...base,extents:high,progress:{version:job.version,cursor:cursor+1}});
  }
  await rpc('finish',{...base,extents:current});

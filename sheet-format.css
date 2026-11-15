@@ -103,3 +103,16 @@
 .om .sheet-whole-row .sheet-rownum.sheet-header-selected{background:#1a73e8!important;color:#fff!important}
 .om .sheet-table .sheet-labels th.sheet-header-selected{box-shadow:inset 0 -2px #1a73e8}
 .om .sheet-first-row-active .sheet-labels th.sheet-header-selected{box-shadow:none}
+
+/* Compact link editor and copy confirmation. */
+.om .sheet-link-editor{width:368px;padding:16px;border:1px solid #dadce0;border-radius:12px;box-shadow:0 4px 16px #20212424,0 1px 3px #20212416}
+.om .sheet-link-editor form{gap:12px}
+.om .sheet-link-editor .sheet-link-field{height:40px;border-color:#dadce0;border-radius:6px;gap:10px;padding:0 12px}
+.om .sheet-link-editor .sheet-link-text{margin-right:0}
+.om .sheet-link-editor .sheet-link-field input{height:38px;font-size:14px}
+.om .sheet-link-editor .sheet-link-url-row{grid-template-columns:minmax(0,1fr) 64px;gap:10px}
+.om .sheet-link-editor .sheet-link-url-row button{height:40px;width:64px;border-radius:6px;background:#e8f0fe;color:#1967d2;font-size:14px}
+.om .sheet-link-editor .sheet-link-url-row button:hover{background:#d2e3fc}
+.om .sheet-link-editor .sheet-link-url-row button:focus-visible{outline:2px solid #1a73e8;outline-offset:2px}
+.sheet-link-toast{position:fixed;left:24px;bottom:24px;z-index:6000;max-width:calc(100vw - 32px);box-sizing:border-box;padding:14px 20px;border-radius:4px;background:#323232;color:#fff;box-shadow:0 2px 8px #0003;font:14px/20px Arial,sans-serif;pointer-events:none}
+@media(max-width:600px){.sheet-link-toast{left:16px;bottom:16px}.om .sheet-link-editor{padding:12px}}
