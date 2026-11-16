@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
+const cell=(html,c)=>{const classes=new Set(),attrs={style:'', 'aria-readonly':'false'};return {dataset:{r:'1',c:String(c)},className:'',writes:0,peers:[],get innerHTML(){return html;},set innerHTML(v){this.writes++;html=v;this.peers=[];},getAttribute:k=>attrs[k],setAttribute(k,v){attrs[k]=v;},classList:{contains:k=>classes.has(k),toggle(k,on){on?classes.add(k):classes.delete(k);}},querySelectorAll(){return this.peers;},append(...items){this.peers.push(...items);}};};
+const old=[cell('old',0),cell('same',1)],next=[cell('new',0),cell('same',1)],peer={};old[0].peers.push(peer);
+const newTable={set innerHTML(v){},querySelectorAll:q=>q==='tr[data-row]'?[{className:''}]:next};
+const ctx={window:{OrderCore:{},SheetModel:{}},document:{createElement:()=>newTable}};vm.runInNewContext(fs.readFileSync('sheet-grid.js','utf8'),ctx);
+const g={period:'2026-11',cols:[{key:'note'},{key:'supplier'}],width:()=>100,slots:[1],rowsWindow:{start:0,end:1},prefix:[0,28],monthStarts:new Set(),formats:{},table:{querySelectorAll:q=>q==='tr[data-row]'?[{className:''}]:old},cellPresentation:new WeakMap()};
+g.tableShape=JSON.stringify([g.period,[['note',100],['supplier',100]],g.slots,g.rowsWindow,g.prefix,[]]);
+for(const c of old)g.cellPresentation.set(c,{html:c.innerHTML,style:'',className:'',readonly:'false'});
+ctx.window.OrderSheetGrid.prototype.applyTableHTML.call(g,'next html');assert.equal(old[0].writes,1);assert.equal(old[1].writes,0);assert.equal(old[0].peers[0],peer);assert.equal(old[0].innerHTML,'new');
+ctx.window.OrderSheetGrid.prototype.applyTableHTML.call(g,'same html');assert.equal(old[0].writes,1);assert.equal(old[1].writes,0);
+console.log('PASS: changed cell patches once, unchanged cell stays intact, peer marker retains identity');
