@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict'),S=require('./workspace-sync');
+const row=(id,position,data)=>({id,position,data}),snap=rows=>({rows,formats:{}});
+const base=snap([row('a',1,{order_id:'A',note:'',quantity:1}),row('b',2,{order_id:'B'})]);
+let local=structuredClone(base),remote=structuredClone(base);local.rows[0].data.note='mine';remote.rows[0].data.quantity=2;remote.rows[1].data.note='theirs';
+let result=S.merge(base,local,remote);assert.equal(result.rows[0].data.note,'mine');assert.equal(result.rows[0].data.quantity,2);assert.equal(result.rows[1].data.note,'theirs');assert.equal(base.rows[0].data.quantity,1);
+local=structuredClone(base);local.rows.splice(0,1);local.rows[0].position=1;result=S.merge(base,local,base);assert.equal(result.rows.length,1);assert.equal(result.rows[0].id,'b');assert.equal(result.rows[0].position,1);
+remote=structuredClone(base);remote.rows[0].data.note='new';assert.throws(()=>S.merge(base,local,remote),/protected/);
+local=structuredClone(base);local.rows[0].data.note='pending';remote=snap([base.rows[1]]);assert.throws(()=>S.merge(base,local,remote),/protected/);
+const blank=snap([]);local=snap([{_key:'new-local',position:1,data:{order_id:'A'}}]);remote=snap([row('server',1,{note:'remote'})]);result=S.merge(blank,local,remote);assert.equal(result.rows.length,1);assert.equal(result.rows[0].id,'server');assert.deepEqual(result.rows[0].data,{note:'remote',order_id:'A'});
+local=structuredClone(base);remote=structuredClone(base);local.formats={1:{order_id:{bold:true}}};remote.formats={1:{order_id:{color:'#123456'}}};result=S.merge(base,local,remote);assert.deepEqual(result.formats[1].order_id,{color:'#123456',bold:true});
+const memory=new Map(),storage={setItem:(k,v)=>memory.set(k,v),getItem:k=>memory.get(k),removeItem:k=>memory.delete(k)};const draft=new S.DraftStore(storage,'test:');draft.save(2026,11,{base,local,pending:{payload:{request_id:'stable'}}});assert.equal(draft.read(2026,11).pending.payload.request_id,'stable');assert.equal(draft.read(2026,12),null);draft.remove(2026,11);assert.equal(draft.read(2026,11),null);
+assert(S.equivalent(base,structuredClone(base)));assert(!S.equivalent(base,local));
+console.log('PASS: independent cell merge, concurrent insert identity, protected delete conflicts, formatting merge, durable request identity');
