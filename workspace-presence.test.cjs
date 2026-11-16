@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
+let tick,onPaint,subscribe,sends=[],cell=1,paintScans=0;const handlers=[];
+const channel={on(...args){handlers.push(args);return this;},subscribe(fn){subscribe=fn;return this;},track:async()=>{},send:async m=>{sends.push(m);},presenceState:()=>({})};
+const tree={},grid={table:{firstElementChild:tree},host:{querySelectorAll(){paintScans++;return [];},addEventListener(e,fn){onPaint=fn;},removeEventListener(){}},cols:[{key:'note'}],activeCell:()=>({r:cell,c:0})};
+const ctx={window:{},setInterval(fn){tick=fn;return 1;},clearInterval(){},document:{}};vm.runInNewContext(fs.readFileSync('workspace-presence.js','utf8'),ctx);
+const presence=ctx.window.WorkspacePresence.mount({client:{channel:()=>channel,removeChannel(){}},storeId:'store',sessionId:'local',grid,period:()=>({year:2026,month:11}),onSaved(){}});
+subscribe('SUBSCRIBED');assert.equal(sends.length,1);
+for(let i=0;i<100;i++){cell++;onPaint();}assert.equal(sends.length,1);assert.equal(paintScans,0);
+tick();assert.equal(sends.length,2);assert.equal(sends[1].payload.r,101);tick();assert.equal(sends.length,2);
+grid.table.firstElementChild={};onPaint();assert.equal(paintScans,1);presence.dispose();
+console.log('PASS: drag selection coalesces to latest presence, unchanged state sends nothing, marker paint only after grid rebuild');
