@@ -12,3 +12,6 @@ const source=fs.readFileSync('dashboard.js','utf8');
 })().catch(e=>{console.error(e);process.exitCode=1;});
 
 (async()=>{for(const interaction of ['editor','stopDrag','popup']){let reads=0;const ctx={busy:false,dirty:false,disposed:false,readBusy:false,grid:{[interaction]:{}},rpc:()=>{reads++;}};vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('async function load(){'),source.indexOf('\nfor(let y=2000')),ctx);await ctx.load();assert.equal(reads,0,interaction+' must defer refresh');}console.log('PASS: background refresh defers during editing, dragging and popup interaction');})();
+
+// A previous cell's timer must never commit the editor opened afterwards.
+{let saved=0,queued=0;const ctx={disposed:false,grid:{editor:{}},saveTimer:null,clearTimeout(){},setTimeout(fn){queued++;return fn;},flush(){saved++;}};vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function autoFlush(){'),source.indexOf('function queueRetry(){')),ctx);ctx.autoFlush();assert.equal(saved,0);assert.equal(queued,1);ctx.grid.editor=null;ctx.autoFlush();assert.equal(saved,1);console.log('PASS: autosave waits for active editor without committing it');}
