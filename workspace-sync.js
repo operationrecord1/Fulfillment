@@ -15,6 +15,8 @@ function merge(base,local,remote){
  const formats=copy(remote.formats||{});for(const p of new Set([...Object.keys(base.formats||{}),...Object.keys(local.formats||{})])){const b=base.formats?.[p]||{},l=local.formats?.[p]||{};if(same(b,l))continue;const row={...(formats[p]||{})};for(const c of new Set([...Object.keys(b),...Object.keys(l)])){if(same(b[c],l[c]))continue;const value=objectDelta(b[c],l[c],row[c]);if(Object.keys(value).length)row[c]=value;else delete row[c];}if(Object.keys(row).length)formats[p]=row;else delete formats[p];}
  return {rows,formats};
 }
+// Merge only changed dimension leaves, preserving other sessions' sizes.
+function mergePreferences(base,local,remote){const out=copy(remote||{});for(const k of new Set([...Object.keys(base||{}),...Object.keys(local||{})])){if(same(base?.[k],local?.[k]))continue;const v=local?.[k];if(v===undefined)delete out[k];else if(v&&typeof v==='object'&&!Array.isArray(v))out[k]=mergePreferences(base?.[k]||{},v,out[k]||{});else out[k]=copy(v);}return out;}
 class DraftStore{
  constructor(storage,prefix){this.storage=storage;this.prefix=prefix;}
  save(year,month,value){this.storage.setItem(this.prefix+year+':'+month,JSON.stringify({version:1,...value}));this.storage.removeItem(this.prefix+year+':'+month+':editor');}
@@ -22,5 +24,5 @@ class DraftStore{
  read(year,month){const raw=this.storage.getItem(this.prefix+year+':'+month);if(!raw)return null;const v=JSON.parse(raw);if(v.version!==1)throw Error('A saved draft needs recovery before editing.');const editor=this.storage.getItem(this.prefix+year+':'+month+':editor');if(editor)v.editor=JSON.parse(editor);return v;}
  remove(year,month){this.storage.removeItem(this.prefix+year+':'+month);this.storage.removeItem(this.prefix+year+':'+month+':editor');}
 }
-const api={merge,objectDelta,DraftStore,same,equivalent};root.WorkspaceSync=api;if(typeof module!=='undefined')module.exports=api;
+const api={mergePreferences,merge,objectDelta,DraftStore,same,equivalent};root.WorkspaceSync=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
