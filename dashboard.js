@@ -60,13 +60,13 @@ function renderTable(rows,a){
 }
 let saveTimer,prefTimer,prefDirty=false,prefGeneration=0,prefChain=Promise.resolve(),generation=0,saveChain=Promise.resolve();
 state.formats={};state.periodRevisions={};state.preferences={};state.preferenceRevision=0;
-const Sync=window.WorkspaceSync,bases={};let pendingCommit=null,retryTimer,retryAttempt=0,collaboration=null,remoteRefresh=false,readBusy=false,releaseDraftLock;
+const Sync=window.WorkspaceSync,bases={};let pendingCommit=null,retryTimer,retryAttempt=0,collaboration=null,remoteRefresh=false,readBusy=false,releaseDraftLock,draftProtected=true;
 let tabIdentity=sessionStorage.getItem('workspace-tab');if(!tabIdentity){tabIdentity=crypto.randomUUID();sessionStorage.setItem('workspace-tab',tabIdentity);}
 if(navigator.locks){await new Promise(resolve=>{const claim=()=>navigator.locks.request('workspace-draft:'+user.id+':'+tabIdentity,{ifAvailable:true},async lock=>{if(!lock){tabIdentity=crypto.randomUUID();sessionStorage.setItem('workspace-tab',tabIdentity);claim();return;}resolve();await new Promise(done=>releaseDraftLock=done);});claim();});}
 const draftStore=new Sync.DraftStore(localStorage,'workspace-draft:'+user.id+':'+profile.store_id+':'+tabIdentity+':');
 const periodKey=()=>state.year+'-'+state.month;
 const snapshot=()=>structuredClone({rows:rowsForPeriod(),formats:state.formats[state.month]||{}});
-function protectDraft(){if(investor||state.month==='all')return;try{draftStore.save(state.year,state.month,{base:bases[periodKey()]||{rows:[],formats:{}},local:snapshot(),pending:pendingCommit,editor:grid.editor?{r:grid.editCell.r,c:grid.editCell.c,value:grid.editor.value}:null,revision:state.periodRevisions[state.month]||0});}catch{feedback('Browser storage is unavailable. Keep this tab open until your changes are saved.',true);}}
+function protectDraft(){if(investor||state.month==='all')return;try{draftStore.save(state.year,state.month,{base:bases[periodKey()]||{rows:[],formats:{}},local:snapshot(),pending:pendingCommit,editor:grid.editor?{r:grid.editCell.r,c:grid.editCell.c,value:grid.editor.value}:null,revision:state.periodRevisions[state.month]||0});draftProtected=true;}catch{draftProtected=false;feedback('Browser storage is unavailable. Keep this tab open until your changes are saved.',true);}}
 function installSnapshot(value){state.rows=state.rows.filter(r=>r.month!==state.month).concat(value.rows);state.formats[state.month]=value.formats;}
 function queueRetry(){clearTimeout(retryTimer);retryTimer=setTimeout(()=>{if(!disposed)flush();},Math.min(30000,1000*2**Math.min(retryAttempt++,5)));}
 
@@ -96,7 +96,7 @@ async function flush(){
   collaboration?.send({type:'broadcast',event:'saved',payload:{year,month,revision:data.revision}}).catch(()=>{});
  }
  feedback('All changes saved');return await savePreferences();
- }catch(e){protectDraft();const permanent=/protected|Invalid|not allowed|permission|access required|View-only|Request identity/i.test(e.message);if(permanent)feedback(e.message,true);else{feedback('Changes are kept on this device. Reconnecting…',true);$('om-retry').hidden=true;queueRetry();}return false;}finally{busy=false;if(!dirty&&!disposed){remoteRefresh=true;setTimeout(()=>load(),0);}}})();return saveChain;
+ }catch(e){protectDraft();const permanent=/^(22|23|42501)/.test(e.code||'')||/protected|Invalid|not allowed|permission|access required|View-only|Request identity/i.test(e.message);if(permanent)feedback(e.message,true);else{feedback(draftProtected?'Changes are kept on this device. Reconnecting…':'Changes are pending. Keep this tab open while reconnecting.',true);$('om-retry').hidden=true;queueRetry();}return false;}finally{busy=false;if(!dirty&&!disposed){remoteRefresh=true;setTimeout(()=>load(),0);}}})();return saveChain;
 }
 const sheetsYears=new Set();
 async function load(){if(busy||dirty||disposed||readBusy)return;readBusy=true;const ticket=++loadId,readGeneration=generation,readYear=state.year;try{const data=await rpc('read',{year:readYear});if(!investor&&!sheetsYears.has(state.year)){const yr=state.year;sheetsYears.add(yr);client.rpc('sheets_ensure_year',{yr}).then(({error})=>{if(error)sheetsYears.delete(yr);}).catch(()=>sheetsYears.delete(yr));}if(disposed||ticket!==loadId||readGeneration!==generation||readYear!==state.year||dirty||busy)return;

@@ -123,3 +123,5 @@
 .om .sheet-table .sheet-labels th.sheet-header-selected{box-shadow:inset 0 -2px #8eb7ed}
 .om .sheet-first-row-active .sheet-labels th.sheet-header-selected{box-shadow:none}
 .sheet-peer-selection{position:absolute;inset:0;border:2px solid var(--peer-color);pointer-events:none;z-index:4;background:transparent}
+
+.sheet-table td:hover>.sheet-peer-selection:after{content:attr(data-label);position:absolute;right:0;top:0;background:var(--peer-color);color:#fff;font:10px/14px Arial,sans-serif;padding:0 3px}
