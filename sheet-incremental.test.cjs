@@ -6,6 +6,6 @@ const ctx={window:{OrderCore:{},SheetModel:{}},document:{createElement:()=>newTa
 const g={period:'2026-11',cols:[{key:'note'},{key:'supplier'}],width:()=>100,slots:[1],rowsWindow:{start:0,end:1},prefix:[0,28],monthStarts:new Set(),formats:{},table:{querySelectorAll:q=>q==='tr[data-row]'?[{className:''}]:old},cellPresentation:new WeakMap()};
 g.tableShape=JSON.stringify([g.period,[['note',100],['supplier',100]],g.slots,g.rowsWindow,g.prefix,[]]);
 for(const c of old)g.cellPresentation.set(c,{html:c.innerHTML,style:'',className:'',readonly:'false'});
-ctx.window.OrderSheetGrid.prototype.applyTableHTML.call(g,'next html');assert.equal(old[0].writes,1);assert.equal(old[1].writes,0);assert.equal(old[0].peers[0],peer);assert.equal(old[0].innerHTML,'new');
+g.nextRowClasses=[''];g.nextCellPresentation=next.map(c=>({html:c.innerHTML,style:'',className:'',readonly:'false'}));ctx.window.OrderSheetGrid.prototype.applyTableHTML.call(g,'next html');assert.equal(old[0].writes,1);assert.equal(old[1].writes,0);assert.equal(old[0].peers[0],peer);assert.equal(old[0].innerHTML,'new');
 ctx.window.OrderSheetGrid.prototype.applyTableHTML.call(g,'same html');assert.equal(old[0].writes,1);assert.equal(old[1].writes,0);
 console.log('PASS: changed cell patches once, unchanged cell stays intact, peer marker retains identity');
