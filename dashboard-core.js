@@ -7,6 +7,7 @@ const investorFields=new Set(columns.map(c=>c[0]).filter(k=>!['purchase_id','pla
 const present=v=>v!==''&&v!==null&&v!==undefined;
 const cents=v=>Math.round(Number(v||0)*100);
 function link(value,kind){
+ const text=String(value).trim();if(kind==='order_id'&&/^\d{2}-\d{5}-\d{5}$/.test(text))return {text,url:'https://www.ebay.com/mesh/ord/details?mode=SH&orderid='+encodeURIComponent(text)+'&source=Orders'};
  let url;try{url=new URL(value);}catch{return {text:value,url:''};}
  if(!['https:','http:'].includes(url.protocol))return {text:value,url:''};
  const host=url.hostname.replace(/^www\./,'');let id='';
