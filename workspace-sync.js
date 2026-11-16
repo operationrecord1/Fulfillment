@@ -17,9 +17,10 @@ function merge(base,local,remote){
 }
 class DraftStore{
  constructor(storage,prefix){this.storage=storage;this.prefix=prefix;}
- save(year,month,value){this.storage.setItem(this.prefix+year+':'+month,JSON.stringify({version:1,...value}));}
- read(year,month){const raw=this.storage.getItem(this.prefix+year+':'+month);if(!raw)return null;const v=JSON.parse(raw);if(v.version!==1)throw Error('A saved draft needs recovery before editing.');return v;}
- remove(year,month){this.storage.removeItem(this.prefix+year+':'+month);}
+ save(year,month,value){this.storage.setItem(this.prefix+year+':'+month,JSON.stringify({version:1,...value}));this.storage.removeItem(this.prefix+year+':'+month+':editor');}
+ saveEditor(year,month,editor){const key=this.prefix+year+':'+month;if(!this.storage.getItem(key))return false;this.storage.setItem(key+':editor',JSON.stringify(editor));return true;}
+ read(year,month){const raw=this.storage.getItem(this.prefix+year+':'+month);if(!raw)return null;const v=JSON.parse(raw);if(v.version!==1)throw Error('A saved draft needs recovery before editing.');const editor=this.storage.getItem(this.prefix+year+':'+month+':editor');if(editor)v.editor=JSON.parse(editor);return v;}
+ remove(year,month){this.storage.removeItem(this.prefix+year+':'+month);this.storage.removeItem(this.prefix+year+':'+month+':editor');}
 }
 const api={merge,objectDelta,DraftStore,same,equivalent};root.WorkspaceSync=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

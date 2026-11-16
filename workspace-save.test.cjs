@@ -10,3 +10,5 @@ const source=fs.readFileSync('dashboard.js','utf8');
  assert.equal(await c.flush(),true);assert.equal(calls[1].request_id,original);assert.notEqual(calls[2].request_id,original);assert.equal(revision,2);assert.equal(c.dirty,false);assert.equal(c.bases['2026-11'].rows[0].data.note,'typed after lost response');
  console.log('PASS: actual load rejects stale response; lost acknowledgement retries same request and preserves later typing');
 })().catch(e=>{console.error(e);process.exitCode=1;});
+
+(async()=>{for(const interaction of ['editor','stopDrag','popup']){let reads=0;const ctx={busy:false,dirty:false,disposed:false,readBusy:false,grid:{[interaction]:{}},rpc:()=>{reads++;}};vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('async function load(){'),source.indexOf('\nfor(let y=2000')),ctx);await ctx.load();assert.equal(reads,0,interaction+' must defer refresh');}console.log('PASS: background refresh defers during editing, dragging and popup interaction');})();

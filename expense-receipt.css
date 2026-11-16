@@ -88,3 +88,7 @@
 .receipt-viewer{isolation:isolate;animation:none;transition:none}
 .receipt-viewer::backdrop{backdrop-filter:none;-webkit-backdrop-filter:none;animation:none;transition:none}
 .receipt-viewer .receipt-viewer-close,.receipt-viewer .receipt-viewer-close:hover,.receipt-viewer .receipt-viewer-close:active{animation:none;transition:none;transform:none;filter:none;box-shadow:none}
+
+/* The menu is outside the input wrapper, so size its icons explicitly. */
+.om .receipt-type-menu button{height:36px;min-height:36px;box-sizing:border-box}
+.om .receipt-type-menu svg{display:block;width:17px;height:17px;flex:0 0 17px;fill:none;stroke:currentColor;stroke-width:1.6}

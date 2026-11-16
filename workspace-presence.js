@@ -11,7 +11,7 @@ function mount({client,storeId,sessionId,grid,period,onSaved}){
  channel.on('broadcast',{event:'saved'},()=>onSaved());
  channel.subscribe(status=>{joined=status==='SUBSCRIBED';if(joined){last='';channel.track({session:sessionId}).catch(()=>{});publish();onSaved();}});
  timer=setInterval(publish,250);
- const onPaint=()=>{paint();publish();};grid.host.addEventListener('sheet-selection',onPaint);
+ let paintedTree=grid.table.firstElementChild;const onPaint=()=>{if(paintedTree!==grid.table.firstElementChild){paintedTree=grid.table.firstElementChild;paint();}};grid.host.addEventListener('sheet-selection',onPaint);
  return {send:message=>channel.send(message),dispose(){disposed=true;clearInterval(timer);grid.host.removeEventListener('sheet-selection',onPaint);client.removeChannel(channel);grid.host.querySelectorAll('.sheet-peer-selection').forEach(el=>el.remove());}};
 }
 root.WorkspacePresence={mount};

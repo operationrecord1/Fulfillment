@@ -11,3 +11,10 @@ local=structuredClone(base);remote=structuredClone(base);local.formats={1:{order
 const memory=new Map(),storage={setItem:(k,v)=>memory.set(k,v),getItem:k=>memory.get(k),removeItem:k=>memory.delete(k)};const draft=new S.DraftStore(storage,'test:');draft.save(2026,11,{base,local,pending:{payload:{request_id:'stable'}}});assert.equal(draft.read(2026,11).pending.payload.request_id,'stable');assert.equal(draft.read(2026,12),null);draft.remove(2026,11);assert.equal(draft.read(2026,11),null);
 assert(S.equivalent(base,structuredClone(base)));assert(!S.equivalent(base,local));
 console.log('PASS: independent cell merge, concurrent insert identity, protected delete conflicts, formatting merge, durable request identity');
+
+// Keystrokes persist only an editor journal; recovery composes it with the durable snapshot.
+draft.save(2026,11,{base,local,editor:null});const original=memory.get('test:2026:11');
+assert(draft.saveEditor(2026,11,{r:2,c:3,value:'typing'}));assert.equal(memory.get('test:2026:11'),original);assert.equal(draft.read(2026,11).editor.value,'typing');
+draft.save(2026,11,{base,local,editor:null});assert.equal(draft.read(2026,11).editor,null);
+draft.saveEditor(2026,11,{r:2,c:3,value:'pending'});draft.remove(2026,11);assert.equal(memory.has('test:2026:11:editor'),false);assert.equal(draft.saveEditor(2026,11,{}),false);
+console.log('PASS: lightweight editor journal recovery and cleanup');

@@ -94,10 +94,11 @@ class SheetGrid{
  }
  paint(){
   this.table.classList.toggle("sheet-first-row-active",this.selection.kind==="cell"&&this.selection.r===this.slots[0]&&this.selection.er===this.slots[0]);
-  this.table.querySelectorAll("td[data-r][data-c]").forEach(td=>td.classList.toggle("sheet-has-note",!!this.formats[td.dataset.r]?.[this.cols[+td.dataset.c]?.key]?.cellNote));
+
   const s=this.selection,b=this.bounds(),active=this.activeCell(),cb=this.clip?.period===this.period?this.clip.bounds:null;
   // Reuse rendered nodes and only write flags that changed; dragging must not rebuild the grid.
   if(this.paintTree!==this.table.firstElementChild){
+  this.table.querySelectorAll("td[data-r][data-c]").forEach(td=>td.classList.toggle("sheet-has-note",!!this.formats[td.dataset.r]?.[this.cols[+td.dataset.c]?.key]?.cellNote));
    this.paintTree=this.table.firstElementChild;this.paintCells=Array.from(this.table.querySelectorAll('[data-r]'));this.paintColumns=Array.from(this.table.querySelectorAll('[data-col]'));this.paintRows=Array.from(this.table.querySelectorAll('[data-row-head]'));this.paintFlags=new WeakMap();
   }
   const classes=['sheet-selected','sheet-active','sheet-range-selected','sheet-copied','sheet-copy-top','sheet-copy-bottom','sheet-copy-left','sheet-copy-right'];
@@ -305,7 +306,7 @@ class SheetGrid{
  commitEditor(){if(!this.editor)return true;const {r,c}=this.editCell,value=this.editor.value;let normalized;try{normalized=S.normalize(this.cols[c].key,value,this.year,this.month,this.platforms);}catch(e){this.warnInput(e.message);this.options.onEditorDraft?.();return false;}this.cancelEditor();return this.setCell(r,c,normalized);}
  snapshot(){return clone({rows:this.rows,formats:this.formats,heights:this.layout()});}
  checkpoint(){if(this.options.onCheckpoint){this.options.onCheckpoint(this.snapshot());return;}this.history.push(this.snapshot());if(this.history.length>50)this.history.shift();this.future=[];}
- changed(){this.rows=this.rows.filter(r=>S.hasInput(r.data)).sort((a,b)=>a.position-b.position);this.options.onChange(this.rows,this.formats);this.render();this.say('');}
+ changed(){this.rows=this.rows.filter(r=>S.hasInput(r.data)).sort((a,b)=>a.position-b.position);const tree=this.table?.firstElementChild;this.options.onChange(this.rows,this.formats);if(this.table?.firstElementChild===tree)this.render();this.say('');}
  ensure(rows,r){let row=rows.find(x=>x.position===r);if(!row){row={_key:crypto.randomUUID(),year:this.year,month:this.month,position:r,data:{}};rows.push(row);}return row;}
  assign(row,c,value){const field=this.cols[c].key;row.data[field]=value;if(['order_id','purchase_id'].includes(field)){const p=C.link(String(value),field);row.data[field]=p.text;row.data[field==='order_id'?'order_url':'purchase_url']=p.url;} }
  setCell(r,c,value){if(!this.canEdit(r,c))return false;try{value=S.normalize(this.cols[c].key,value,this.year,this.month,this.platforms);if(String(this.raw(r,c))===String(value)&&!(value===''&&this.cols[c].type==='select'&&this.formats[r]?.[this.cols[c].key]?.options?.length))return true;this.checkpoint();if(value===''&&this.cols[c].type==='select'){const key=this.cols[c].key,local=this.formats[r]?.[key]?.options;if(local)window.SheetFormatModel.patch(this.formats,r,key,{options:[]});}this.assign(this.ensure(this.rows,r),c,value);if(this.formats[r]?.[this.cols[c].key])delete this.formats[r][this.cols[c].key].href;this.changed();return true;}catch(e){this.say(e.message,true);return false;}}
