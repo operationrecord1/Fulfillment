@@ -7,3 +7,5 @@
 .om .orders-chart>header{display:block;position:static;inset:auto;height:auto;min-height:0;width:auto;padding:0;margin:0;border:0;background:transparent;box-shadow:none;backdrop-filter:none;z-index:auto}
 .om .orders-chart>header h3{display:block;margin:0 0 5px}.om .orders-chart>header p{display:block;margin:0;line-height:1.5}
 @media(max-width:650px){body.order-workspace .om>.om-head{flex-wrap:wrap;height:auto!important;gap:7px!important;padding:8px!important}.om .om-head .workspace-primary-nav{flex:1 0 calc(100% - 42px);order:1;margin:0;justify-content:flex-start}.om .om-head>.om-store-mark{order:0}.om .om-head .om-report-nav{order:2!important;margin-left:auto!important}.om .om-head>.om-profile{order:3!important;margin-left:0!important}.om .om-profile-trigger{min-height:38px!important}.om .workspace-primary-nav a{padding:8px 12px;font-size:12px}}
+@media(max-width:1100px){.om .commerce-orders .ebay-table td{height:auto!important;min-height:0;align-self:stretch;text-align:left}.om .commerce-orders .ebay-table tr{align-items:stretch}}
+@media(max-width:650px){.orders-trend-chart .orders-axis{font-size:24px}}
