@@ -5,7 +5,7 @@ const formatAmount=x=>x?.value!=null?new Intl.NumberFormat('en-US',{style:'curre
 const date=x=>x?new Date(x).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'America/Los_Angeles'}):'—';
 const human=x=>String(x||'Unknown').toLowerCase().replaceAll('_',' ').replace(/^./,x=>x.toUpperCase());
 const safeImage=x=>{try{const u=new URL(x);return u.protocol==='https:'&&/(^|\.)ebayimg\.com$/.test(u.hostname)?u.href:'';}catch{return '';}};
-window.EbayWorkspace={mount({container,client,storeId,view='orders',navigate,workspace,readWorkspace}){
+window.EbayWorkspace={mount({container,client,storeId,view='orders',navigate,workspace,readWorkspace,onExpenses}){
  let disposed=false,request=0,page=1,query='',filter=view==='listings'?'ACTIVE':'',total=0,timer,debounce,rows=[],rowSignature='',inflight=0,polls=0;
  const icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-2l2 2M4 17l2 2a7 7 0 0 0 12-2"/></svg>';
  container.className='ebay-workspace commerce-'+view;
@@ -13,7 +13,8 @@ window.EbayWorkspace={mount({container,client,storeId,view='orders',navigate,wor
  const $=s=>container.querySelector(s),notice=$('.ebay-notice');
  if(view==='orders'){$('.ebay-sync-time').classList.add('orders-sync-history');container.prepend($('.ebay-sync-time'));}
  let size=25,overview=null;
- if(view==='orders'){const overviewHost=document.createElement('section');overviewHost.className='orders-overview';$('.ebay-metrics').before(overviewHost);$('.ebay-metrics').hidden=true;overview=window.OrdersOverview.mount(overviewHost,{initial:workspace,read:readWorkspace,onPeriod:()=>{page=1;rows=[];rowSignature='';$('tbody').replaceChildren();$('.ebay-range').textContent='Loading selected period…';load();}});}
+ if(view==='orders'){const overviewHost=document.createElement('section');overviewHost.className='orders-overview';$('.ebay-metrics').before(overviewHost);$('.ebay-metrics').hidden=true;overview=window.OrdersOverview.mount(overviewHost,{initial:workspace,read:readWorkspace,onExpenses,onPeriod:()=>{page=1;rows=[];rowSignature='';$('tbody').replaceChildren();$('.ebay-range').textContent='Loading selected period…';load();}});}
+ if(view==='orders'){const canvas=document.createElement('div');canvas.className='orders-page-canvas';while(container.firstChild)canvas.append(container.firstChild);container.append(canvas);}
  function metric(label,value,note=''){return `<article><span>${label}</span><strong>${Number(value||0).toLocaleString()}</strong><small>${note}</small></article>`;}
  const muted=text=>'<span class="commerce-unlinked">'+esc(text)+'</span>';
  const link=(text,href)=>P.url(href)?'<a class="commerce-link" href="'+esc(P.url(href))+'" target="_blank" rel="noopener noreferrer">'+esc(text)+' <span aria-hidden="true">↗</span></a>':esc(text);

@@ -41,7 +41,7 @@ function aggregate(rows,expenses,investor=false,taxPercentage=15){
  const expense=expenses.reduce((s,e)=>s+cents(e.amount),0),tax=Math.round(Math.max(0,gross-expense)*(Number.isFinite(Number(taxPercentage))?Math.max(0,Number(taxPercentage)):15)/100),count=orders.size;
  return {groups:gs,count,revenue,cost,gross,expense,tax,net:gross-expense-tax,margin:margins.length?margins.reduce((a,b)=>a+b,0)/margins.length:0,avgOrder:count?Math.round(revenue/count):0,avgProfit:count?Math.round(gross/count):0,avgDaily:daily.size?count/daily.size:0,sizes,points:[...daily].sort(([a],[b])=>a.localeCompare(b))};
 }
-// Annual tax is the sum of monthly liabilities; a loss month cannot undo another month's tax.
+// Apply the configured reporting tax rate to the full-year result.
 function aggregateYear(rows,expenses,investor=false,taxPercentage=15){
  const periods=new Map(),period=(year,month)=>String(year||'')+'-'+String(month).padStart(2,'0');
  const bucket=key=>{if(!periods.has(key))periods.set(key,{rows:[],expenses:[]});return periods.get(key);};
@@ -50,8 +50,10 @@ function aggregateYear(rows,expenses,investor=false,taxPercentage=15){
  const ordered=[...periods.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([,value])=>value);
  const result=aggregate(ordered.flatMap(p=>p.rows),expenses,investor,taxPercentage);
  const monthly=ordered.map(p=>aggregate(p.rows,p.expenses,investor,taxPercentage));
- for(const key of ['gross','expense','tax','net'])result[key]=monthly.reduce((sum,a)=>sum+a[key],0);
- result.taxableAmount=monthly.reduce((sum,a)=>sum+Math.max(0,a.gross-a.expense),0);
+ for(const key of ['gross','expense'])result[key]=monthly.reduce((sum,a)=>sum+a[key],0);
+ result.taxableAmount=Math.max(0,result.gross-result.expense);
+ result.tax=Math.round(result.taxableAmount*(Number.isFinite(Number(taxPercentage))?Math.max(0,Number(taxPercentage)):15)/100);
+ result.net=result.gross-result.expense-result.tax;
  return result;
 }
 function duplicates(rows,fields=['order_id','purchase_id']){const marks=new Set();for(const key of fields){const runs=new Map();let prev='',month=null,position=null;for(const r of rows){const value=r.data[key]||'';if(value){if(!runs.has(value))runs.set(value,[]);if(value!==prev||month!==r.month||(r.position!==undefined&&position!==null&&r.position!==position+1))runs.get(value).push([]);runs.get(value).at(-1).push(r);}prev=value;month=r.month;position=r.position??null;}for(const run of runs.values())if(run.length>1)run.flat().forEach(r=>marks.add(r.id||r._key));}return marks;}

@@ -16,10 +16,12 @@ const taxRows=[{id:'tax',position:1,month:11,data:{order_id:'tax',earning:100,pr
 const yearlyRows=[row('jan',{order_id:'shared',purchase_id:'shared',earning:100,product_cost:0,date:'2026-01-01'},1),row('feb',{order_id:'loss',earning:10,product_cost:60,date:'2026-02-01'},2),row('mar',{order_id:'shared',purchase_id:'shared',earning:20,date:'2026-03-01'},3),row('apr',{order_id:'shared',purchase_id:'shared',product_cost:5,date:'2026-04-01'},4)];
 const yearlyExpenses=[{amount:10,date:'2026-01-02'},{amount:3,date:'2026-05-01'}];
 const annual=C.aggregateYear(yearlyRows,yearlyExpenses,false,15);
-assert.equal(annual.gross,5000);assert.equal(annual.tax,1350);assert.equal(annual.taxableAmount,9000);assert.equal(annual.net,2350);assert.equal(annual.expense,1300);
+assert.equal(annual.gross,5000);assert.equal(annual.tax,555);assert.equal(annual.taxableAmount,3700);assert.equal(annual.net,3145);assert.equal(annual.expense,1300);
 assert.equal(annual.groups.length,4);assert.equal(annual.groups[2].profit,null);assert.equal(annual.groups[3].profit,null);
 const monthlyTotals=Array.from({length:12},(_,i)=>C.aggregate(yearlyRows.filter(r=>r.month===i+1),yearlyExpenses.filter(e=>Number(e.date.slice(5,7))===i+1),false,15));
-for(const key of ['gross','tax','expense','net'])assert.equal(annual[key],monthlyTotals.reduce((sum,a)=>sum+a[key],0));
+for(const key of ['gross','expense'])assert.equal(annual[key],monthlyTotals.reduce((sum,a)=>sum+a[key],0));
 assert.equal(C.aggregateYear([],[],false,15).net,0);
 assert.equal(C.aggregateYear(yearlyRows,yearlyExpenses,false,0).tax,0);
-console.log('PASS: annual metrics sum monthly tax and profit, expense-only months, and independent cross-month groups');
+console.log('PASS: annual metrics apply tax to annual profit, expense-only months, and independent cross-month groups');
+
+const annualLoss=C.aggregateYear(yearlyRows,[{amount:100,date:'2026-05-01'}],false,15);assert.equal(annualLoss.tax,0);assert.equal(annualLoss.net,-5000);

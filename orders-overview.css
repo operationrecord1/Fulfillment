@@ -101,3 +101,21 @@
 .om .orders-period-popup button{position:static;inset:auto}
 .om .commerce-orders .orders-data-basis{margin-top:6px}
 .om .commerce-listings .ebay-resync{display:none}
+
+/* One page-wide scroll surface, retaining Dashboard renderers. */
+.om .ebay-workspace.commerce-orders{background:#f3f6f5;overflow:auto;scrollbar-gutter:stable;padding-bottom:10px}
+.om .orders-page-canvas{min-width:1080px;width:100%}
+.om .orders-kpi-scroll,.om .orders-chart-scroll{overflow:visible}
+.om .orders-sync-history{display:none}
+.om .commerce-orders .ebay-data-panel{background:transparent;border:0;box-shadow:none;border-radius:0}
+.om .commerce-orders .ebay-toolbar{background:transparent;border-bottom:1px solid #e0e8e4;padding:10px 0}
+.om .orders-period-trigger,.om .orders-period-trigger:hover,.om .orders-period-trigger[aria-expanded=true]{background:transparent;box-shadow:none;color:#111;font-size:23px;font-weight:650;line-height:1.2;letter-spacing:normal}
+.om .orders-period-trigger span{white-space:normal;text-align:center}
+.om .orders-kpis>.om-kpi>strong{font-size:clamp(19px,1.6vw,23px);white-space:nowrap;font-variant-numeric:tabular-nums}
+.om .orders-period-trigger{font-size:clamp(19px,1.6vw,23px)}
+.om .orders-kpis .orders-add-expense{position:static;align-self:center;display:flex;align-items:center;gap:4px;font-size:10px;padding:2px 5px;margin-top:3px;background:transparent;color:#176650}
+.om .orders-add-expense svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.7}
+.om .orders-kpis>[data-metric=expense]{padding-bottom:4px}
+@media(max-width:1400px){.om .orders-charts.om-charts{grid-template-columns:200px 200px minmax(0,1fr)}.om .orders-charts>.om-panel:nth-child(-n+2) .om-chart{max-width:170px;margin-inline:auto}.om .orders-charts>.om-panel{padding:12px 9px}}
+
+.om .orders-trend-chart{overflow:visible}
