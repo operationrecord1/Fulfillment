@@ -20,13 +20,13 @@ const api={carrier,supplierUrl,phoneDisplay,mount({container,client,storeId,onSa
 
  const pickers={};
  for(const native of form.querySelectorAll('select')){
-  const isStatus=native.name==='status',label=native.getAttribute('aria-label'),wrap=document.createElement('div');native.hidden=true;wrap.className='order-status-picker';native.after(wrap);
+  const isStatus=native.name==='status',label=native.getAttribute('aria-label'),wrap=document.createElement('div');native.hidden=true;wrap.className='order-status-picker'+(isStatus?' editor-status-colors':'');native.after(wrap);
   const id='editor-options-'+native.name;
   wrap.innerHTML='<button type="button" class="order-status-trigger" role="combobox" aria-label="'+esc(label)+'" aria-haspopup="listbox" aria-expanded="false" aria-controls="'+id+'"></button><div id="'+id+'" role="listbox" aria-label="'+esc(label)+' options" hidden></div>';
   const trigger=wrap.querySelector('button'),menu=wrap.querySelector('[role=listbox]');
   const colors=value=>isStatus?(root.OrderCore.statusColors[value]||['#ffffff','#515455']):['#ffffff','#515455'];
   const icon=value=>isStatus&&value?root.OrderCore.statusIcon(value):'';
-  const render=()=>{const palette=colors(native.value);trigger.style.backgroundColor=palette[0];trigger.style.color=palette[1];trigger.innerHTML=icon(native.value)+'<span>'+esc(native.selectedOptions[0]?.text||'')+'</span><i aria-hidden="true"></i>';menu.innerHTML=Array.from(native.options).map(o=>{const p=colors(o.value);return '<button type="button" role="option" aria-selected="'+(o.value===native.value)+'" data-value="'+esc(o.value)+'" style="--option-bg:'+p[0]+';--option-color:'+p[1]+'">'+icon(o.value)+'<span>'+esc(o.text)+'</span></button>';}).join('');};
+  const render=()=>{const palette=colors(native.value);trigger.style.backgroundColor=palette[0];trigger.style.color=palette[1];trigger.innerHTML=icon(native.value)+'<span>'+esc(native.selectedOptions[0]?.text||'')+'</span><i aria-hidden="true"></i>';menu.innerHTML=Array.from(native.options).map(o=>{const p=colors(o.value);return '<button type="button" role="option" aria-selected="'+(o.value===native.value)+'" data-value="'+esc(o.value)+'" style="--option-bg:'+p[0]+';--option-icon:'+(p[1]==='#ffffff'?p[0]:p[1])+'">'+icon(o.value)+'<span>'+esc(o.text)+'</span></button>';}).join('');};
   const toggle=open=>{if(open)Object.values(pickers).forEach(p=>p.close());menu.hidden=!open;trigger.setAttribute('aria-expanded',String(open));if(open){const bounds=dialog.getBoundingClientRect(),r=trigger.getBoundingClientRect();menu.style.top='calc(100% + 4px)';menu.style.bottom='auto';if(r.bottom+menu.offsetHeight+4>bounds.bottom-12&&r.top-menu.offsetHeight-4>=bounds.top+12){menu.style.top='auto';menu.style.bottom='calc(100% + 4px)';}}};
   pickers[native.name]={render,close:()=>toggle(false)};render();trigger.onclick=()=>toggle(menu.hidden);
   trigger.onkeydown=e=>{if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();toggle(true);(menu.querySelector('[aria-selected=true]')||menu.firstElementChild).focus();}if(e.key==='Escape'){e.preventDefault();e.stopPropagation();toggle(false);}};
