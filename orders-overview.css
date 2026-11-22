@@ -62,3 +62,6 @@
 .om .orders-kpi strong{font-size:22px}
 .om .orders-period-trigger{font-size:15px}
 }
+/* Orders uses a consistent 10px gutter, including wide desktop screens. */
+.om .ebay-workspace.commerce-orders{padding-left:10px;padding-right:10px}
+.om .commerce-orders>.orders-overview,.om .commerce-orders>.ebay-page-head,.om .commerce-orders>.ebay-event-status,.om .commerce-orders>.ebay-data-panel,.om .commerce-orders>.ebay-footnote{max-width:none}
