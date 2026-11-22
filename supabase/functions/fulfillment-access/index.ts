@@ -13,13 +13,13 @@ const secretKeys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}") as R
 const serviceKey = secretKeys.default ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const admin = createClient(supabaseUrl, serviceKey, { auth: { autoRefreshToken: false, persistSession: false } });
 const appUrl = "https://fulfilment.site";
-const fromAddress = Deno.env.get("FULFILLMENT_FROM_EMAIL") ?? "Fulfillment <no-reply@mail.fulfilment.site>";
+const fromAddress = Deno.env.get("FULFILLMENT_FROM_EMAIL") ?? "Fulfilment <no-reply@mail.fulfilment.site>";
 const ownerEmail = Deno.env.get("FULFILLMENT_ADMIN_EMAIL") ?? "operationrecord1@gmail.com";
 
 function esc(v: string) { return v.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]!)); }
 async function sendMail(to:string, subject:string, htmlContent:string) {
   const key=Deno.env.get("BREVO_API_KEY"); if(!key)return false;
-  const response=await fetch("https://api.brevo.com/v3/smtp/email",{method:"POST",headers:{"api-key":key,"accept":"application/json","content-type":"application/json"},body:JSON.stringify({sender:{name:"Fulfillment",email:fromAddress.match(/<([^>]+)>/)?.[1]??fromAddress},to:[{email:to}],subject,htmlContent})});
+  const response=await fetch("https://api.brevo.com/v3/smtp/email",{method:"POST",headers:{"api-key":key,"accept":"application/json","content-type":"application/json"},body:JSON.stringify({sender:{name:"Fulfilment",email:fromAddress.match(/<([^>]+)>/)?.[1]??fromAddress},to:[{email:to}],subject,htmlContent})});
   if(!response.ok)throw new Error("Email provider returned " + response.status);
   return true;
 }
@@ -53,7 +53,7 @@ async function handleAccessStatus(rec:any,old:any){
   if(!Deno.env.get("BREVO_API_KEY")){await revertStatus("access_requests",rec.id);return;}
   const {data:r,error}=await admin.from("access_requests").select("*").eq("id",rec.id).maybeSingle();if(error)throw error;if(!r)return;
   if(rec.status==="rejected"){
-    const sent=await sendMail(r.email,"Update on your Fulfillment access request",shell("Request update",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+', your Fulfillment access request was not approved. If you believe this is a mistake, contact the Fulfillment owner.</p>'));
+    const sent=await sendMail(r.email,"Update on your Fulfilment access request",shell("Request update",'<p style="font-size:15px;line-height:1.7">Hello '+esc(r.full_name)+', your Fulfilment access request was not approved. If you believe this is a mistake, contact the Fulfilment owner.</p>'));
     if(!sent){await revertStatus("access_requests",rec.id);return;}
     const rejectedAccount=await findUser(r.email);
     if(rejectedAccount){
@@ -98,7 +98,7 @@ async function handleAccessStatus(rec:any,old:any){
   if(profileError){if(created)await admin.auth.admin.deleteUser(account.id);await revertStatus("access_requests",rec.id);throw profileError;}
   let sent=false;
   try{
-    sent=await sendMail(r.email,"Your Fulfillment access is approved",approvalEmail(r.full_name,roleLabel,store?.name,passwordLink));
+    sent=await sendMail(r.email,"Your Fulfilment access is approved",approvalEmail(r.full_name,roleLabel,store?.name,passwordLink));
   }catch(e){await rollback();throw e;}
   if(!sent){await rollback();return;}
 }
@@ -107,18 +107,18 @@ async function handleDeletionStatus(rec:any,old:any){
   if(!Deno.env.get("BREVO_API_KEY")){await revertStatus("account_deletion_requests",rec.id);return;}
   const {data:r,error}=await admin.from("account_deletion_requests").select("*").eq("id",rec.id).maybeSingle();if(error)throw error;if(!r)return;
   if(rec.status==="rejected"){
-    await sendMail(r.email,"Update on your Fulfillment account request",shell("Request update",'<p style="font-size:15px;line-height:1.7">Your account deletion request was not approved. Your account remains active.</p>'));return;
+    await sendMail(r.email,"Update on your Fulfilment account request",shell("Request update",'<p style="font-size:15px;line-height:1.7">Your account deletion request was not approved. Your account remains active.</p>'));return;
   }
   if(r.user_id){const {error:de}=await admin.auth.admin.deleteUser(r.user_id);if(de){await revertStatus("account_deletion_requests",rec.id);throw de;}}
-  try{await sendMail(r.email,"Your Fulfillment account was deleted",shell("Account deleted",'<p style="font-size:15px;line-height:1.7">Your request was approved and your Fulfillment account has been deleted.</p>'));}catch(e){console.error("deletion confirmation email failed",e);}
+  try{await sendMail(r.email,"Your Fulfilment account was deleted",shell("Account deleted",'<p style="font-size:15px;line-height:1.7">Your request was approved and your Fulfilment account has been deleted.</p>'));}catch(e){console.error("deletion confirmation email failed",e);}
 }
 async function notifyRequest(r:any){
   const label=r.requested_role==="staff"?"Employee":"Investor";
   const applicant=acknowledgementEmail(r.full_name,label,r.store_name);
   const owner=ownerNotification(r,label);
-  const a=await sendMail(r.email,"We received your Fulfillment access request",applicant);
+  const a=await sendMail(r.email,"We received your Fulfilment access request",applicant);
   if(!a)return {email_sent:false,owner_notified:false};
-  const b=await sendMail(ownerEmail,"New Fulfillment access request",owner);
+  const b=await sendMail(ownerEmail,"New Fulfilment access request",owner);
   return {email_sent:true,owner_notified:b};
 }
 
@@ -200,7 +200,7 @@ Deno.serve(async(req:Request)=>{
       let email_sent=false,owner_notified=false;
       try{const [a,b]=await Promise.all([
         sendMail(user.email!,"We received your account deletion request",shell("Deletion request received",'<p style="font-size:15px;line-height:1.7">Your request is pending owner review. Your account remains active unless the owner approves deletion.</p>')),
-        sendMail(ownerEmail,"New Fulfillment account deletion request",shell("Deletion request for review",'<p style="font-size:15px;line-height:1.7">Account '+esc(user.email||"")+' requested deletion. Request ID: '+r.id+'</p>')),
+        sendMail(ownerEmail,"New Fulfilment account deletion request",shell("Deletion request for review",'<p style="font-size:15px;line-height:1.7">Account '+esc(user.email||"")+' requested deletion. Request ID: '+r.id+'</p>')),
       ]);email_sent=a;owner_notified=b;}catch(e){console.error("deletion email failed",e);}
       return json({ok:true,request_id:r.id,email_sent,owner_notified});
     }
