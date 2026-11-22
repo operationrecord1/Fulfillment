@@ -126,3 +126,15 @@
 .om .orders-kpis .orders-add-expense:hover{background:#edf3fa;border-color:#bacbdb}
 
 .om .orders-period-trigger:hover{font-size:clamp(19px,1.6vw,23px)}
+
+/* Shared white commerce canvas: scrolling belongs to the whole page. */
+body.order-workspace,body.order-workspace .info-view,.om .om-main,.om .ebay-workspace.commerce-orders,.om .ebay-workspace.commerce-listings{background:#fff}
+.om .ebay-workspace.commerce-listings{padding:8px 10px 10px;overflow:auto;scrollbar-gutter:stable}
+.om .listings-page-canvas{width:100%;min-width:1420px}
+.om .commerce-listings .ebay-page-head,.om .commerce-listings .ebay-event-status,.om .commerce-listings .ebay-metrics,.om .commerce-listings .ebay-sync-time,.om .commerce-listings .ebay-filters select,.om .commerce-listings .ebay-footnote{display:none}
+.om .ebay-workspace .ebay-data-panel{background:#fff;border:0;border-radius:0;box-shadow:none;overflow:visible}
+.om .ebay-workspace .ebay-table-scroll{overflow:visible;max-height:none;min-height:0;scrollbar-gutter:auto}
+.om .ebay-workspace .ebay-toolbar{background:#fff;padding:12px 0;border-bottom:1px solid #e0e5e9}
+.om .ebay-workspace .ebay-table th{background:#fff}
+.om .ebay-workspace .ebay-pagination{background:#fff}
+.om .orders-charts>.om-panel,.om .orders-kpis>.om-kpi{background:#fff;box-shadow:none}
