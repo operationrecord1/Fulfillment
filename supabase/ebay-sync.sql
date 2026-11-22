@@ -58,10 +58,15 @@ begin
   if j.resource='listings' and payload ? 'reconcile_active_before' then
    update fulfillment_private.ebay_records set data=data||'{"catalog_present":false}'::jsonb where store_id=target and resource='listings' and data#>>'{listing,listingTerms,lifecycleTerms,listingStatus}'='ACTIVE' and updated_at<(payload->>'reconcile_active_before')::timestamptz;
   end if;
+  -- Never acknowledge an event until a fresh provider record has actually been saved.
+  update fulfillment_private.ebay_notification_inbox e set processed_at=now(),disposition='processed'
+  where e.store_id=target and e.resource=j.resource and e.processed_at is null and e.disposition='pending'
+  and e.received_at<=(payload->>'watermark')::timestamptz
+  and exists(select 1 from fulfillment_private.ebay_records r where r.store_id=target and r.resource=j.resource and r.external_id=e.entity_id and r.updated_at>=e.received_at);
   update fulfillment_private.ebay_sync_jobs set cursor=coalesce(payload->'cursor','{}'),
    watermark=case when (payload->>'done')::boolean then (payload->>'watermark')::timestamptz else watermark end,
    last_success=case when (payload->>'done')::boolean then now() else last_success end,
-   available_at=now()+make_interval(secs=>case when not (payload->>'done')::boolean then 0 when resource='orders' then 120 when resource in ('traffic','listing_traffic') then 21600 else 600 end),
+   available_at=now()+make_interval(secs=>case when not (payload->>'done')::boolean then 0 when resource in ('orders','listings') and exists(select 1 from fulfillment_private.ebay_notification_subscriptions s where s.store_id=target and s.status='ENABLED' and s.topic=case when j.resource='orders' then 'ORDER_CONFIRMATION' else 'LISTING' end) then 21600 when resource='orders' then 120 when resource in ('traffic','listing_traffic') then 21600 else 600 end),
    lease_id=null,lease_until=null,last_error=null,failures=0 where store_id=target and resource=j.resource;
  elsif action='fail' then
   update fulfillment_private.ebay_sync_jobs set last_error=left(payload->>'error',160),failures=failures+1,
