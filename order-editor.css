@@ -35,4 +35,5 @@
 .order-edit-dialog .buyer-copy-hint{margin:3px 0 0}.order-edit-dialog .buyer-grid{padding-top:12px}
 
 .om .order-edit-dialog .order-status-picker [role=option] .status-symbol{color:var(--option-icon)}
-.order-edit-dialog .editor-status-colors [role=option][data-value=""] span,.order-edit-dialog .editor-status-colors .order-status-trigger:not(:has(svg)) span{margin-left:29px}
+.order-edit-dialog .editor-status-colors [role=option][data-value=""] span{margin-left:29px}
+.order-edit-dialog .editor-status-colors .order-status-trigger:not(:has(svg)) span{margin-left:0}
