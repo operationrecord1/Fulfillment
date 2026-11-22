@@ -24,3 +24,23 @@ The approved Investor role is view-only, but the business data fields/features t
 Apply [reset-policy.sql](./reset-policy.sql) to the Supabase project. The `auth.users` trigger stores each successful recovery send by Auth user ID, so browsers share the same cooldown. Sends 1–5 wait 60 seconds, 6–10 wait 120 seconds, 11–19 wait 300 seconds, and the twentieth send starts a 24-hour lock. The public status RPC returns the next available time without exposing the count. The website renders that time as a countdown.
 
 Keep the verified Brevo sender in Supabase Auth, the 30-minute Email OTP expiry, and the branded recovery template. Supabase’s project-wide email quota and Auth limits still apply independently. Unknown email addresses get a neutral response and do not receive mail.
+
+## eBay connection and read mirror (22 November 2026)
+
+The existing Creston Global Production OAuth application is connected to Fulfilment. Do not recreate its keyset or repeat seller consent during routine development. The callback is `ebay-connect/callback` on this Supabase project, and the browser entry/status page is `https://fulfilment.site/#connect-ebay`. Client credentials and seller tokens are in encrypted Vault, not the repository. The refresh grant renews access tokens and preserves the existing long-lived refresh token. Revoked or expired seller authorization still requires consent again.
+
+Deployment order for a new environment: `ebay-connect.sql`, `ebay-connect` function, `ebay-sync.sql`, `ebay-read.sql`, `ebay-sync` function, then `ebay-sync-schedule.sql`. Production has the corresponding remote migrations applied. The function verifies the existing private webhook secret itself, so gateway JWT verification is disabled. Neither browser role can invoke its worker RPC or read private records directly. The two browser read RPCs validate the active profile and assigned store; investors cannot access this integration.
+
+`fulfillment-ebay-sync` runs every minute independently of browser activity. Each invocation processes up to 32 pages within a 45-second work budget. Store leases serialize refresh/import operations. Records are upserted by store, resource and eBay ID; a page and its cursor commit together. Failures retain the previous records and cursor and retry with bounded backoff. Orders poll after 120 seconds, listings/returns/transactions after 600 seconds, and analytics after six hours. These are scheduling targets, not guaranteed eBay delivery latency.
+
+Current coverage:
+
+- Orders: first import covers 89 days, then last-modified increments with a five-minute overlap. Full eBay order payloads include monetary, line-item, payment, shipment and cancellation information.
+- Listings: active, ended and scheduled listing searches, including products created outside the Inventory API. After the initial catalog, modified-date increments cover all three states. Titles, image URLs, SKU, available/sold quantities, price and status are retained.
+- Returns: recent 89-day return requests using the Post-Order OAuth `IAF` authorization scheme.
+- Financial transactions: recent 89-day monetary transactions, including the refund/fee types supplied by eBay. No refund is issued by this integration.
+- Traffic: up to one year of daily US marketplace reports in bounded windows, then recent 30-day refreshes. Listing-level traffic covers the recent 30-day period and is batched after the listing catalog is available. API response coverage can differ from the requested date range; retain reported dates and applicability flags.
+
+Imported records are separate from the manual spreadsheet/dashboard. The connection page offers an authorized, paginated data preview; it is not the planned final Orders/Listings interface. Notifications/webhooks, multi-marketplace analytics, older order/financial backfills and yearly per-listing analytics are not implemented by this release. Do not label these features enabled merely because OAuth granted the corresponding scopes. Future workers must reuse the saved connection and respect eBay per-API quotas; evaluate quota capacity before onboarding many stores.
+
+Verification: `node --test ebay-oauth.test.mjs ebay-sync.test.mjs auth-callback.test.cjs auth-workspace.test.cjs`. Live checks additionally verified six successful resource jobs, token renewal, private-table/worker access denial, browser record pagination, and successful scheduled dispatches. To pause imports without deleting data or disconnecting eBay, deactivate the named cron job in the database.

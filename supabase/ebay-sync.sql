@@ -27,6 +27,7 @@ begin
   select store_id,k from fulfillment_private.ebay_connections cross join unnest(array['orders','listings','returns','transactions','traffic','listing_traffic']) k on conflict do nothing;
   select * into j from fulfillment_private.ebay_sync_jobs a where a.available_at<=now()
    and coalesce(a.lease_until,now())<=now()
+   and (a.resource<>'listing_traffic' or exists(select 1 from fulfillment_private.ebay_sync_jobs l where l.store_id=a.store_id and l.resource='listings' and l.last_success is not null))
    and not exists(select 1 from fulfillment_private.ebay_sync_jobs b where b.store_id=a.store_id and b.lease_until>now())
    order by a.available_at,a.store_id,a.resource for update skip locked limit 1;
   if not found then return null; end if;
