@@ -174,3 +174,28 @@ body.order-workspace .om>.om-head{border-bottom:0;box-shadow:none}
 }
 
 @media(min-width:1400px){.om .commerce-orders .orders-page-canvas{min-width:1530px!important}}
+
+/* Compact commerce rows; only the header freezes, never the product cells. */
+.om .ebay-workspace .ebay-data-panel{width:100%;max-width:none;margin:0;border-radius:0;overflow:visible}
+.om .ebay-workspace .ebay-table{table-layout:fixed;border-collapse:separate;border-spacing:0}
+.om .ebay-workspace .ebay-table td{height:81px;padding:10px 12px;vertical-align:middle;text-align:center}
+.om .ebay-workspace .ebay-table th{text-align:center;padding:12px;position:sticky;top:0;z-index:4;background:#fff}
+.om .ebay-workspace .ebay-table td:first-child{position:static;left:auto;z-index:auto;border-right:0;min-width:0;width:330px;padding-left:0}
+.om .ebay-workspace .ebay-table th:first-child{left:auto;min-width:0;width:330px;border-right:0;padding-left:0}
+.om .ebay-workspace .ebay-product{align-items:center;gap:10px;min-width:0}
+.om .ebay-workspace .commerce-image,.om .ebay-workspace .ebay-product img,.om .ebay-workspace .ebay-image-empty{width:60px;height:60px;flex:0 0 60px}
+.om .ebay-workspace .commerce-title{-webkit-line-clamp:2;line-height:1.45;font-size:12px;text-align:center;max-height:35px;font-weight:500}
+.om .ebay-workspace .ebay-product small{display:none}
+.om .ebay-workspace .commerce-select-row{align-self:center;flex:none;margin:0}
+.om .ebay-workspace .commerce-field{margin-top:4px;grid-template-columns:45px minmax(0,1fr);text-align:left}
+.om .commerce-orders .ebay-table{min-width:1540px}
+.om .commerce-orders .ebay-table th:nth-child(2){width:160px}
+.om .commerce-orders .ebay-table th:nth-child(3){width:75px}
+.om .commerce-orders .ebay-table th:nth-child(4){width:160px}
+.om .commerce-orders .ebay-table th:nth-child(5){width:110px}
+.om .commerce-orders .ebay-table th:nth-child(6){width:170px}
+.om .commerce-orders .ebay-table th:nth-child(7){width:220px}
+.om .commerce-orders .ebay-table th:nth-child(8){width:160px}
+.om .ebay-workspace .ebay-table th:last-child{width:55px}
+.om .ebay-workspace .ebay-detail-button{font-size:23px;padding:4px 10px;line-height:1}
+.commerce-status{position:relative;text-align:left}.commerce-status summary{cursor:pointer;white-space:nowrap}.commerce-status>div{position:absolute;right:0;top:100%;z-index:6;width:220px;padding:12px;background:white;border:1px solid #e1e7e4;border-radius:8px;box-shadow:0 5px 20px #0002}.commerce-profit.gain{color:#23764f}.commerce-profit.loss{color:#b94646}
