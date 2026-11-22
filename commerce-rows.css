@@ -117,3 +117,7 @@
 .om .commerce-orders .commerce-order-identities .commerce-field>div{display:flex;align-items:center;min-height:32px}
 .om .commerce-orders .commerce-order-identities .commerce-brand-link{font-weight:500;color:#787b80}
 .om .commerce-orders .commerce-order-identities .commerce-add-product{width:100%;justify-content:space-between;gap:5px;font:500 13px/21px CommerceInter,Inter,sans-serif;color:#787b80}
+
+/* Restore the missing Order ID action; keep the SELL ID styling untouched. */
+.om .commerce-orders .commerce-order-identities .commerce-add-product{color:rgb(38,120,217);font:400 13px/21px CommerceAction,CommerceInter,sans-serif;justify-content:space-between;gap:4px}
+.om .commerce-orders .commerce-order-identities .commerce-id-separator{display:inline-block;transform:scaleX(1.5);transform-origin:center;flex:none}
