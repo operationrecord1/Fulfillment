@@ -28,8 +28,9 @@ const headerResize=new ResizeObserver(()=>host.querySelector('.om').style.setPro
 const disposeChartTips=Charts.bindTooltips(host);const insights=window.DashboardInsights.bind(host);
 let dailyPoints=[],dailyYearly=false,dailyWidth=0;
 function drawDaily(){const el=document.getElementById('om-daily');if(disposed||!el||viewport.hidden||!el.clientWidth)return;dailyWidth=Math.floor(el.clientWidth);const width=dailyWidth;el.dataset.scrollable='false';el.tabIndex=-1;el.setAttribute('aria-label','Profit and loss chart');el.innerHTML=Charts.profitChart(dailyPoints,dailyYearly,width,{horizontalLoss:dailyYearly});el.querySelector('svg').style.minWidth=width+'px';const inset=Charts.profitLayout(dailyPoints,width).left;for(const id of ['om-profit-title','om-profit-description'])document.getElementById(id).style.marginLeft=inset+'px';fitChartTitles();}
-function fitKpiTitles(){for(const text of host.querySelectorAll('.om-kpi-title>span')){const base=window.innerWidth<600?10:13;text.style.fontSize=base+'px';if(text.scrollWidth>text.clientWidth&&text.clientWidth)text.style.fontSize=(base*text.clientWidth/text.scrollWidth)+'px';}}
-function fitChartTitles(){for(const title of host.querySelectorAll('.om-charts h2')){title.style.fontSize='15px';const available=title.clientWidth;if(title.scrollWidth>available)title.style.fontSize=(15*available/title.scrollWidth-.2)+'px';}}
+function fitTitles(selector,base,offset=0){if(viewport.hidden)return;const items=[...host.querySelectorAll(selector)];for(const item of items)item.style.fontSize=base+'px';const sizes=items.map(item=>({item,width:item.clientWidth,scroll:item.scrollWidth}));for(const {item,width,scroll} of sizes)if(width&&scroll>width)item.style.fontSize=(base*width/scroll-offset)+'px';}
+function fitKpiTitles(){fitTitles('.om-kpi-title>span',window.innerWidth<600?10:13);}
+function fitChartTitles(){fitTitles('.om-charts h2',15,.2);}
 const titleResize=new ResizeObserver(fitChartTitles);titleResize.observe(host.querySelector('.om-charts'));
 const dailyResize=new ResizeObserver(entries=>{if(Math.floor(entries[0].contentRect.width)!==dailyWidth)drawDaily();});dailyResize.observe(document.getElementById('om-daily'));
 const $=id=>document.getElementById(id);if(account){$('om-account').append(account);account.hidden=false;}
