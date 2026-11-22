@@ -1,7 +1,7 @@
 @font-face{font-family:CommerceInter;font-style:normal;font-weight:400;font-display:swap;src:url(fonts/inter-400.ttf) format("truetype")}
 @font-face{font-family:CommerceInter;font-style:normal;font-weight:500;font-display:swap;src:url(fonts/inter-500.ttf) format("truetype")}
 @font-face{font-family:CommerceInter;font-style:normal;font-weight:600;font-display:swap;src:url(fonts/inter-600.ttf) format("truetype")}
-.om .commerce-orders .ebay-table{width:1591px;min-width:1591px;table-layout:fixed;font-family:CommerceInter,Inter,sans-serif}
+.om .commerce-orders .ebay-table{width:1615px;min-width:1615px;table-layout:fixed;font-family:CommerceInter,Inter,sans-serif}
 .om .commerce-orders .ebay-table th{width:auto!important;font:600 13px/21px CommerceInter,Inter,sans-serif;color:#343b43}
 .om .commerce-orders .ebay-table td{font:400 13px/21px CommerceInter,Inter,sans-serif;color:#343b43;background:#fff}
 .om .commerce-orders .commerce-title{font:400 13px/21px CommerceInter,Inter,sans-serif;max-height:42px;-webkit-line-clamp:2;color:#26323c}
@@ -16,10 +16,10 @@
 .om .commerce-orders .ebay-table th:nth-child(-n+6){z-index:5}
 .om .commerce-orders .ebay-table :is(td,th):nth-child(1){left:0px}
 .om .commerce-orders .ebay-table :is(td,th):nth-child(2){left:296px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(3){left:376px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(4){left:556px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(5){left:701px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(6){left:801px;box-shadow:3px 0 4px -4px #24372f}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(3){left:400px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(4){left:580px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(5){left:725px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(6){left:825px;box-shadow:3px 0 4px -4px #24372f}
 .om .commerce-orders .ebay-table td:has(.commerce-status[open]){z-index:6}
 }
 .om .commerce-orders .ebay-table .commerce-selected td{background:#eef6f2}
