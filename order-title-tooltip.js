@@ -8,14 +8,18 @@ window.OrderTitleTooltip={mount(container){
  function show(el){cancel();if(active!==el)active?.removeAttribute('aria-describedby');active=el;tip.textContent=el.dataset.fullTitle;tip.hidden=false;el.setAttribute('aria-describedby',tip.id);const r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;const left=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2));const above=r.top-h-12>=70;tip.style.left=left+'px';tip.style.top=(above?r.top-h-12:Math.min(innerHeight-h-8,r.bottom+12))+'px';tip.dataset.placement=above?'top':'bottom';const tr=tip.getBoundingClientRect();bridge.style.cssText='position:fixed;z-index:9999;left:'+Math.min(r.left,tr.left)+'px;width:'+(Math.max(r.right,tr.right)-Math.min(r.left,tr.left))+'px;top:'+(above?tr.bottom:r.bottom)+'px;height:'+Math.max(0,above?r.top-tr.bottom:tr.top-r.bottom)+'px';bridge.hidden=false;tip.style.setProperty('--arrow-left',Math.max(12,Math.min(w-12,r.left+r.width/2-left))+'px');}
  const later=()=>{cancel();timer=setTimeout(hide,400);};
  const over=e=>{const el=e.target.closest('[data-full-title]');if(el&&container.contains(el))show(el);};
- const out=e=>{const el=e.target.closest('[data-full-title]');if(!el||el.contains(e.relatedTarget)||tip.contains(e.relatedTarget))return;later();};
+ const out=e=>{const el=e.target.closest('[data-full-title]');if(!el||el.contains(e.relatedTarget)||tip.contains(e.relatedTarget)||bridge.contains(e.relatedTarget))return;if(safe(e))cancel();else later();};
  const focus=e=>{const el=e.target.closest('[data-full-title]');if(el)show(el);};
  const blur=e=>{if(!tip.contains(e.relatedTarget)&&!tip.matches(':hover'))later();};
  const key=e=>{if(e.key==='Escape')hide();};
- const outside=e=>{if(!tip.contains(e.target)&&!active?.contains(e.target))hide();};
+ const inside=(r,x,y)=>x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
+ const safe=e=>{if(!active)return false;return inside(active.getBoundingClientRect(),e.clientX,e.clientY)||inside(tip.getBoundingClientRect(),e.clientX,e.clientY)||inside(bridge.getBoundingClientRect(),e.clientX,e.clientY);};
+ const move=e=>{if(!active)return;if(safe(e))cancel();else hide();};
+ const outside=e=>{if(!safe(e))hide();};
+ document.addEventListener('pointermove',move);
  bridge.addEventListener('pointerenter',cancel);bridge.addEventListener('pointerleave',later);
  tip.addEventListener('pointerenter',cancel);tip.addEventListener('pointerleave',later);tip.addEventListener('pointerdown',cancel);
  container.addEventListener('pointerover',over);container.addEventListener('pointerout',out);container.addEventListener('focusin',focus);container.addEventListener('focusout',blur);document.addEventListener('keydown',key);document.addEventListener('pointerdown',outside);container.addEventListener('scroll',hide,{passive:true});window.addEventListener('resize',hide);
- return {hide,dispose(){hide();tip.remove();bridge.remove();container.removeEventListener('pointerover',over);container.removeEventListener('pointerout',out);container.removeEventListener('focusin',focus);container.removeEventListener('focusout',blur);document.removeEventListener('keydown',key);document.removeEventListener('pointerdown',outside);container.removeEventListener('scroll',hide);window.removeEventListener('resize',hide);}};
+ return {hide,dispose(){hide();tip.remove();bridge.remove();container.removeEventListener('pointerover',over);container.removeEventListener('pointerout',out);container.removeEventListener('focusin',focus);container.removeEventListener('focusout',blur);document.removeEventListener('pointermove',move);document.removeEventListener('keydown',key);document.removeEventListener('pointerdown',outside);container.removeEventListener('scroll',hide);window.removeEventListener('resize',hide);}};
 }};
 })();
