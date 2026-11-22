@@ -61,8 +61,8 @@ begin
   -- Never acknowledge an event until a fresh provider record has actually been saved.
   update fulfillment_private.ebay_notification_inbox e set processed_at=now(),disposition='processed'
   where e.store_id=target and e.resource=j.resource and e.processed_at is null and e.disposition='pending'
-  and e.received_at<=(payload->>'watermark')::timestamptz
-  and exists(select 1 from fulfillment_private.ebay_records r where r.store_id=target and r.resource=j.resource and r.external_id=e.entity_id and r.updated_at>=e.received_at);
+  and e.received_at<=(ebay_sync_worker.payload->>'watermark')::timestamptz
+  and exists(select 1 from fulfillment_private.ebay_records mirror where mirror.store_id=target and mirror.resource=j.resource and mirror.external_id=e.entity_id and mirror.updated_at>=e.received_at);
   update fulfillment_private.ebay_sync_jobs set cursor=coalesce(payload->'cursor','{}'),
    watermark=case when (payload->>'done')::boolean then (payload->>'watermark')::timestamptz else watermark end,
    last_success=case when (payload->>'done')::boolean then now() else last_success end,
