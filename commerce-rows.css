@@ -109,3 +109,4 @@
 .om .commerce-orders .commerce-order-identities .commerce-brand-link{font:400 13px/21px CommerceInter,Inter,sans-serif;color:rgb(90,88,89);text-decoration:none;transition:color .3s}
 .om .commerce-orders .commerce-order-identities .commerce-brand-link:hover{color:rgb(105,177,255);text-decoration:none}
 .om .commerce-orders .commerce-order-identities .commerce-brand-link{gap:5px}
+.om .commerce-orders .commerce-order-identities .commerce-field{flex-direction:row}.om .commerce-orders .commerce-order-identities .commerce-field>span{height:16px}
