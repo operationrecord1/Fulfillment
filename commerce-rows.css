@@ -1,7 +1,7 @@
 @font-face{font-family:CommerceInter;font-style:normal;font-weight:400;font-display:swap;src:url(fonts/inter-400.ttf) format("truetype")}
 @font-face{font-family:CommerceInter;font-style:normal;font-weight:500;font-display:swap;src:url(fonts/inter-500.ttf) format("truetype")}
 @font-face{font-family:CommerceInter;font-style:normal;font-weight:600;font-display:swap;src:url(fonts/inter-600.ttf) format("truetype")}
-.om .commerce-orders .ebay-table{width:1669px;min-width:1669px;table-layout:fixed;font-family:CommerceInter,Inter,sans-serif}
+.om .commerce-orders .ebay-table{width:1647px;min-width:1647px;table-layout:fixed;font-family:CommerceInter,Inter,sans-serif}
 .om .commerce-orders .ebay-table th{width:auto!important;font:600 13px/21px CommerceInter,Inter,sans-serif;color:#343b43}
 .om .commerce-orders .ebay-table td{font:400 13px/21px CommerceInter,Inter,sans-serif;color:#343b43;background:#fff}
 .om .commerce-orders .commerce-title{font:400 13px/21px CommerceInter,Inter,sans-serif;max-height:42px;-webkit-line-clamp:2;color:#26323c}
@@ -15,11 +15,11 @@
 .om .commerce-orders .ebay-table td:nth-child(-n+6){position:sticky;z-index:2;background:#fff}
 .om .commerce-orders .ebay-table th:nth-child(-n+6){z-index:5}
 .om .commerce-orders .ebay-table :is(td,th):nth-child(1){left:0px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(2){left:296px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(3){left:384px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(4){left:634px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(5){left:779px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(6){left:879px;box-shadow:3px 0 4px -4px #24372f}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(2){left:286px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(3){left:362px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(4){left:612px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(5){left:757px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(6){left:857px;box-shadow:3px 0 4px -4px #24372f}
 .om .commerce-orders .ebay-table td:has(.commerce-status[open]){z-index:6}
 }
 .om .commerce-orders .ebay-table .commerce-selected td{background:#eef6f2}
@@ -82,3 +82,9 @@
 .om .commerce-orders .commerce-profit.gain{color:rgb(89,206,136)}
 .om .commerce-orders .commerce-profit.loss{color:#d83a43}
 .om .commerce-orders .commerce-add-product{font:400 13px/21px CommerceInter,Inter,sans-serif;color:#267561;white-space:nowrap}
+
+.om .commerce-orders .ebay-table :is(th,td):nth-child(2){padding-left:4px;padding-right:4px;text-align:center}
+.om .ebay-workspace .commerce-identities .commerce-field{gap:4px}
+.om .ebay-workspace .commerce-brand-link{gap:4px}
+.om .ebay-workspace .commerce-platform-logo[alt="Amazon"]{opacity:.48}
+.om .commerce-orders .commerce-status-edit{cursor:pointer;font:13.3333px Arial,sans-serif}
