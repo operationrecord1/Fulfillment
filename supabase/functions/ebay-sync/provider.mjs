@@ -11,6 +11,8 @@ export async function refreshAccess(config,refreshToken,fetcher=fetch){
 }
 export async function request(url,token,options={},fetcher=fetch){
  const response=await fetcher(url,{...options,headers:{Authorization:'Bearer '+token,'Content-Type':'application/json','X-EBAY-C-MARKETPLACE-ID':'EBAY_US',...options.headers},signal:AbortSignal.timeout(20000)});
+ // Finances returns HTTP 204 (not an empty JSON list) for periods with no transactions.
+ if(response.status===204&&url.startsWith('https://apiz.ebay.com/sell/finances/v1/transaction?'))return {transactions:[],total:0};
  const data=await response.json().catch(()=>({}));
  if(!response.ok||data.errors?.length){
   const codes=(data.errors||[]).map(e=>e.errorId||e.extensions?.errorId||e.extensions?.code).filter(Boolean).join(',').replace(/[^a-zA-Z0-9_,.-]/g,'').slice(0,60);
@@ -24,7 +26,7 @@ const day=value=>date(value).slice(0,10).replaceAll('-','');
 const listingFields=`listings { listingId listing { marketplace sellerProduct { title images { ebayImageUrl externalImageUrl order } } listingTerms { totalQuantityAvailable listingFormat lifecycleTerms { listingStatus startAt actualEndAt } } items { itemId sku itemTerms { availability { quantityAvailable quantitySold } pricingTerms { fixedPrice { original { currency value } } } } } } } pagination { nextCursor totalElements totalPages }`;
 export async function readPage(job,token,fetcher=fetch,now=Date.now()){
  const c=job.cursor||{},end=c.end||date(now),offset=c.offset||0;
- if(job.resource==='orders_history')return readHistory(job,token,fetcher,now);
+ if(job.resource==='orders_history'||job.resource==='transactions_history')return readHistory(job,token,fetcher,now);
  const get=(url,options)=>request(url,token,options,fetcher);
  let rows,next=null,reconcileActive,snapshot;
  if(job.resource==='listings'){
@@ -54,7 +56,7 @@ export async function readPage(job,token,fetcher=fetch,now=Date.now()){
   if(perListing&&job.listing_ids.length===50)next={end,after:job.listing_ids.at(-1)};
   if(!perListing&&!job.watermark&&start>floor)next={end,reportEnd:date(start-DAY)};
  } else {
-  const start=c.start||(job.resource==='orders'&&job.watermark?date(Date.parse(job.watermark)-5*60000):date(now-89*DAY));
+  const start=c.start||(job.resource==='orders'&&job.watermark?date(Date.parse(job.watermark)-5*60000):job.resource==='transactions'&&job.watermark?date(Date.parse(job.watermark)-7*DAY):date(now-89*DAY));
   let url,key,id;
   const params=new URLSearchParams({limit:'100',offset:String(offset)});
   if(job.resource==='orders'){
@@ -80,13 +82,14 @@ export async function readPage(job,token,fetcher=fetch,now=Date.now()){
 
 // Independent, resumable history traversal; current-order sync stays available.
 async function readHistory(job,token,fetcher,now){
+ const finance=job.resource==='transactions_history',key=finance?'transactions':'orders',id=finance?'transactionId':'orderId';
  const c=job.cursor||{},ceiling=c.ceiling||date(now-120000);
  const anniversary=new Date(now);anniversary.setUTCFullYear(anniversary.getUTCFullYear()-2);
  const floor=c.floor||date(anniversary.getTime()+DAY),end=c.end||ceiling,start=c.start||date(Math.max(Date.parse(floor),Date.parse(end)-30*DAY)),offset=c.offset||0;
- const p=new URLSearchParams({limit:'100',offset:String(offset),filter:'creationdate:['+start+'..'+end+']'});
- const d=await request('https://api.ebay.com/sell/fulfillment/v1/order?'+p,token,{},fetcher);
- if(!Array.isArray(d.orders)&&d.total!==0)throw new ProviderError('Order history response could not be validated');
- const entries=d.orders||[];if(entries.some(x=>!x.orderId))throw new ProviderError('Missing eBay record identifier');
+ const p=new URLSearchParams({limit:'100',offset:String(offset),filter:(finance?'transactionDate':'creationdate')+':['+start+'..'+end+']'});
+ const d=await request((finance?'https://apiz.ebay.com/sell/finances/v1/transaction?':'https://api.ebay.com/sell/fulfillment/v1/order?')+p,token,{},fetcher);
+ if(!Array.isArray(d[key])&&d.total!==0)throw new ProviderError('History response could not be validated');
+ const entries=d[key]||[];if(entries.some(x=>!x[id]))throw new ProviderError('Missing eBay record identifier');
  const more=!!d.next||(Number.isFinite(d.total)?offset+entries.length<d.total:entries.length===100);
  let next=null;
  // Split dense windows before an API offset cap can truncate history. Upserts deduplicate overlap.
@@ -94,5 +97,5 @@ async function readHistory(job,token,fetcher,now){
  else if(more){if(!entries.length)throw new ProviderError('Order history pagination incomplete');next={...c,ceiling,floor,start,end,offset:offset+entries.length};}
  else if(c.pending?.length){const pending=[...c.pending],w=pending.pop();next={ceiling,floor,...w,offset:0,pending};}
  else if(Date.parse(start)>Date.parse(floor)){next={ceiling,floor,end:start,start:date(Math.max(Date.parse(floor),Date.parse(start)-30*DAY)),offset:0};}
- return {records:entries.map(data=>({id:data.orderId,data})),cursor:next||{},done:!next,watermark:ceiling,history_from:floor};
+ return {records:entries.map(data=>({id:data[id],data})),cursor:next||{},done:!next,watermark:ceiling,history_from:floor};
 }

@@ -1,6 +1,15 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {refreshAccess,readPage} from './supabase/functions/ebay-sync/provider.mjs';
+test('empty financial history accepts the real HTTP 204 response',async()=>{const r=await readPage({resource:'transactions_history',cursor:{}},'t',async()=>new Response(null,{status:204}));assert.deepEqual(r.records,[]);assert.equal(r.done,false);});
+
+test('financial history uses actual transactions with durable bounded windows',async()=>{
+ const page=await readPage({resource:'transactions_history',cursor:{}},'token',async url=>{const u=new URL(url);assert.equal(u.hostname,'apiz.ebay.com');assert.match(u.searchParams.get('filter'),/^transactionDate:/);return Response.json({transactions:[{transactionId:'fee-1',bookingEntry:'DEBIT',amount:{value:'0.70'}}],total:1});},Date.parse('2026-11-22T12:00:00Z'));
+ assert.equal(page.records[0].id,'fee-1');assert.equal(page.records[0].data.amount.value,'0.70');assert.ok(page.cursor.end);assert.equal(page.done,false);
+});
+test('financial refresh overlaps seven days for delayed fees',async()=>{
+ await readPage({resource:'transactions',cursor:{},watermark:'2026-11-22T12:00:00Z'},'token',async url=>{assert.match(new URL(url).searchParams.get('filter'),/2026-11-15T12:00:00.000Z/);return Response.json({transactions:[],total:0});});
+});
 test('refresh preserves long-lived token by returning access fields only',async()=>{
  const token=await refreshAccess({ebay_client_id:'id',ebay_client_secret:'secret'},'refresh',async(url,init)=>{
   assert.equal(new URLSearchParams(init.body).get('grant_type'),'refresh_token');
