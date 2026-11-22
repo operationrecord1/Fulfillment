@@ -89,3 +89,15 @@
 @media(max-width:1179.98px){.om .orders-kpis.om-kpis,.om .orders-charts.om-charts{min-width:1080px}}
 
 .om .orders-kpis>.orders-period-card{align-items:stretch}.om .orders-period-card .orders-period-trigger{min-height:68px;justify-content:center}
+/* Preserve the Dashboard visuals while removing duplicated Orders headings. */
+.om .commerce-orders>.ebay-page-head,.om .commerce-orders>.ebay-event-status,.om .commerce-orders .orders-overview-head{display:none}
+.om .ebay-workspace.commerce-orders{padding-top:8px}
+.om .commerce-orders>.orders-sync-history{margin:0 0 6px;font-size:11px;line-height:18px;color:#72817d}
+.om .commerce-orders .orders-overview{margin:0 0 8px}
+.om .orders-kpis.om-kpis,.om .orders-charts.om-charts{gap:4px}
+.om .orders-chart-scroll{margin-top:4px}
+.om .orders-kpis>.om-kpi{min-height:98.6px}
+.om .orders-period-card .orders-period-trigger{position:static;inset:auto;margin:0;min-height:60px}
+.om .orders-period-popup button{position:static;inset:auto}
+.om .commerce-orders .orders-data-basis{margin-top:6px}
+.om .commerce-listings .ebay-resync{display:none}
