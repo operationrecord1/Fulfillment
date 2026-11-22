@@ -34,3 +34,9 @@
 .commerce-product-dialog .product-error{color:#b63e3e;font-size:12px;line-height:1.5}
 
 .om .commerce-orders .commerce-identities .commerce-field>div{white-space:nowrap}.om .commerce-orders .commerce-identities .commerce-link span{display:none}.om .commerce-orders .commerce-add-product[aria-label]{font-size:11px;margin-left:2px}.om .commerce-orders .commerce-identities .commerce-unlinked{font-size:12px}
+
+/* Orders title matches the measured AutoDS title block. */
+.om .commerce-orders .ebay-product{column-gap:7px}
+.om .commerce-orders .ebay-product>div{flex:0 0 165px;width:165px;min-width:0}
+.om .commerce-orders .commerce-title{font:600 13px/21px CommerceInter,Inter,sans-serif;text-align:left;max-height:42px;-webkit-line-clamp:2;text-decoration:none}
+.om .commerce-orders .commerce-title:hover,.om .commerce-orders .commerce-title:active{color:#26323c;text-decoration:none}
