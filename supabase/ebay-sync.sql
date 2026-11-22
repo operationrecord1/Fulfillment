@@ -1,7 +1,7 @@
 -- Read-only eBay mirror. Tokens and imported data remain server-side.
 create table fulfillment_private.ebay_sync_jobs (
  store_id uuid not null references fulfillment_private.ebay_connections(store_id),
- resource text not null check(resource in ('orders','listings','returns','transactions','traffic')),
+ resource text not null check(resource in ('orders','listings','returns','transactions','traffic','listing_traffic')),
  cursor jsonb not null default '{}', watermark timestamptz,
  available_at timestamptz not null default now(), lease_id uuid, lease_until timestamptz,
  last_success timestamptz, last_error text, failures integer not null default 0,
@@ -24,7 +24,7 @@ begin
   -- Serialize claim selection, including claims for different resources of one seller.
   perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('ebay_sync_claim',0));
   insert into fulfillment_private.ebay_sync_jobs(store_id,resource)
-  select store_id,k from fulfillment_private.ebay_connections cross join unnest(array['orders','listings','returns','transactions','traffic']) k on conflict do nothing;
+  select store_id,k from fulfillment_private.ebay_connections cross join unnest(array['orders','listings','returns','transactions','traffic','listing_traffic']) k on conflict do nothing;
   select * into j from fulfillment_private.ebay_sync_jobs a where a.available_at<=now()
    and coalesce(a.lease_until,now())<=now()
    and not exists(select 1 from fulfillment_private.ebay_sync_jobs b where b.store_id=a.store_id and b.lease_until>now())
@@ -34,7 +34,8 @@ begin
   update fulfillment_private.ebay_sync_jobs set lease_id=token,lease_until=now()+interval '90 seconds' where store_id=j.store_id and resource=j.resource;
   select * into c from fulfillment_private.ebay_connections where store_id=j.store_id;
   select decrypted_secret::jsonb into t from vault.decrypted_secrets where id=c.token_secret_id;
-  return to_jsonb(j)||jsonb_build_object('lease_id',token,'tokens',t,'access_expires_at',c.access_expires_at,'refresh_expires_at',c.refresh_expires_at);
+  return to_jsonb(j)||jsonb_build_object('lease_id',token,'tokens',t,'access_expires_at',c.access_expires_at,'refresh_expires_at',c.refresh_expires_at,
+   'listing_ids',case when j.resource='listing_traffic' then coalesce((select jsonb_agg(external_id order by external_id) from (select external_id from fulfillment_private.ebay_records where store_id=j.store_id and resource='listings' and external_id>coalesce(j.cursor->>'after','') order by external_id limit 50) x),'[]'::jsonb) else null end);
  end if;
  target=(payload->>'store_id')::uuid;
  select * into j from fulfillment_private.ebay_sync_jobs where store_id=target and resource=payload->>'resource' and lease_id=(payload->>'lease_id')::uuid and lease_until>now() for update;
@@ -54,7 +55,7 @@ begin
   update fulfillment_private.ebay_sync_jobs set cursor=coalesce(payload->'cursor','{}'),
    watermark=case when (payload->>'done')::boolean then (payload->>'watermark')::timestamptz else watermark end,
    last_success=case when (payload->>'done')::boolean then now() else last_success end,
-   available_at=now()+make_interval(secs=>case when not (payload->>'done')::boolean then 2 when resource='orders' then 120 when resource='traffic' then 21600 else 600 end),
+   available_at=now()+make_interval(secs=>case when not (payload->>'done')::boolean then 0 when resource='orders' then 120 when resource in ('traffic','listing_traffic') then 21600 else 600 end),
    lease_id=null,lease_until=null,last_error=null,failures=0 where store_id=target and resource=j.resource;
  elsif action='fail' then
   update fulfillment_private.ebay_sync_jobs set last_error=left(payload->>'error',160),failures=failures+1,

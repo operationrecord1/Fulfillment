@@ -30,3 +30,13 @@ test('listing cursor walks active, ended and scheduled only after successful pag
  });
  assert.equal(result.cursor.phase,'ended');assert.equal(result.records[0].id,'123');assert.equal(result.done,false);
 });
+test('traffic history uses bounded windows and listing analytics batches IDs',async()=>{
+ const fetcher=async(url)=>{
+  const p=new URL(url).searchParams;assert.ok(p.get('filter').includes('date_range:'));
+  return Response.json({records:[{dimensionValues:[{value:'123'}],metricValues:[]}],header:{}});
+ };
+ const historical=await readPage({resource:'traffic'},'token',fetcher,Date.parse('2026-11-22T00:00:00Z'));
+ assert.equal(historical.done,false);assert.ok(historical.cursor.reportEnd);
+ const listing=await readPage({resource:'listing_traffic',listing_ids:['123']},'token',fetcher);
+ assert.equal(listing.done,true);assert.equal(listing.records[0].id,'123');
+});

@@ -15,7 +15,7 @@ Deno.serve(async(req:Request)=>{
   const config=await rpc('ebay_connection_worker',{action:'credentials',payload:{}});
   const started=Date.now();let completed=0,failed=0;
   // Bounded work keeps each invocation inside the edge lifetime. Jobs resume from durable cursors.
-  while(Date.now()-started<45000&&completed+failed<8){
+  while(Date.now()-started<45000&&completed+failed<32){
    const job=await work('claim');if(!job)break;
    const identity={store_id:job.store_id,resource:job.resource,lease_id:job.lease_id};
    try{

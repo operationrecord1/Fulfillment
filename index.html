@@ -589,7 +589,7 @@ body.info-open .info-view{display:block}
       const {data:stores,error:se}=await query;
       if(se||!stores?.length)throw Error('No accessible store was found.');
       stores.forEach(store=>{const option=document.createElement('option');option.value=store.id;option.textContent=store.name;select.append(option);});
-      let connected=false,checkSequence=0;
+      let connected=false,needsReconnect=false,checkSequence=0;
       const details=document.createElement('div');details.id='ebay-sync-details';form.append(details);
       async function checkConnection(){
         const sequence=++checkSequence;button.disabled=true;connected=false;
@@ -598,7 +598,8 @@ body.info-open .info-view{display:block}
         if(sequence!==checkSequence||!form.isConnected)return;
         if(error){setAuthStatus(status,'Could not check the saved connection. Reload this page; reconnecting is not needed.','error');return;}
         connected=!!data?.connected;
-        button.textContent=connected?'Refresh sync status':'Continue to eBay';button.disabled=false;
+        needsReconnect=connected&&(Date.parse(data.refresh_expires_at)<=Date.now()||(data.jobs||[]).some(job=>job.last_error?.startsWith('Reconnect required:')));
+        button.textContent=needsReconnect?'Reconnect on eBay':connected?'Refresh sync status':'Continue to eBay';button.disabled=false;
         setAuthStatus(status,connected?'Connected to '+data.username+'. Your eBay authorization is saved securely.':'Choose the workspace store that owns this eBay account.');
         if(connected){
           const note=document.createElement('p');note.textContent='Background import runs independently of your browser. Orders: about 2–3 minutes; listings, returns and transactions: about 10 minutes; traffic reports: every 6 hours. eBay availability and rate limits can delay updates.';details.append(note);
@@ -609,9 +610,9 @@ body.info-open .info-view{display:block}
             item.append(document.createTextNode(job.count+' saved records. '+(job.last_error?'Needs attention — '+job.last_error:job.last_success?'Last complete sync: '+new Date(job.last_success).toLocaleString():'Initial import in progress.')));list.append(item);
           }
           details.append(list);
-          const preview=document.createElement('div');preview.style.cssText='margin:20px 0;overflow:auto';
+          const preview=document.createElement('div');preview.style.cssText='margin:20px 0;overflow:auto;max-height:480px';
           const picker=document.createElement('select');picker.setAttribute('aria-label','Imported eBay data');
-          for(const name of ['orders','listings','returns','transactions','traffic']){const option=document.createElement('option');option.value=name;option.textContent=name[0].toUpperCase()+name.slice(1);picker.append(option);}
+          for(const name of ['orders','listings','returns','transactions','traffic','listing_traffic']){const option=document.createElement('option');option.value=name;option.textContent=(name[0].toUpperCase()+name.slice(1)).replace('_',' ');picker.append(option);}
           details.append(picker,preview);
           let previewSequence=0;
           async function showRecords(after=''){
@@ -623,6 +624,7 @@ body.info-open .info-view{display:block}
             if(error){preview.textContent='Saved records could not be loaded.';return;}
             if(!records?.length){preview.textContent='No imported records in this page yet.';return;}
             const table=document.createElement('table');table.style.cssText='width:100%;font-size:13px;border-collapse:collapse;text-align:left';
+            const head=document.createElement('thead'),heading=document.createElement('tr');for(const label of ['ID / Date','Description','Status / Metrics','Amount']){const th=document.createElement('th');th.textContent=label;th.style.cssText='padding:10px 8px;background:#f4f6f5;position:sticky;top:0';heading.append(th);}head.append(heading);table.append(head);
             for(const row of records){
               const tr=document.createElement('tr'),d=row.data;
               const title=kind==='orders'?d.lineItems?.map(x=>x.title).join(', '):kind==='listings'?d.listing?.sellerProduct?.title:kind==='transactions'?d.transactionType:kind==='returns'?d.creationInfo?.reason:'Daily traffic';
@@ -635,12 +637,12 @@ body.info-open .info-view{display:block}
             if(records.length===50){const more=document.createElement('button');more.type='button';more.textContent='Next 50 records';more.addEventListener('click',()=>showRecords(records.at(-1).external_id));preview.append(more);}
           }
           picker.addEventListener('change',()=>showRecords());await showRecords();
-          const scope=document.createElement('p');scope.textContent='Initial coverage: recent 89 days of orders, returns and transactions; active/ended/scheduled listings; last 30 complete days of US traffic. Imported data is separate from your manual dashboard.';details.append(scope);
+          const scope=document.createElement('p');scope.textContent='Coverage: recent 89 days of orders, returns and transactions; active/ended/scheduled listings; up to one year of US daily traffic; recent 30-day listing traffic. eBay reporting delays and history limits apply. Imported data is separate from your manual dashboard.';details.append(scope);
         }
       }
       select.addEventListener('change',checkConnection);await checkConnection();
       form.addEventListener('submit',async event=>{
-        event.preventDefault();if(button.disabled)return;if(connected){await checkConnection();return;}button.disabled=true;setAuthStatus(status,'Opening secure eBay authorization…');
+        event.preventDefault();if(button.disabled)return;if(connected&&!needsReconnect){await checkConnection();return;}button.disabled=true;setAuthStatus(status,'Opening secure eBay authorization…');
         try{
           const {data,error}=await client.functions.invoke('ebay-connect/start',{body:{store_id:select.value}});
           if(error||!data?.url)throw Error('Connection could not start. Check your access and try again.');
