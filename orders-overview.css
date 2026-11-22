@@ -199,3 +199,5 @@ body.order-workspace .om>.om-head{border-bottom:0;box-shadow:none}
 .om .ebay-workspace .ebay-table th:last-child{width:55px}
 .om .ebay-workspace .ebay-detail-button{font-size:23px;padding:4px 10px;line-height:1}
 .commerce-status{position:relative;text-align:left}.commerce-status summary{cursor:pointer;white-space:nowrap}.commerce-status>div{position:absolute;right:0;top:100%;z-index:6;width:220px;padding:12px;background:white;border:1px solid #e1e7e4;border-radius:8px;box-shadow:0 5px 20px #0002}.commerce-profit.gain{color:#23764f}.commerce-profit.loss{color:#b94646}
+
+.om .commerce-orders .ebay-table{width:1540px}.om .commerce-listings .ebay-table{width:1420px}.om .ebay-workspace .ebay-product>div{flex:0 0 216px;width:216px;min-width:0}.om .ebay-workspace .ebay-table th:first-child .commerce-select-all{position:absolute;left:0;top:50%;transform:translateY(-50%);margin:0}
