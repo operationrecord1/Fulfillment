@@ -53,3 +53,5 @@
 .om .commerce-listings .commerce-title:hover,.om .commerce-listings .commerce-title:active{color:#26323c;text-decoration:none}
 .om .commerce-listings .ebay-table{width:1480px;min-width:1480px}
 .om .commerce-listings .ebay-table th:first-child,.om .commerce-listings .ebay-table td:first-child{width:390px}
+
+.om .commerce-listings .commerce-title{user-select:text;-webkit-user-select:text;cursor:text}
