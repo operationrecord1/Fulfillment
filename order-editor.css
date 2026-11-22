@@ -37,3 +37,5 @@
 .om .order-edit-dialog .order-status-picker [role=option] .status-symbol{color:var(--option-icon)}
 .order-edit-dialog .editor-status-colors [role=option][data-value=""] span{margin-left:29px}
 .order-edit-dialog .editor-status-colors .order-status-trigger:not(:has(svg)) span{margin-left:0}
+
+.om .order-edit-dialog .order-meta-tip::after{left:50%;right:auto;transform:translateX(-50%);translate:none;width:max-content;max-width:none;text-align:center}
