@@ -138,3 +138,10 @@ body.order-workspace,body.order-workspace .info-view,.om .om-main,.om .ebay-work
 .om .ebay-workspace .ebay-table th{background:#fff}
 .om .ebay-workspace .ebay-pagination{background:#fff}
 .om .orders-charts>.om-panel,.om .orders-kpis>.om-kpi{background:#fff;box-shadow:none}
+
+body.order-workspace .om>.om-head{border-bottom:0;box-shadow:none}
+.om .ebay-workspace.commerce-listings,.om .ebay-workspace.commerce-orders{padding-top:0}
+.om .commerce-listings .ebay-toolbar{padding-top:6px;padding-bottom:8px}
+.om .commerce-listings .ebay-count{display:inline;padding:0;border:0;border-radius:0;background:transparent;color:inherit;font:inherit}
+.om .ebay-workspace input.commerce-select-row,.om .ebay-workspace input.commerce-select-all{appearance:auto;width:16px;min-width:16px;height:16px;padding:0;margin:3px 6px 0 0;flex:0 0 16px;accent-color:#276d55;cursor:pointer;vertical-align:middle}
+.om .ebay-workspace tr.commerce-selected td{background:#f0f7f3}
