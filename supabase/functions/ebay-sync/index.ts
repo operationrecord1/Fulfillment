@@ -15,7 +15,7 @@ Deno.serve(async(req:Request)=>{
   const config=await rpc('ebay_connection_worker',{action:'credentials',payload:{}});
   const started=Date.now();let completed=0,failed=0;
   // Bounded work keeps each invocation inside the edge lifetime. Jobs resume from durable cursors.
-  while(Date.now()-started<45000&&completed+failed<32){
+  const lane=async()=>{let attempts=0;while(Date.now()-started<45000&&attempts++<16){
    const job=await work('claim');if(!job)break;
    const identity={store_id:job.store_id,resource:job.resource,lease_id:job.lease_id};
    try{
@@ -34,6 +34,7 @@ Deno.serve(async(req:Request)=>{
     await work('fail',{...identity,error:known?e.message:'Temporary sync failure; saved data retained',retry_after:known?e.retryAfter:60});failed++;
    }
   }
+  };await Promise.all([lane(),lane(),lane()]);
   return Response.json({completed,failed},{headers:{'Cache-Control':'no-store'}});
  }catch{return new Response('Background sync unavailable',{status:503});}
 });

@@ -1,18 +1,21 @@
 create or replace function public.ebay_orders_period_page(target uuid,kind text default 'orders',query_text text default '',status_filter text default '',page_number integer default 1,page_size integer default 25,period_year integer default 2026,period_month integer default 1) returns jsonb
 language plpgsql security definer set search_path='' as $$
-declare result jsonb; n integer:=greatest(1,page_number); size integer:=least(100,greatest(10,page_size));
+declare zone text; lower_date text; upper_date text; result jsonb; n integer:=greatest(1,page_number); size integer:=least(100,greatest(10,page_size));
 begin
  if not exists(select 1 from public.profiles where user_id=auth.uid() and is_active and (role='admin' or (role='staff' and store_id=target))) then raise exception 'Store access required'; end if;
+ select reporting_timezone into zone from fulfillment_private.ebay_connections where store_id=target;zone=coalesce(zone,'America/Los_Angeles');
  if kind<>'orders' or period_year not between 2000 and 2100 or period_month not between 0 and 12 then raise exception 'Invalid order period'; end if;
+ lower_date=to_char((make_date(period_year,greatest(1,period_month),1)::timestamp at time zone zone) at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"');
+ upper_date=to_char(((make_date(period_year,greatest(1,period_month),1)+case when period_month=0 then interval '1 year' else interval '1 month' end) at time zone zone) at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"');
  with records as (
   select r.external_id,r.data,r.updated_at,
    case when kind='listings' then case when r.data->>'catalog_present'='false' then 'UNAVAILABLE' else r.data#>>'{listing,listingTerms,lifecycleTerms,listingStatus}' end else case when r.data#>>'{cancelStatus,cancelState}'='CANCELED' then 'CANCELLED' else r.data->>'orderFulfillmentStatus' end end as state,
    case when kind='listings' then r.data#>>'{listing,sellerProduct,title}' else (select string_agg(x->>'title',' ') from jsonb_array_elements(r.data->'lineItems') x) end as title,
    case when kind='orders' then r.data->>'creationDate' else r.data#>>'{listing,listingTerms,lifecycleTerms,startAt}' end as created
-  from fulfillment_private.ebay_records r where r.store_id=target and r.resource=kind and r.data->>'creationDate'>=make_date(period_year,greatest(1,period_month),1)::text and r.data->>'creationDate'<(make_date(period_year,greatest(1,period_month),1)+case when period_month=0 then interval '1 year' else interval '1 month' end)::date::text
+  from fulfillment_private.ebay_records r where r.store_id=target and r.resource=kind and r.data->>'creationDate'>=lower_date and r.data->>'creationDate'<upper_date
  ), filtered as (select * from records where (status_filter='' or state=status_filter) and (query_text='' or external_id ilike '%'||left(query_text,160)||'%' or title ilike '%'||left(query_text,160)||'%' or data->'buyer'->>'username' ilike '%'||left(query_text,160)||'%')),
  paged as (select * from filtered order by created desc nulls last,external_id desc limit size offset (n-1)*size)
- select jsonb_build_object('total',(select count(*) from filtered),'counts',(select coalesce(jsonb_object_agg(state,c),'{}') from (select coalesce(state,'UNKNOWN') state,count(*) c from records group by 1) c),
+ select jsonb_build_object('timezone',zone,'imported_total',(select count(*) from fulfillment_private.ebay_records where store_id=target and resource='orders'),'period_count',(select count(*) from records),'size_counts',jsonb_build_array((select count(*) from records where coalesce((data#>>'{pricingSummary,total,value}')::numeric,0)<12),(select count(*) from records where (data#>>'{pricingSummary,total,value}')::numeric>=12 and (data#>>'{pricingSummary,total,value}')::numeric<30),(select count(*) from records where (data#>>'{pricingSummary,total,value}')::numeric>=30)),'history',(select jsonb_build_object('complete',last_success is not null,'error',last_error,'from',coverage_from) from fulfillment_private.ebay_sync_jobs where store_id=target and resource='orders_history'),'total',(select count(*) from filtered),'counts',(select coalesce(jsonb_object_agg(state,c),'{}') from (select coalesce(state,'UNKNOWN') state,count(*) c from records group by 1) c),
  'rows',coalesce((select jsonb_agg(jsonb_build_object('id',p.external_id,'data',p.data,'updated_at',p.updated_at,'workspace_rows',case when kind='orders' then coalesce((select jsonb_agg(jsonb_build_object('id',o.id,'display_number',o.display_number::text,'year',o.year,'month',o.month,'position',o.position,'data',o.data) order by o.year,o.month,o.position) from fulfillment_private.order_rows o where o.store_id=target and btrim(o.data->>'order_id')=p.external_id),'[]'::jsonb) else '[]'::jsonb end,'image',case when kind='orders' then (select l.data#>>'{listing,sellerProduct,images,0,ebayImageUrl}' from fulfillment_private.ebay_records l where l.store_id=target and l.resource='listings' and l.external_id=p.data#>>'{lineItems,0,legacyItemId}' limit 1) else p.data#>>'{listing,sellerProduct,images,0,ebayImageUrl}' end,'traffic',case when kind='listings' then (select t.data from fulfillment_private.ebay_records t where t.store_id=target and t.resource='listing_traffic' and t.external_id=p.external_id) else null end) order by p.created desc nulls last,p.external_id desc) from paged p),'[]'),
  'sync',(select jsonb_build_object('last_success',last_success,'error',last_error,'running',coalesce(lease_until>now(),false) or reset_requested or cursor<>'{}'::jsonb,'requested_at',requested_at) from fulfillment_private.ebay_sync_jobs where store_id=target and resource=kind),
  'analytics_sync',(select jsonb_build_object('last_success',last_success,'error',last_error) from fulfillment_private.ebay_sync_jobs where store_id=target and resource='listing_traffic'),
@@ -22,4 +25,5 @@ begin
 end $$;
 revoke all on function public.ebay_orders_period_page(uuid,text,text,text,integer,integer,integer,integer) from public,anon;
 grant execute on function public.ebay_orders_period_page(uuid,text,text,text,integer,integer,integer,integer) to authenticated;
+
 

@@ -24,8 +24,9 @@ const day=value=>date(value).slice(0,10).replaceAll('-','');
 const listingFields=`listings { listingId listing { marketplace sellerProduct { title images { ebayImageUrl externalImageUrl order } } listingTerms { totalQuantityAvailable listingFormat lifecycleTerms { listingStatus startAt actualEndAt } } items { itemId sku itemTerms { availability { quantityAvailable quantitySold } pricingTerms { fixedPrice { original { currency value } } } } } } } pagination { nextCursor totalElements totalPages }`;
 export async function readPage(job,token,fetcher=fetch,now=Date.now()){
  const c=job.cursor||{},end=c.end||date(now),offset=c.offset||0;
+ if(job.resource==='orders_history')return readHistory(job,token,fetcher,now);
  const get=(url,options)=>request(url,token,options,fetcher);
- let rows,next=null,reconcileActive;
+ let rows,next=null,reconcileActive,snapshot;
  if(job.resource==='listings'){
   const phase=c.phase||'active',field=phase+'Listings',input='Seller'+phase[0].toUpperCase()+phase.slice(1)+'ListingSearchInput';
   const filters=job.watermark?{modifiedAtRange:{startAt:date(Date.parse(job.watermark)-5*60000),endAt:end}}:undefined;
@@ -33,10 +34,13 @@ export async function readPage(job,token,fetcher=fetch,now=Date.now()){
   const page=result.data?.sellerListingSearch?.[field];
   if(page?.__typename!=='SellerListings'||!Array.isArray(page.listings))throw new ProviderError('eBay listing response could not be validated');
   rows=page.listings.map(data=>({id:data.listingId,data:{...data,syncCategory:phase,catalog_present:true}}));
+  if(page.pagination?.nextCursor===c.pageCursor&&c.pageCursor)throw new ProviderError('Listing pagination cursor did not advance');
   if(page.pagination?.nextCursor)next={end,phase,pageCursor:page.pagination.nextCursor};
   else if(phase==='active')next={end,phase:'ended'};
   else if(phase==='ended')next={end,phase:'scheduled'};
-  if(phase==='active'&&!page.pagination?.nextCursor&&!job.watermark)reconcileActive=end;
+  if(!job.watermark){const totals={...(c.totals||{})};if(Number.isFinite(page.pagination?.totalElements))totals[phase]=page.pagination.totalElements;
+   if(next)next.totals=totals;snapshot={id:end,totals};if(!next)reconcileActive=end;
+  }
  } else if(job.resource==='traffic'||job.resource==='listing_traffic'){
   const perListing=job.resource==='listing_traffic';
   const finish=c.reportEnd?Date.parse(c.reportEnd):Date.parse(end)-DAY;
@@ -68,8 +72,27 @@ export async function readPage(job,token,fetcher=fetch,now=Date.now()){
   const entries=data[key]||[];
   rows=entries.map(data=>({id:String(data[id]||''),data}));
   // Fetch one extra empty page when the API does not expose a total.
-  if(entries.length===100)next={start,end,offset:offset+100};
+  if(data.next||(Number.isFinite(data.total)?offset+entries.length<data.total:entries.length===100)){if(!entries.length)throw new ProviderError('Order pagination returned an incomplete page');next={start,end,offset:offset+entries.length};}
  }
  if(rows.some(r=>!r.id||r.id.endsWith(':undefined')))throw new ProviderError('Missing eBay record identifier');
- return {records:rows,cursor:next||{},done:!next,watermark:end,...(reconcileActive?{reconcile_active_before:reconcileActive}:{})};
+ return {records:rows,cursor:next||{},done:!next,watermark:end,...(snapshot?{snapshot}:{}),...(reconcileActive?{reconcile_active_before:reconcileActive}:{})};
+}
+
+// Independent, resumable history traversal; current-order sync stays available.
+async function readHistory(job,token,fetcher,now){
+ const c=job.cursor||{},ceiling=c.ceiling||date(now-120000);
+ const anniversary=new Date(now);anniversary.setUTCFullYear(anniversary.getUTCFullYear()-2);
+ const floor=c.floor||date(anniversary.getTime()+DAY),end=c.end||ceiling,start=c.start||date(Math.max(Date.parse(floor),Date.parse(end)-30*DAY)),offset=c.offset||0;
+ const p=new URLSearchParams({limit:'100',offset:String(offset),filter:'creationdate:['+start+'..'+end+']'});
+ const d=await request('https://api.ebay.com/sell/fulfillment/v1/order?'+p,token,{},fetcher);
+ if(!Array.isArray(d.orders)&&d.total!==0)throw new ProviderError('Order history response could not be validated');
+ const entries=d.orders||[];if(entries.some(x=>!x.orderId))throw new ProviderError('Missing eBay record identifier');
+ const more=!!d.next||(Number.isFinite(d.total)?offset+entries.length<d.total:entries.length===100);
+ let next=null;
+ // Split dense windows before an API offset cap can truncate history. Upserts deduplicate overlap.
+ if(more&&offset+entries.length>=9000){const span=Date.parse(end)-Date.parse(start);if(span<2000)throw new ProviderError('Dense order history window requires reconciliation');const mid=date(Date.parse(start)+Math.floor(span/2));next={ceiling,floor,end,start:mid,offset:0,pending:[...(c.pending||[]),{start,end:mid}]};}
+ else if(more){if(!entries.length)throw new ProviderError('Order history pagination incomplete');next={...c,ceiling,floor,start,end,offset:offset+entries.length};}
+ else if(c.pending?.length){const pending=[...c.pending],w=pending.pop();next={ceiling,floor,...w,offset:0,pending};}
+ else if(Date.parse(start)>Date.parse(floor)){next={ceiling,floor,end:start,start:date(Math.max(Date.parse(floor),Date.parse(start)-30*DAY)),offset:0};}
+ return {records:entries.map(data=>({id:data.orderId,data})),cursor:next||{},done:!next,watermark:ceiling,history_from:floor};
 }

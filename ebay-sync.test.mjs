@@ -46,8 +46,20 @@ test('active catalog reconciliation waits for the last full-scan page',async()=>
  const partial=await readPage({resource:'listings'},'token',fetcher(true));
  assert.equal(partial.reconcile_active_before,undefined);
  const complete=await readPage({resource:'listings',cursor:partial.cursor},'token',fetcher(false));
- assert.equal(complete.reconcile_active_before,partial.cursor.end);
+ assert.equal(complete.reconcile_active_before,undefined);
+ assert.equal(complete.cursor.phase,'ended');
+ const final=await readPage({resource:'listings',cursor:{end:partial.cursor.end,phase:'scheduled'}},'token',async()=>Response.json({data:{sellerListingSearch:{scheduledListings:{__typename:'SellerListings',listings:[],pagination:{totalElements:0}}}}}));
+ assert.equal(final.reconcile_active_before,partial.cursor.end);
  assert.equal(complete.records[0].data.catalog_present,true);
  const incremental=await readPage({resource:'listings',watermark:'2026-11-22T00:00:00Z'},'token',fetcher(false));
  assert.equal(incremental.reconcile_active_before,undefined);
 });
+
+test('history traverses bounded windows backwards and keeps a fixed ceiling',async()=>{
+ const now=Date.parse('2026-11-22T12:00:00Z'),calls=[];const fetcher=async url=>{calls.push(new URL(url).searchParams.get('filter'));return Response.json({orders:[],total:0});};
+ const first=await readPage({resource:'orders_history'},'token',fetcher,now);assert.equal(first.done,false);assert.match(calls[0],/creationdate:/);assert.equal(first.cursor.end,'2026-10-23T11:58:00.000Z');
+ const last=await readPage({resource:'orders_history',cursor:{...first.cursor,start:first.cursor.floor,end:first.cursor.end}},'token',fetcher,now+60000);assert.equal(last.done,true);assert.equal(last.watermark,'2026-11-22T11:58:00.000Z');
+});
+test('short pages follow provider total instead of silently truncating',async()=>{const p=await readPage({resource:'orders',watermark:'2026-11-20T00:00:00Z'},'token',async()=>Response.json({total:3,orders:[{orderId:'one'}]}));assert.equal(p.done,false);assert.equal(p.cursor.offset,1);});
+test('repeated listing cursor is rejected, not looped or published',async()=>{await assert.rejects(readPage({resource:'listings',cursor:{phase:'active',pageCursor:'same'}},'token',async()=>Response.json({data:{sellerListingSearch:{activeListings:{__typename:'SellerListings',listings:[],pagination:{nextCursor:'same'}}}}})),/did not advance/);});
+test('history dense windows split before excessive offset',async()=>{const p=await readPage({resource:'orders_history',cursor:{start:'2026-10-01T00:00:00Z',end:'2026-10-30T00:00:00Z',floor:'2024-12-01T00:00:00Z',ceiling:'2026-11-01T00:00:00Z',offset:8900}},'token',async()=>Response.json({total:10001,orders:Array.from({length:100},(_,i)=>({orderId:String(i)}))}));assert.equal(p.cursor.offset,0);assert.equal(p.cursor.pending.length,1);});
