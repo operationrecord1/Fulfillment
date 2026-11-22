@@ -71,12 +71,12 @@
 .om .orders-kpis>.om-kpi>strong{font-size:23px;font-weight:650;line-height:1.2;letter-spacing:normal;margin:0;color:#111}
 .om .orders-kpis>.om-kpi>strong.negative{color:#bd2638}
 .om .orders-kpis>.om-kpi small[hidden]{display:none}
-.om .orders-kpis>[data-kpi=period]{grid-area:1/1}.om .orders-kpis>[data-kpi=count]{grid-area:2/1}
-.om .orders-kpis>[data-kpi=revenue]{grid-area:1/2}.om .orders-kpis>[data-kpi=cost]{grid-area:2/2}
-.om .orders-kpis>[data-kpi=gross]{grid-area:1/3}.om .orders-kpis>[data-kpi=net]{grid-area:2/3}
-.om .orders-kpis>[data-kpi=tax]{grid-area:1/4}.om .orders-kpis>[data-kpi=expense]{grid-area:2/4}
-.om .orders-kpis>[data-kpi=avgOrder]{grid-area:1/5}.om .orders-kpis>[data-kpi=avgProfit]{grid-area:2/5}
-.om .orders-kpis>[data-kpi=margin]{grid-area:1/6}.om .orders-kpis>[data-kpi=avgDaily]{grid-area:2/6}
+.om .orders-kpis>[data-metric=period]{grid-area:1/1}.om .orders-kpis>[data-metric=count]{grid-area:2/1}
+.om .orders-kpis>[data-metric=revenue]{grid-area:1/2}.om .orders-kpis>[data-metric=cost]{grid-area:2/2}
+.om .orders-kpis>[data-metric=gross]{grid-area:1/3}.om .orders-kpis>[data-metric=net]{grid-area:2/3}
+.om .orders-kpis>[data-metric=tax]{grid-area:1/4}.om .orders-kpis>[data-metric=expense]{grid-area:2/4}
+.om .orders-kpis>[data-metric=avgOrder]{grid-area:1/5}.om .orders-kpis>[data-metric=avgProfit]{grid-area:2/5}
+.om .orders-kpis>[data-metric=margin]{grid-area:1/6}.om .orders-kpis>[data-metric=avgDaily]{grid-area:2/6}
 .om .orders-charts.om-charts{width:100%;grid-template-columns:238px 238px minmax(0,1fr);grid-template-rows:auto;gap:8px;margin:0}
 .om .orders-charts>.om-panel{min-width:0;padding:14px 12px;border-radius:12px;grid-column:auto;grid-row:auto}
 .om .orders-charts>.om-panel:nth-child(-n+2){display:grid;grid-template-rows:22px 38px auto auto;align-content:start}
@@ -87,3 +87,5 @@
 .om .orders-trend-chart{overflow-x:auto;max-width:100%;margin-top:16px;scrollbar-width:thin;overscroll-behavior-x:contain}
 .om .orders-trend-chart svg{display:block;width:100%;height:auto;min-height:0;max-width:none}
 @media(max-width:1179.98px){.om .orders-kpis.om-kpis,.om .orders-charts.om-charts{min-width:1080px}}
+
+.om .orders-kpis>.orders-period-card{align-items:stretch}.om .orders-period-card .orders-period-trigger{min-height:68px;justify-content:center}
