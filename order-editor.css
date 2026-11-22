@@ -26,3 +26,10 @@
 @media(max-height:700px){.order-edit-dialog{padding-top:40px}.order-edit-dialog .order-edit-summary{padding:8px}.order-edit-dialog nav [role=tab]{padding:10px 0}.order-edit-dialog h3{margin:5px 0 8px}.order-edit-dialog .order-edit-grid{gap:8px}.order-purchase-grid{margin-top:8px}.order-edit-dialog label{gap:4px}.order-edit-dialog footer{padding-top:8px}.order-edit-dialog .order-status-picker [role=option]{height:27px}}
 .order-edit-dialog .order-status-picker .status-symbol{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .om .order-edit-dialog .order-status-picker button .status-symbol{width:24px!important;height:24px!important;min-width:24px;flex:0 0 24px}
+
+/* Match Dashboard status colors and align copy-only Buyer values. */
+.om .order-edit-dialog .order-status-picker [role=option]{background:var(--option-bg);color:var(--option-color);transition:filter .12s}
+.om .order-edit-dialog .order-status-picker [role=option]:hover,.om .order-edit-dialog .order-status-picker [role=option]:focus-visible{background:var(--option-bg);color:var(--option-color);filter:brightness(.94);box-shadow:inset 3px 0 currentColor}
+.order-edit-dialog .order-status-trigger i{border-color:currentColor}.order-status-trigger span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.om .order-edit-dialog #edit-panel-Buyer input[readonly]{padding-left:0;padding-right:0;text-align:left;text-indent:0;margin:0}
+.order-edit-dialog .buyer-copy-hint{margin:3px 0 0}.order-edit-dialog .buyer-grid{padding-top:12px}

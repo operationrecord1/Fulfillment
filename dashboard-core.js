@@ -1,6 +1,7 @@
 (function(root){
 'use strict';
 const statusLabel=value=>/^buyer cancel(?:led)?$/i.test(value||'')?'Cancelled':value;
+const statusColors={'Pending':['#ffcfc9','#b10202'],'Processed':['#d4edbc','#11734b'],'Delivered':['#11734b','#ffffff'],'Label Created':['#ffe5a0','#473821'],'Cancelled':['#ffcfc9','#b10202'],'Refunded':['#b10202','#ffffff'],'OOS':['#b10202','#ffffff'],'Alert':['#b10202','#ffffff']};
 const statuses=['Delivered','Processed','Pending','Refunded','OOS','Alert','Label Created','Cancelled'];
 const columns=[['order_id','Order ID'],['quantity','Quantity','number'],['earning','Order Earning','money'],['purchase_id','Purchase ID'],['supplier','Supplier Reference'],['note','Note'],['platform','Platform','select'],['tracking','Tracking'],['secondary_tracking','Secondary Tracking'],['status','Order Status','select'],['product_cost','Product Cost','money'],['shipping_cost','Shipping Cost','money'],['additional_cost','Additional Cost','money'],['gross','Gross Profit','computed'],['margin','Profit Margin','computed'],['id','Unique ID','computed'],['date','Order Date','date']];
 const investorFields=new Set(columns.map(c=>c[0]).filter(k=>!['purchase_id','platform'].includes(k)));
@@ -74,5 +75,5 @@ const statusPaths={
   };
 const statusIcon=value=>{const key=({'Label Created':'label','Clear Selection':'clear'})[value]||String(value).toLowerCase();return statusPaths[key]?'<svg class="status-symbol" viewBox="0 0 24 24" aria-hidden="true">'+statusPaths[key]+'</svg>':'';};
 const statusOrder=values=>[...values].sort((a,b)=>(statuses.indexOf(a)<0?99:statuses.indexOf(a))-(statuses.indexOf(b)<0?99:statuses.indexOf(b)));
-const api={statusIcon,statusOrder,statusLabel,statuses,columns,investorFields,present,cents,link,groups,aggregate,aggregateYear,duplicates};root.OrderCore=api;if(typeof module!=='undefined')module.exports=api;
+const api={statusColors,statusIcon,statusOrder,statusLabel,statuses,columns,investorFields,present,cents,link,groups,aggregate,aggregateYear,duplicates};root.OrderCore=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

@@ -21,7 +21,7 @@ begin
  end loop;
  if changes ? 'supplier' and changes->>'supplier' not in ('Amazon','AliExpress','Alibaba') then raise exception 'Invalid supplier'; end if;
  if changes ? 'buyer_account' and changes->>'buyer_account' not in ('','Amazon','AutoDS') then raise exception 'Invalid buyer account'; end if;
- if changes ? 'status' and changes->>'status' not in ('','Pending','Ordered','Processed','Shipped','Delivered','Cancelled','Refunded','Alert','Label Created') then raise exception 'Invalid status'; end if;
+ if changes ? 'status' and changes->>'status' not in ('','Pending','Ordered','Processed','Shipped','Delivered','Cancelled','Refunded','OOS','Alert','Label Created') then raise exception 'Invalid status'; end if;
  if changes ? 'carrier' and changes->>'carrier' not in ('','Amazon','USPS','UPS','DHL','FedEx','Other') then raise exception 'Invalid carrier'; end if;
  if coalesce(changes->>'buy_url','')<>'' and changes->>'buy_url' !~ '^https://([a-zA-Z0-9-]+\.)*(amazon\.com|aliexpress\.com|alibaba\.com)/' then raise exception 'Use a supported supplier product URL'; end if;
  insert into fulfillment_private.ebay_order_edits as e(store_id,order_id,data,updated_by)

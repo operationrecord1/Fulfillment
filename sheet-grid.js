@@ -3,7 +3,7 @@
 const C=window.OrderCore,S=window.SheetModel;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone=v=>structuredClone(v),money=v=>Number(v).toFixed(2);
-const statusColors={'Pending':['#ffcfc9','#b10202'],'Processed':['#d4edbc','#11734b'],'Delivered':['#11734b','#ffffff'],'Label Created':['#ffe5a0','#473821'],'Cancelled':['#ffcfc9','#b10202'],'Refunded':['#b10202','#ffffff'],'OOS':['#b10202','#ffffff'],'Alert':['#b10202','#ffffff']};
+const statusColors=C.statusColors;
 const widths=[146,70,135,146,131,169,131,105,140,136,101,101,101,101,101,122,95],gutter=33;
 class SheetGrid{
  constructor(host,options){
