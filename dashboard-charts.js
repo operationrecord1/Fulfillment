@@ -52,8 +52,12 @@ function profitLayout(points,width=900,options={}){
  return {p,cx,yt,label,pointSlot};});
  // Profit labels stay anchored to their own candle, never to a neighbouring date.
  const measureSvg=typeof document!=='undefined'?document.createElementNS('http://www.w3.org/2000/svg','svg'):null;
- let measureText=null;if(measureSvg){measureSvg.setAttribute('aria-hidden','true');measureSvg.style.cssText='position:absolute;visibility:hidden;width:0;height:0;overflow:hidden;pointer-events:none';measureText=document.createElementNS(measureSvg.namespaceURI,'text');measureText.style.cssText='font-family:Inter,Segoe UI,Arial,sans-serif;font-weight:500;font-variant-numeric:tabular-nums';measureSvg.append(measureText);document.body.append(measureSvg);}
- const textWidth=(text,size)=>{if(measureText){measureText.setAttribute('font-size',size);measureText.textContent=text;return measureText.getComputedTextLength();}return text.length*size*.59;};
+ const measured=new Map();if(measureSvg){measureSvg.setAttribute('aria-hidden','true');measureSvg.style.cssText='position:absolute;visibility:hidden;width:0;height:0;overflow:hidden;pointer-events:none;contain:strict';
+  for(const text of new Set(placed.map(label=>label.text))){const node=document.createElementNS(measureSvg.namespaceURI,'text');node.style.cssText='font-family:Inter,Segoe UI,Arial,sans-serif;font-weight:500;font-variant-numeric:tabular-nums';node.setAttribute('font-size','12');node.textContent=text;measureSvg.append(node);measured.set(text,node);}
+  document.body.append(measureSvg);
+  for(const [text,node] of measured)measured.set(text,node.getComputedTextLength());
+ }
+ const textWidth=(text,size)=>measured.has(text)?measured.get(text)*size/12:text.length*size*.59;
  for(const item of items)if(item.label&&!item.label.negative){const l=item.label;l.x=item.cx;l.font=Math.max(9,Math.min(12,Math.floor(12*(item.pointSlot-1)/textWidth(l.text,12))));l.font=Math.min(l.font,12*(2*Math.min(l.x-1,w-l.x-1))/textWidth(l.text,12));l.half=textWidth(l.text,l.font)/2;}
  // A one-pixel gap, with each colliding group balanced around its original dates.
  const losses=placed.filter(l=>l.negative&&!l.vertical);
@@ -83,7 +87,7 @@ function profitCandleFit(text,width,height){
 function profitSlotWidths(points,yearly=false){return points.map(p=>Math.max(26,(!p.value||(yearly&&p.value>0))?26:(p.value/100).toFixed(2).length*11*.62+2));}
 function profitScrollWidth(points,yearly=false){return Math.max(360,Math.ceil(profitSlotWidths(points,yearly).reduce((a,b)=>a+b,0)+60));}
 function profitChart(points,yearly,width=900,options={}){
- const l=profitLayout(points,width,{...options,yearly}),{w,h,left,right,slot,top,base,max,step,dateY}=l,depth=3,y=v=>base-v/max*(base-top);
+ const l=options.layout||profitLayout(points,width,{...options,yearly}),{w,h,left,right,slot,top,base,max,step,dateY}=l,depth=3,y=v=>base-v/max*(base-top);
  let s='<svg class="'+(yearly?'om-year-chart':'om-day-chart')+'" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+(yearly?'Monthly':'Daily')+' gross profit and loss"><defs><linearGradient id="om-profit-face"><stop stop-color="#48b48d"/><stop offset=".45" stop-color="#269875"/><stop offset="1" stop-color="#177458"/></linearGradient></defs>';
  for(let v=0;v<=max+step*.01;v+=step)s+='<line x1="'+left+'" y1="'+y(v)+'" x2="'+(w-right)+'" y2="'+y(v)+'" stroke="#e4ebe7"/><text x="'+(left-6)+'" y="'+(y(v)+3)+'" text-anchor="end" fill="#72817d" font-size="10">'+number(v)+'</text>';
  s+='<line x1="'+left+'" x2="'+(w-right)+'" y1="'+base+'" y2="'+base+'" stroke="#9aaba3"/>';
