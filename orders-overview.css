@@ -65,3 +65,25 @@
 /* Orders uses a consistent 10px gutter, including wide desktop screens. */
 .om .ebay-workspace.commerce-orders{padding-left:10px;padding-right:10px}
 .om .commerce-orders>.orders-overview,.om .commerce-orders>.ebay-page-head,.om .commerce-orders>.ebay-event-status,.om .commerce-orders>.ebay-data-panel,.om .commerce-orders>.ebay-footnote{max-width:none}
+/* Reuse Dashboard card and chart presentation within the Orders viewport. */
+.om .orders-kpis.om-kpis{width:100%;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,auto);gap:8px;margin:0}
+.om .orders-kpis>.om-kpi{position:relative;display:flex;flex-direction:column;justify-content:center;min-height:100px;padding:12px 14px 18px;background:#fff;border:1px solid #e1e7eb;border-radius:12px;box-shadow:0 1px 2px #152b3910}
+.om .orders-kpis>.om-kpi>strong{font-size:23px;font-weight:650;line-height:1.2;letter-spacing:normal;margin:0;color:#111}
+.om .orders-kpis>.om-kpi>strong.negative{color:#bd2638}
+.om .orders-kpis>.om-kpi small[hidden]{display:none}
+.om .orders-kpis>[data-kpi=period]{grid-area:1/1}.om .orders-kpis>[data-kpi=count]{grid-area:2/1}
+.om .orders-kpis>[data-kpi=revenue]{grid-area:1/2}.om .orders-kpis>[data-kpi=cost]{grid-area:2/2}
+.om .orders-kpis>[data-kpi=gross]{grid-area:1/3}.om .orders-kpis>[data-kpi=net]{grid-area:2/3}
+.om .orders-kpis>[data-kpi=tax]{grid-area:1/4}.om .orders-kpis>[data-kpi=expense]{grid-area:2/4}
+.om .orders-kpis>[data-kpi=avgOrder]{grid-area:1/5}.om .orders-kpis>[data-kpi=avgProfit]{grid-area:2/5}
+.om .orders-kpis>[data-kpi=margin]{grid-area:1/6}.om .orders-kpis>[data-kpi=avgDaily]{grid-area:2/6}
+.om .orders-charts.om-charts{width:100%;grid-template-columns:238px 238px minmax(0,1fr);grid-template-rows:auto;gap:8px;margin:0}
+.om .orders-charts>.om-panel{min-width:0;padding:14px 12px;border-radius:12px;grid-column:auto;grid-row:auto}
+.om .orders-charts>.om-panel:nth-child(-n+2){display:grid;grid-template-rows:22px 38px auto auto;align-content:start}
+.om .orders-charts>.om-panel:nth-child(-n+2)>.om-chart{display:block;width:100%;max-width:210px;margin:0 auto}
+.om .orders-charts h2{font-size:15px;line-height:1.4;white-space:normal;margin:0 0 5px}
+.om .orders-charts>.om-panel>p{font-size:11px;line-height:1.5;margin:0;color:#72817d}
+.om .orders-charts .orders-size-legend{min-width:0;flex:none}
+.om .orders-trend-chart{overflow-x:auto;max-width:100%;margin-top:16px;scrollbar-width:thin;overscroll-behavior-x:contain}
+.om .orders-trend-chart svg{display:block;width:100%;height:auto;min-height:0;max-width:none}
+@media(max-width:1179.98px){.om .orders-kpis.om-kpis,.om .orders-charts.om-charts{min-width:1080px}}

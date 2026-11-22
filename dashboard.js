@@ -14,6 +14,7 @@ avgProfit:'<path d="M15 22l-3-2-3 2-3-2-3 2V3a1 1 0 0 1 1-1h15v10M6 6h10M6 10h10
 revenue:'<path d="M2 8l3-6h14l3 6M2 8h20M3 8v2c0 3 4 3 4 0 0 3 5 3 5 0 0 3 5 3 5 0 0 3 4 3 4 0V8M9 2L7 8M15 2l2 6M4 13v9h8M7 22v-7h5M1 22h11"/><circle cx="18" cy="18" r="5"/><path d="M18 15v6M20 16c-4-2-5 2-2 2s3 4-2 2"/>'
 });
 const kpiIcon=k=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+(referenceKpiIcons[k]||'<path d="'+kpiIcons[k]+'"/>')+'</svg>';
+window.DashboardKpiIcon=kpiIcon;
 window.FulfillmentDashboard={async mount({client,profile,user,logout}){
 if(!profile.store_id||profile.role==='admin')return;
 const host=document.getElementById('info-article');if(!host)return;let disposed=false,busy=false,dirty=false,loadId=0;
