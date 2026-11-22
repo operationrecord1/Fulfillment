@@ -162,3 +162,13 @@ body.order-workspace .om>.om-head{border-bottom:0;box-shadow:none}
 .om .commerce-selection button{border:0;background:transparent;padding:4px;color:#24634e;text-decoration:underline;font:inherit}
 
 .om .commerce-orders .orders-overview{max-width:none;width:100%}
+
+@media(min-width:1400px){
+.om .commerce-orders .orders-page-canvas{min-width:0;width:100%}
+.om .commerce-orders .orders-overview{position:sticky;left:10px;width:calc(100vw - 35px);max-width:calc(100vw - 35px);min-width:0}
+.om .orders-kpis.om-kpis{min-width:0;width:100%;grid-template-columns:repeat(6,minmax(0,1fr))}
+.om .orders-charts.om-charts{min-width:0;width:100%;grid-template-columns:200px 200px minmax(0,1fr)}
+.om .orders-trend-chart{min-width:0;width:100%;overflow:hidden}
+.om .orders-trend-chart svg{min-width:0!important;max-width:100%;width:100%}
+.om .orders-charts>.om-panel:nth-child(-n+2)>.om-chart{max-width:170px}
+}
