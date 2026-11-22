@@ -38,7 +38,7 @@ Deno.serve(async(req:Request)=>{
    const seller=await sellerIdentity(tokens.access_token);
    const granted=typeof tokens.scope==='string'?tokens.scope.split(' '):saved.scopes;
    await rpc('save',{...saved,...seller,tokens,scopes:granted});
-   return message('eBay store connected securely. Order and listing synchronization is not enabled yet. You can return to your Fulfilment workspace.');
+   return new Response(null,{status:303,headers:{...headers,Location:origin+'/#connect-ebay'}});
   }
   return message('Not found.',404);
  }catch{
