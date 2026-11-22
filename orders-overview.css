@@ -172,3 +172,5 @@ body.order-workspace .om>.om-head{border-bottom:0;box-shadow:none}
 .om .orders-trend-chart svg{min-width:0!important;max-width:100%;width:100%}
 .om .orders-charts>.om-panel:nth-child(-n+2)>.om-chart{max-width:170px}
 }
+
+@media(min-width:1400px){.om .commerce-orders .orders-page-canvas{min-width:1530px!important}}
