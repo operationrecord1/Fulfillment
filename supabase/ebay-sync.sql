@@ -5,6 +5,7 @@ create table fulfillment_private.ebay_sync_jobs (
  cursor jsonb not null default '{}', watermark timestamptz,
  available_at timestamptz not null default now(), lease_id uuid, lease_until timestamptz,
  last_success timestamptz, last_error text, failures integer not null default 0,
+ reset_requested boolean not null default false, requested_at timestamptz,
  primary key(store_id,resource)
 );
 create table fulfillment_private.ebay_records (
