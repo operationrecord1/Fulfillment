@@ -40,3 +40,8 @@
 .om .commerce-orders .ebay-product>div{flex:0 0 165px;width:165px;min-width:0}
 .om .commerce-orders .commerce-title{font:600 13px/21px CommerceInter,Inter,sans-serif;text-align:left;max-height:42px;-webkit-line-clamp:2;text-decoration:none}
 .om .commerce-orders .commerce-title:hover,.om .commerce-orders .commerce-title:active{color:#26323c;text-decoration:none}
+
+.om .commerce-orders .commerce-title{word-break:normal;overflow-wrap:normal;white-space:normal;hyphens:none;cursor:default}
+.order-title-tooltip{position:fixed;z-index:10000;box-sizing:border-box;width:250px;max-width:calc(100vw - 16px);padding:6px 8px;border:0;border-radius:4px;background:rgb(9,14,53);color:white;font:400 13px/21px CommerceInter,Inter,sans-serif;text-align:left;white-space:normal;word-break:normal;overflow-wrap:break-word;user-select:text;cursor:text;box-shadow:0 6px 16px #00000014,0 3px 6px -4px #0000001f,0 9px 28px 8px #0000000d}
+.order-title-tooltip[hidden]{display:none}.order-title-tooltip::after{content:'';position:absolute;left:var(--arrow-left);width:8px;height:8px;background:inherit;transform:translateX(-50%) rotate(45deg)}.order-title-tooltip[data-placement=top]::after{bottom:-4px}.order-title-tooltip[data-placement=bottom]::after{top:-4px}
+.order-title-tooltip::before{content:'';position:absolute;left:0;right:0;height:14px}.order-title-tooltip[data-placement=top]::before{top:100%}.order-title-tooltip[data-placement=bottom]::before{bottom:100%}
