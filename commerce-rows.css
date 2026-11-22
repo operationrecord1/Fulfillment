@@ -14,12 +14,12 @@
 @media(min-width:1150px){
 .om .commerce-orders .ebay-table td:nth-child(-n+6){position:sticky;z-index:2;background:#fff}
 .om .commerce-orders .ebay-table th:nth-child(-n+6){z-index:5}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(1){left:10px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(2){left:340px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(3){left:405px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(4){left:585px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(5){left:730px}
-.om .commerce-orders .ebay-table :is(td,th):nth-child(6){left:830px;box-shadow:3px 0 4px -4px #24372f}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(1){left:0px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(2){left:330px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(3){left:395px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(4){left:575px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(5){left:720px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(6){left:820px;box-shadow:3px 0 4px -4px #24372f}
 .om .commerce-orders .ebay-table td:has(.commerce-status[open]){z-index:6}
 }
 .om .commerce-orders .ebay-table .commerce-selected td{background:#eef6f2}
