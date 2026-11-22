@@ -160,3 +160,5 @@ body.order-workspace .om>.om-head{border-bottom:0;box-shadow:none}
 .om .ebay-workspace input.commerce-select-row{align-self:center;margin-block:0}
 .om .commerce-selection{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:12px;color:#52615b}
 .om .commerce-selection button{border:0;background:transparent;padding:4px;color:#24634e;text-decoration:underline;font:inherit}
+
+.om .commerce-orders .orders-overview{max-width:none;width:100%}
