@@ -31,7 +31,7 @@ begin
  elsif action='begin' then
   select * into p from public.profiles where user_id=(payload->>'user_id')::uuid and is_active and role in ('staff','admin');
   if not found then raise exception 'Active employee required'; end if;
-  target=coalesce(p.store_id,(payload->>'store_id')::uuid);
+  target=case when p.role='admin' then coalesce((payload->>'store_id')::uuid,p.store_id) else p.store_id end;
   if target is null or (p.role<>'admin' and target is distinct from p.store_id) or not exists(select 1 from public.stores where id=target) then raise exception 'Store access required'; end if;
   delete from fulfillment_private.ebay_oauth_states where expires_at<now() or user_id=p.user_id;
   insert into fulfillment_private.ebay_oauth_states(state_hash,user_id,store_id,scopes) values(payload->>'hash',p.user_id,target,payload->'scopes');
