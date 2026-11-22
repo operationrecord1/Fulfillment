@@ -127,3 +127,5 @@
 .sheet-table td:hover>.sheet-peer-selection:after{content:attr(data-label);position:absolute;right:0;top:0;background:var(--peer-color);color:#fff;font:10px/14px Arial,sans-serif;padding:0 3px}
 
 .sheet-copy-outline.sheet-fill-outline{border:2px dotted #5f6368}
+
+.om .sheet-table td.sheet-editing{z-index:13}

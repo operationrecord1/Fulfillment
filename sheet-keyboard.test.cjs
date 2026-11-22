@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
-const context={window:{OrderCore:require('./dashboard-core'),SheetModel:require('./sheet-model')},structuredClone};
+const context={window:{removeEventListener(){},OrderCore:require('./dashboard-core'),SheetModel:require('./sheet-model')},structuredClone};
 vm.runInNewContext(fs.readFileSync('sheet-grid.js','utf8'),context);
 const proto=context.window.OrderSheetGrid.prototype;
 const event=(key,extra={})=>({key,target:{closest:()=>null},prevented:false,preventDefault(){this.prevented=true},stopPropagation(){},...extra});
