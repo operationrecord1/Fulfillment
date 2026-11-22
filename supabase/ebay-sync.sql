@@ -66,9 +66,13 @@ begin
   update fulfillment_private.ebay_sync_jobs set cursor=coalesce(payload->'cursor','{}'),
    watermark=case when (payload->>'done')::boolean then (payload->>'watermark')::timestamptz else watermark end,
    last_success=case when (payload->>'done')::boolean then now() else last_success end,
-   available_at=now()+make_interval(secs=>case when not (payload->>'done')::boolean then 0 when resource in ('orders','listings') and exists(select 1 from fulfillment_private.ebay_notification_subscriptions s where s.store_id=target and s.status='ENABLED' and s.topic=case when j.resource='orders' then 'ORDER_CONFIRMATION' else 'LISTING' end) then 21600 when resource='orders' then 120 when resource in ('traffic','listing_traffic') then 21600 else 600 end),
+   available_at=now()+make_interval(secs=>case when not (payload->>'done')::boolean then 0 when resource in ('orders','listings') and exists(select 1 from fulfillment_private.ebay_notification_subscriptions s where s.store_id=target and s.status='ENABLED' and s.topic=case when j.resource='orders' then 'ORDER_CONFIRMATION' else 'LISTING' end) then 21600 when resource='orders' then 120 when resource in ('traffic','listing_traffic') then 86400 else 600 end),
    lease_id=null,lease_until=null,last_error=null,failures=0 where store_id=target and resource=j.resource;
  elsif action='fail' then
+  if j.resource in ('traffic','listing_traffic') and payload->>'error' like 'eBay HTTP 429%' then
+   update fulfillment_private.ebay_sync_jobs set available_at=now()+interval '24 hours',last_error='eBay analytics quota reached; saved report retained',failures=failures+1,lease_id=null,lease_until=null where store_id=target and resource in ('traffic','listing_traffic');
+   return '{}'::jsonb;
+  end if;
   update fulfillment_private.ebay_sync_jobs set last_error=left(payload->>'error',160),failures=failures+1,
    available_at=now()+make_interval(secs=>least(21600,greatest(60,coalesce((payload->>'retry_after')::integer,0),60*power(2,least(failures,8))::integer))),
    lease_id=null,lease_until=null where store_id=target and resource=j.resource;

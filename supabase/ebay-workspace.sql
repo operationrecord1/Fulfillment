@@ -18,6 +18,7 @@ begin
  select jsonb_build_object('total',(select count(*) from filtered),'counts',(select coalesce(jsonb_object_agg(state,c),'{}') from (select coalesce(state,'UNKNOWN') state,count(*) c from records group by 1) c),
  'rows',coalesce((select jsonb_agg(jsonb_build_object('id',p.external_id,'data',p.data,'updated_at',p.updated_at,'image',case when kind='orders' then (select l.data#>>'{listing,sellerProduct,images,0,ebayImageUrl}' from fulfillment_private.ebay_records l where l.store_id=target and l.resource='listings' and l.external_id=p.data#>>'{lineItems,0,legacyItemId}' limit 1) else p.data#>>'{listing,sellerProduct,images,0,ebayImageUrl}' end,'traffic',case when kind='listings' then (select t.data from fulfillment_private.ebay_records t where t.store_id=target and t.resource='listing_traffic' and t.external_id=p.external_id) else null end) order by p.created desc nulls last,p.external_id desc) from paged p),'[]'),
  'sync',(select jsonb_build_object('last_success',last_success,'error',last_error,'running',coalesce(lease_until>now(),false) or reset_requested or cursor<>'{}'::jsonb,'requested_at',requested_at) from fulfillment_private.ebay_sync_jobs where store_id=target and resource=kind),
+ 'analytics_sync',(select jsonb_build_object('last_success',last_success,'error',last_error) from fulfillment_private.ebay_sync_jobs where store_id=target and resource='listing_traffic'),
  'events',jsonb_build_object('enabled',(select count(*)=4 from fulfillment_private.ebay_notification_subscriptions where store_id=target and status='ENABLED' and topic in ('LISTING','ORDER_CONFIRMATION','ITEM_MARKED_SHIPPED','ORDER_CANCELLATION_ACTIVITY')),'pending',(select count(*) from fulfillment_private.ebay_notification_inbox where store_id=target and disposition='pending'),'last_received',(select max(received_at) from fulfillment_private.ebay_notification_inbox where store_id=target),'last_processed',(select max(processed_at) from fulfillment_private.ebay_notification_inbox where store_id=target)),
  'seller',(select username from fulfillment_private.ebay_connections where store_id=target),'store',(select name from public.stores where id=target)) into result;
  return result;
@@ -25,13 +26,13 @@ end $$;
 revoke all on function public.ebay_workspace_page(uuid,text,text,text,integer,integer) from public,anon;
 grant execute on function public.ebay_workspace_page(uuid,text,text,text,integer,integer) to authenticated;
 
-create function public.ebay_resync_store(target uuid) returns jsonb language plpgsql security definer set search_path='' as $$
+create or replace function public.ebay_resync_store(target uuid) returns jsonb language plpgsql security definer set search_path='' as $$
 begin
  if not exists(select 1 from public.profiles where user_id=auth.uid() and is_active and (role='admin' or (role='staff' and store_id=target))) then raise exception 'Store access required'; end if;
  if not exists(select 1 from fulfillment_private.ebay_connections where store_id=target) then raise exception 'Connect your eBay store first'; end if;
  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('ebay_resync_'||target::text,0));
  if exists(select 1 from fulfillment_private.ebay_sync_jobs where store_id=target and requested_at>now()-interval '60 seconds') then return jsonb_build_object('queued',true,'already_queued',true); end if;
- update fulfillment_private.ebay_sync_jobs set reset_requested=resource in ('orders','listings'),requested_at=now(),available_at=now() where store_id=target;
+ update fulfillment_private.ebay_sync_jobs set reset_requested=resource in ('orders','listings'),requested_at=now(),available_at=now() where store_id=target and resource in ('orders','listings');
  perform fulfillment_private.ebay_dispatch();
  return jsonb_build_object('queued',true);
 end $$;

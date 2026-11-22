@@ -51,9 +51,10 @@ Deno.serve(async(req:Request)=>{
  try{
   if(req.method==='GET'&&url.searchParams.has('challenge_code')){const code=url.searchParams.get('challenge_code')!;if(code.length>1024)return new Response('Invalid challenge',{status:400});const cfg=await work('config');return Response.json({challengeResponse:challenge(code,cfg.verificationToken,endpoint)});}
   if(req.method!=='POST')return new Response('Method not allowed',{status:405});
-  if(['/setup','/inspect','/test','/verify-traffic'].some(p=>url.pathname.endsWith(p))){
+  if(['/setup','/inspect','/test','/verify-traffic','/limits'].some(p=>url.pathname.endsWith(p))){
    const candidate=req.headers.get('x-fulfillment-webhook-secret');if(!candidate||!await rpc('verify_fulfillment_webhook',{candidate}))return new Response('Unauthorized',{status:401});
    try{
+    if(url.pathname.endsWith('/limits')){const results=[];const ar=await fetch('https://api.ebay.com/developer/analytics/v1_beta/rate_limit/?api_name=analytics&api_context=sell',{headers:{Authorization:'Bearer '+await applicationToken()},signal:AbortSignal.timeout(15000)});results.push({scope:'application',status:ar.status,data:await ar.json().catch(()=>({}))});for(const store of await work('stores')){const r=await fetch('https://api.ebay.com/developer/analytics/v1_beta/user_rate_limit/?api_name=analytics&api_context=sell',{headers:{Authorization:'Bearer '+store.tokens.access_token},signal:AbortSignal.timeout(15000)});results.push({store:store.store_id,status:r.status,data:await r.json().catch(()=>({}))});}return Response.json({results});}
     if(url.pathname.endsWith('/test')){
      const cfg=await work('config'),results=[];
      for(const store of await work('stores')){const list=await call('/subscription?limit=100',store.tokens.access_token);for(const s of list.subscriptions||[]){if(s.destinationId!==cfg.destinationId)continue;try{await call('/subscription/'+encodeURIComponent(s.subscriptionId)+'/test',store.tokens.access_token,'POST');results.push({topic:s.topicId,test:'sent'});}catch(e){results.push({topic:s.topicId,error:e.message});}}}
@@ -69,7 +70,7 @@ Deno.serve(async(req:Request)=>{
      return Response.json({results});
     }
     return Response.json(await setup(url.pathname.endsWith('/inspect')));
-   }catch(e){await work('result',{error:e.message});return Response.json({error:e.message},{status:502});}
+   }catch(e){if(url.pathname.endsWith('/setup'))await work('result',{error:e.message});return Response.json({error:e.message},{status:502});}
   }
   stage='signature';const header=req.headers.get('x-ebay-signature');if(!header)return new Response('Signature required',{status:401});
   if(Number(req.headers.get('content-length'))>262144)return new Response('Too large',{status:413});
