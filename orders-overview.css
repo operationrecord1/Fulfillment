@@ -145,3 +145,12 @@ body.order-workspace .om>.om-head{border-bottom:0;box-shadow:none}
 .om .commerce-listings .ebay-count{display:inline;padding:0;border:0;border-radius:0;background:transparent;color:inherit;font:inherit}
 .om .ebay-workspace input.commerce-select-row,.om .ebay-workspace input.commerce-select-all{appearance:auto;width:16px;min-width:16px;height:16px;padding:0;margin:3px 6px 0 0;flex:0 0 16px;accent-color:#276d55;cursor:pointer;vertical-align:middle}
 .om .ebay-workspace tr.commerce-selected td{background:#f0f7f3}
+
+/* Let wrapped headings and helper text reserve their own space. */
+.om .orders-charts>.om-panel:nth-child(-n+2){grid-template-rows:minmax(42px,auto) minmax(36px,auto) auto auto;row-gap:4px}
+.om .orders-charts>.om-panel:nth-child(-n+2)>h2{line-height:21px;margin:0;overflow-wrap:normal}
+.om .orders-charts>.om-panel:nth-child(-n+2)>p{line-height:16px;white-space:normal;overflow-wrap:break-word}
+.om .orders-charts .om-performance-legend .om-progress-row{display:grid;grid-template-columns:40px max-content minmax(8px,1fr) 34px;gap:4px;min-width:0;padding:10px 0;margin:0;font-size:10px}
+.om .orders-charts .om-progress-row>span,.om .orders-charts .om-progress-row>b{white-space:nowrap}
+.om .commerce-listings .ebay-toolbar h2{display:flex;align-items:baseline;gap:12px}
+.om .commerce-listings .ebay-count{font-size:26px;font-weight:650;line-height:1.2;font-variant-numeric:tabular-nums}
