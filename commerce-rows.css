@@ -88,3 +88,15 @@
 .om .ebay-workspace .commerce-brand-link{gap:4px}
 .om .ebay-workspace .commerce-platform-logo[alt="Amazon"]{opacity:.48}
 .om .commerce-orders .commerce-status-edit{cursor:pointer;font:13.3333px Arial,sans-serif}
+
+/* Missing identity actions share the connected SELL link's column edges. */
+.om .ebay-workspace .commerce-identities{display:grid;grid-template-columns:30px max-content;column-gap:4px;row-gap:4px;align-items:center;width:max-content;max-width:100%}
+.om .ebay-workspace .commerce-identities .commerce-field{display:contents}
+.om .ebay-workspace .commerce-identities .commerce-field>div{min-width:0}
+.om .ebay-workspace .commerce-identities .commerce-add-product{display:flex;justify-content:space-between;gap:3px;width:100%;border:0;padding:0;background:none;color:rgb(38,120,217);font:700 13px/21px CommerceInter,Inter,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer}
+.om .ebay-workspace .commerce-identities .commerce-add-product:hover{color:#69b1ff}
+.om .commerce-orders .commerce-unlinked.commerce-missing-amount{font-size:26px;line-height:21px;vertical-align:middle}
+
+@font-face{font-family:CommerceAction;src:url(fonts/inter-bold-reference.woff2) format("woff2");font-weight:400;font-display:swap}
+.om .ebay-workspace .commerce-identities .commerce-add-product{font-family:CommerceAction,CommerceInter,sans-serif;font-weight:400;transition:color .3s}
+.om .ebay-workspace .commerce-identities .commerce-add-product:hover{color:rgb(228,158,76)}
