@@ -1,10 +1,14 @@
 (function(root){'use strict';
 class SessionHistory{
- constructor(key,storage){this.key=key;this.storage=storage;this.past=[];this.future=[];this.running=false;try{const saved=JSON.parse(storage?.getItem(key)||'null');if(saved?.version===1){this.past=saved.past;this.future=saved.future;}}catch{}}
- persist(){try{this.storage?.setItem(this.key,JSON.stringify({version:1,past:this.past,future:this.future}));}catch{/* The complete history remains available in memory if browser storage is full. */}}
- record(entry){if(this.running)return;this.past.push(structuredClone(entry));this.future=[];this.persist();}
+ constructor(key,storage){this.key=key;this.storage=storage;this.past=[];this.future=[];this.running=false;this.ids=new WeakMap();this.next=1;this.legacy=false;try{const saved=JSON.parse(storage?.getItem(key)||'null');if(saved?.version===1){this.past=saved.past;this.future=saved.future;this.legacy=true;}else if(saved?.version===2){this.next=saved.next;const read=id=>{const entry=JSON.parse(storage.getItem(key+':entry:'+id));if(!entry)throw Error('Incomplete undo history');this.ids.set(entry,id);return entry;};this.past=saved.past.map(read);this.future=saved.future.map(read);}}catch{}}
+ entryId(entry){if(!this.ids.has(entry))this.ids.set(entry,this.next++);return this.ids.get(entry);}
+ writeEntry(entry){this.storage?.setItem(this.key+':entry:'+this.entryId(entry),JSON.stringify(entry));}
+ manifest(){this.storage?.setItem(this.key,JSON.stringify({version:2,next:this.next,past:this.past.map(e=>this.entryId(e)),future:this.future.map(e=>this.entryId(e))}));}
+ persist(){try{for(const e of [...this.past,...this.future])this.writeEntry(e);this.manifest();this.legacy=false;}catch{/* In-memory history and the independent recovery draft remain available. */}}
+ persistEntry(entry){if(this.legacy){this.persist();return;}try{this.writeEntry(entry);}catch{}}
+ record(entry){if(this.running)return;const discarded=this.future;this.past.push(structuredClone(entry));this.future=[];if(this.legacy){this.persist();return;}try{this.writeEntry(this.past.at(-1));this.manifest();for(const e of discarded)this.storage?.removeItem(this.key+':entry:'+this.ids.get(e));}catch{}}
  async travel(redo,apply){if(this.running)return false;const source=redo?this.future:this.past,target=redo?this.past:this.future;if(!source.length)return false;this.running=true;try{const entry=source[source.length-1];await apply(entry,redo);source.pop();target.push(entry);this.persist();return true;}finally{this.running=false;}}
- clear(){this.past=[];this.future=[];this.storage?.removeItem(this.key);}
+ clear(){for(const e of [...this.past,...this.future])this.storage?.removeItem(this.key+':entry:'+this.ids.get(e));this.past=[];this.future=[];this.storage?.removeItem(this.key);}
 }
 function averageDaily(value){return value<=0?0:value<=.66?.5:Math.max(1,Math.round(value));}
 function days(year,month){return Array.from({length:new Date(year,month,0).getDate()},(_,i)=>`${year}-${String(month).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`);}

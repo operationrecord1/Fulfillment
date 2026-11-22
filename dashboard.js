@@ -1,7 +1,8 @@
 (function(){'use strict';
 const C=window.OrderCore,M=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money=c=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(c/100),num=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(n);
+const moneyFormat=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}),numberFormat=new Intl.NumberFormat('en-US',{maximumFractionDigits:2});
+const money=c=>moneyFormat.format(c/100),num=n=>numberFormat.format(n);
 const palette=['#fe8101','#01a6ff','#6eb146'];
 const Charts=window.OrderCharts;
 const kpiIcons={"count":"M8 4h12v17H4V4h4M8 2h8v4H8zM7 10l1 1 2-2M12 10h5M7 16l1 1 2-2M12 16h5","revenue":"M3 17l6-6 4 3 8-10M15 4h6v6","cost":"M4 8l8-5 8 5v10l-8 4-8-4zM4 8l8 5 8-5M12 13v9","gross":"M4 20V10h4v10M10 20V6h4v14M16 20V2h4v18","tax":"M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6","expense":"M3 6h17v14H3zM3 6V4h14M15 11h6v5h-6z","net":"M3 8h18v12H3zM3 8V5h14M15 12h6v5h-6zM6 15l2 2 4-5","margin":"M6 18L18 6M8 6a2 2 0 1 0-4 0 2 2 0 0 0 4 0M20 18a2 2 0 1 0-4 0 2 2 0 0 0 4 0","avgOrder":"M4 7h16v14H4zM8 3v4M16 3v4M8 13h8M8 17h5","avgProfit":"M12 3v18M16 7c-1-3-8-3-8 1s8 2 8 6-7 4-9 1","avgDaily":"M4 5h16v16H4zM8 3v4M16 3v4M4 10h16M8 14h3M8 17h6"};
@@ -94,9 +95,9 @@ async function flush(){
   const sent=structuredClone(pendingCommit.sent);const {data,error}=await client.rpc('workspace_commit',{payload:pendingCommit.payload});
   if(error){if(/This month changed in another session/.test(error.message)&&conflicts++<4){const fresh=await rpc('read',{year});const remote={rows:fresh.rows.filter(r=>r.month===month).map(r=>({...r,_key:r.id})),formats:fresh.formats?.[month]||{}};const merged=Sync.merge(bases[pk]||{rows:[],formats:{}},snapshot(),remote);installSnapshot(merged);bases[pk]=structuredClone(remote);state.periodRevisions[month]=fresh.period_revisions[month]||0;pendingCommit=null;protectDraft();continue;}throw Object.assign(new Error(error.message),{code:error.code});}
   const mappings=new Map(data.mappings.map(m=>[m.key,m]));
-  const identify=rows=>{for(const r of rows){const m=mappings.get(r._key||r.id);if(m){r.id=m.id;r.display_number=m.display_number;r.revision=m.revision;}}};
+  const identify=rows=>{let changed=false;for(const r of rows){const m=mappings.get(r._key||r.id);if(m){if(r.id!==m.id||r.display_number!==m.display_number||r.revision!==m.revision)changed=true;r.id=m.id;r.display_number=m.display_number;r.revision=m.revision;}}return changed;};
   identify(sent.rows);identify(state.rows);grid.syncIds(data.mappings);
-  for(const entry of [...session.past,...session.future])if(entry.kind==='grid'&&entry.year===year&&entry.month===month)for(const snap of [entry.before,entry.after])identify(snap.rows);session.persist();
+  for(const entry of [...session.past,...session.future])if(entry.kind==='grid'&&entry.year===year&&entry.month===month){let changed=false;for(const snap of [entry.before,entry.after])changed=identify(snap.rows)||changed;if(changed)session.persistEntry(entry);}
   state.periodRevisions[month]=data.revision;bases[pk]=sent;pendingCommit=null;retryAttempt=0;
   if(Sync.equivalent(sent,snapshot())){dirty=false;if(grid.editor)protectDraft();else draftStore.remove(year,month);}else protectDraft();
   collaboration?.send({type:'broadcast',event:'saved',payload:{year,month,revision:data.revision}}).catch(()=>{});
@@ -173,7 +174,7 @@ const sessionKeys=e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey||e.target.closest('in
 const profileMenu=host.querySelector('.om-profile-menu');
 const navIcon=path=>'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+path+'"/></svg>';profileMenu.innerHTML='<div class="profile-menu-identity"></div>'+(investor?'':'<button type="button" id="om-settings-nav">'+navIcon('M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M8 15v6')+'<span>Settings</span></button>')+'<button type="button" id="om-signout">'+navIcon('M10 4H4v16h6M9 12h11m-4-4 4 4-4 4')+'<span>Log out</span></button>';profileMenu.addEventListener('toggle',()=>{const trigger=host.querySelector('.om-profile-trigger'),rect=trigger.getBoundingClientRect();trigger.setAttribute('aria-expanded',String(profileMenu.matches(':popover-open')));profileMenu.style.top=(rect.bottom+8)+'px';profileMenu.style.right=Math.max(8,innerWidth-rect.right)+'px';});
 document.documentElement.dataset.omTheme='light';localStorage.removeItem('fulfillment-theme:'+user.id);
-if(!investor)profileMenu.querySelector('#om-settings-nav').onclick=async()=>{if(!await flush())return;profileMenu.hidePopover();openSettings();};
+if(!investor)profileMenu.querySelector('#om-settings-nav').onclick=()=>{if(!grid.commitEditor())return;if(dirty){protectDraft();if(!draftProtected)return;}profileMenu.hidePopover();openSettings();setTimeout(autoFlush,0);};
 profileMenu.querySelector('#om-signout').onclick=signOutWorkspace;
 
 const pullEvents=new AbortController(),pullHint=document.createElement('div');pullHint.className='om-pull-refresh';pullHint.hidden=true;pullHint.setAttribute('role','status');host.querySelector('.om').append(pullHint);let pullStart=null,pullDistance=0,refreshing=false;
