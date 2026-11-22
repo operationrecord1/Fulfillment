@@ -40,3 +40,14 @@ test('traffic history uses bounded windows and listing analytics batches IDs',as
  const listing=await readPage({resource:'listing_traffic',listing_ids:['123']},'token',fetcher);
  assert.equal(listing.done,true);assert.equal(listing.records[0].id,'123');
 });
+
+test('active catalog reconciliation waits for the last full-scan page',async()=>{
+ const fetcher=next=>async()=>Response.json({data:{sellerListingSearch:{activeListings:{__typename:'SellerListings',listings:[{listingId:'123'}],pagination:next?{nextCursor:'next'}:{}}}}});
+ const partial=await readPage({resource:'listings'},'token',fetcher(true));
+ assert.equal(partial.reconcile_active_before,undefined);
+ const complete=await readPage({resource:'listings',cursor:partial.cursor},'token',fetcher(false));
+ assert.equal(complete.reconcile_active_before,partial.cursor.end);
+ assert.equal(complete.records[0].data.catalog_present,true);
+ const incremental=await readPage({resource:'listings',watermark:'2026-11-22T00:00:00Z'},'token',fetcher(false));
+ assert.equal(incremental.reconcile_active_before,undefined);
+});

@@ -1,7 +1,7 @@
 alter table fulfillment_private.ebay_sync_jobs add column if not exists reset_requested boolean not null default false;
 alter table fulfillment_private.ebay_sync_jobs add column if not exists requested_at timestamptz;
 
-create function public.ebay_workspace_page(target uuid,kind text default 'orders',query_text text default '',status_filter text default '',page_number integer default 1,page_size integer default 25) returns jsonb
+create or replace function public.ebay_workspace_page(target uuid,kind text default 'orders',query_text text default '',status_filter text default '',page_number integer default 1,page_size integer default 25) returns jsonb
 language plpgsql security definer set search_path='' as $$
 declare result jsonb; n integer:=greatest(1,page_number); size integer:=least(100,greatest(10,page_size));
 begin
@@ -17,7 +17,7 @@ begin
  paged as (select * from filtered order by created desc nulls last,external_id desc limit size offset (n-1)*size)
  select jsonb_build_object('total',(select count(*) from filtered),'counts',(select coalesce(jsonb_object_agg(state,c),'{}') from (select coalesce(state,'UNKNOWN') state,count(*) c from records group by 1) c),
  'rows',coalesce((select jsonb_agg(jsonb_build_object('id',p.external_id,'data',p.data,'updated_at',p.updated_at,'image',case when kind='orders' then (select l.data#>>'{listing,sellerProduct,images,0,ebayImageUrl}' from fulfillment_private.ebay_records l where l.store_id=target and l.resource='listings' and l.external_id=p.data#>>'{lineItems,0,legacyItemId}' limit 1) else p.data#>>'{listing,sellerProduct,images,0,ebayImageUrl}' end,'traffic',case when kind='listings' then (select t.data from fulfillment_private.ebay_records t where t.store_id=target and t.resource='listing_traffic' and t.external_id=p.external_id) else null end) order by p.created desc nulls last,p.external_id desc) from paged p),'[]'),
- 'sync',(select jsonb_build_object('last_success',last_success,'error',last_error,'running',lease_until>now() or reset_requested,'requested_at',requested_at) from fulfillment_private.ebay_sync_jobs where store_id=target and resource=kind),
+ 'sync',(select jsonb_build_object('last_success',last_success,'error',last_error,'running',coalesce(lease_until>now(),false) or reset_requested or cursor<>'{}'::jsonb,'requested_at',requested_at) from fulfillment_private.ebay_sync_jobs where store_id=target and resource=kind),
  'seller',(select username from fulfillment_private.ebay_connections where store_id=target),'store',(select name from public.stores where id=target)) into result;
  return result;
 end $$;
