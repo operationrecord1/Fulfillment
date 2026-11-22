@@ -110,3 +110,10 @@
 .om .commerce-orders .commerce-order-identities .commerce-brand-link:hover{color:rgb(105,177,255);text-decoration:none}
 .om .commerce-orders .commerce-order-identities .commerce-brand-link{gap:5px}
 .om .commerce-orders .commerce-order-identities .commerce-field{flex-direction:row}.om .commerce-orders .commerce-order-identities .commerce-field>span{height:16px}
+
+/* Shared ID column keeps missing BUY actions aligned with the SELL identity. */
+.om .commerce-orders .commerce-order-identities{display:grid;grid-template-columns:30px max-content;column-gap:5px;row-gap:0}
+.om .commerce-orders .commerce-order-identities .commerce-field{display:contents}
+.om .commerce-orders .commerce-order-identities .commerce-field>div{display:flex;align-items:center;min-height:32px}
+.om .commerce-orders .commerce-order-identities .commerce-brand-link{font-weight:500;color:#787b80}
+.om .commerce-orders .commerce-order-identities .commerce-add-product{width:100%;justify-content:space-between;gap:5px;font:500 13px/21px CommerceInter,Inter,sans-serif;color:#787b80}
