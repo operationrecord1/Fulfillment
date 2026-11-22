@@ -15,6 +15,18 @@
 .om .orders-picker-months button,.om .orders-picker-years button{border:1px solid transparent;border-radius:6px;background:#f5f8f5;color:#56705e;font-size:12px;padding:7px 3px;transition:background .12s,border-color .12s}.om .orders-picker-years button{min-height:34px}.om .orders-picker-months button:hover,.om .orders-picker-years button:hover{background:#eaf3ed;border-color:#aac3b2}.om .orders-period-popup button[aria-pressed=true]{background:#deece3;border-color:#749c82;color:#234f36;font-weight:600}
 .om .orders-picker-full{flex-shrink:0;width:100%;padding:9px 8px;margin-top:12px;background:#edf5ef;border:1px solid #d9e7dd;border-radius:7px;color:#326148;font-size:12px!important}.om .orders-period-popup button:focus-visible,.om .orders-period-trigger:focus-visible{outline:2px solid #43845e;outline-offset:1px}
 @media(max-width:650px){.om .orders-kpis .orders-period-card{min-height:120px}.om .orders-period-trigger{padding:10px 7px;font-size:14px}}
+/* Match the Dashboard pagination's centered controls and restrained blue feedback. */
+.om .orders-kpis .orders-period-card{background:#fff;border-color:#e0e8e2}
+.om .orders-period-trigger{justify-content:center;gap:8px;background:#fff;border-color:#dce2e8;color:#364553;text-align:center;box-shadow:none;font-weight:500}
+.om .orders-period-trigger:hover,.om .orders-period-trigger[aria-expanded=true]{background:#f1f4f8;border-color:#b4c9e5}
+.om .orders-period-chevron{display:block;width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .16s ease}
+.om .orders-period-trigger[aria-expanded=true]>.orders-period-chevron,.om .orders-picker-year[aria-expanded=true]>.orders-period-chevron{transform:rotate(180deg)}
+.om .orders-picker-head{justify-content:center;position:relative;min-height:32px}.om .orders-picker-close{position:absolute;right:0;top:0}
+.om .orders-picker-year{display:flex;align-items:center;justify-content:center;gap:7px;background:white;border-color:#dce2e8;color:#364553;min-width:88px}
+.om .orders-picker-year:hover{background:#f1f4f8}.om .orders-picker-months button,.om .orders-picker-years button{background:white;color:#425365}
+.om .orders-picker-months button:hover,.om .orders-picker-years button:hover{background:#f1f4f8;border-color:#dce2e8}
+.om .orders-period-popup button[aria-pressed=true]{background:#eaf1fc;border-color:#b4c9e5;color:#174ea6}
+.om .orders-picker-full{background:#f5f8fb;color:#3e5b78;border-color:#dce4ed}.om .orders-picker-full:hover{background:#eaf1fc;border-color:#b4c9e5}
 /* Isolate chart headings from the public site's global header styling. */
 .om .orders-chart>header{display:block;position:static;inset:auto;height:auto;min-height:0;width:auto;padding:0;margin:0;border:0;background:transparent;box-shadow:none;backdrop-filter:none;z-index:auto}
 .om .orders-chart>header h3{display:block;margin:0 0 5px}.om .orders-chart>header p{display:block;margin:0;line-height:1.5}
