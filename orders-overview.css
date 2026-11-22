@@ -119,3 +119,8 @@
 @media(max-width:1400px){.om .orders-charts.om-charts{grid-template-columns:200px 200px minmax(0,1fr)}.om .orders-charts>.om-panel:nth-child(-n+2) .om-chart{max-width:170px;margin-inline:auto}.om .orders-charts>.om-panel{padding:12px 9px}}
 
 .om .orders-trend-chart{overflow:visible}
+
+.om .ebay-workspace.commerce-orders{background:#f4f7fa}
+.om .orders-kpis .orders-add-expense{position:absolute;top:auto;bottom:5px;right:8px;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:550;padding:3px 5px;border:0;background:transparent;color:#586b75;margin:0}
+.om .orders-kpis>[data-metric=expense]{padding-bottom:18px}
+.om .orders-kpis .orders-add-expense:hover{background:#edf3fa;border-color:#bacbdb}
