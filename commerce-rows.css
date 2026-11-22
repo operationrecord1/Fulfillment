@@ -32,3 +32,5 @@
 .om .commerce-product-dialog button{padding:9px 15px;border:1px solid #ccd5d0;border-radius:6px;background:white;cursor:pointer}
 .om .commerce-product-dialog button[type=submit]{background:#23604c;color:white;border-color:#23604c}
 .commerce-product-dialog .product-error{color:#b63e3e;font-size:12px;line-height:1.5}
+
+.om .commerce-orders .commerce-identities .commerce-field>div{white-space:nowrap}.om .commerce-orders .commerce-identities .commerce-link span{display:none}.om .commerce-orders .commerce-add-product[aria-label]{font-size:11px;margin-left:2px}.om .commerce-orders .commerce-identities .commerce-unlinked{font-size:12px}
