@@ -5,7 +5,7 @@ function supplierUrl(raw,supplier){try{const u=new URL(raw);const domain={Amazon
 const api={carrier,supplierUrl,mount({container,client,storeId,onSave}){
  const dialog=document.createElement('dialog');dialog.className='order-edit-dialog';container.append(dialog);let row=null,initial={},busy=false,dirty=false;
  const field=(label,name,type='text')=>'<label>'+label+'<input name="'+name+'" type="'+type+'" '+(type==='number'?'min="0" step="0.01"':'maxlength="2000"')+'></label>';
- const select=(label,name,options)=>'<label>'+label+'<select name="'+name+'">'+options.map(x=>'<option value="'+esc(x)+'">'+esc(x||'Select '+label.toLowerCase())+'</option>').join('')+'</select></label>';
+ const select=(label,name,options)=>'<label>'+label+'<select aria-label="'+label+'" name="'+name+'">'+options.map(x=>'<option value="'+esc(x)+'">'+esc(x||'Select '+label.toLowerCase())+'</option>').join('')+'</select></label>';
  function open(r,asin){row=r;const m=root.EbayPresentation.order(r),d=r.data||{},contact=d.fulfillmentStartInstructions?.[0]?.shippingStep?.shipTo||{},a=contact.contactAddress||{},name=(contact.fullName||'').trim().split(/\s+/),edit=r.edit?.data||{};
  initial={status:m.localStatus[0]||'',tags:'',note:m.note.join('\n'),purchase_id:m.purchase.join(', '),buyer_account:'',buy_price:m.cost??'',tracking:m.tracking.join(', '),carrier:'',supplier:'Amazon',buy_url:asin?'https://www.amazon.com/dp/'+asin:'',first_name:name.shift()||'',last_name:name.join(' '),address1:a.addressLine1||'',address2:a.addressLine2||'',city:a.city||'',state:a.stateOrProvince||'',zip:a.postalCode||'',country:a.countryCode||'',phone:contact.primaryPhone?.phoneNumber||'',...edit};
  dirty=false;busy=false;
