@@ -23,6 +23,7 @@ begin
  if action='claim' then
   -- Serialize claim selection, including claims for different resources of one seller.
   perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('ebay_sync_claim',0));
+  update fulfillment_private.ebay_sync_jobs set cursor='{}',watermark=null,reset_requested=false,available_at=now() where reset_requested and coalesce(lease_until,now())<=now();
   insert into fulfillment_private.ebay_sync_jobs(store_id,resource)
   select store_id,k from fulfillment_private.ebay_connections cross join unnest(array['orders','listings','returns','transactions','traffic','listing_traffic']) k on conflict do nothing;
   select * into j from fulfillment_private.ebay_sync_jobs a where a.available_at<=now()
@@ -53,6 +54,9 @@ begin
    insert into fulfillment_private.ebay_records(store_id,resource,external_id,data) values(target,j.resource,r->>'id',r->'data')
     on conflict(store_id,resource,external_id) do update set data=excluded.data,updated_at=now();
   end loop;
+  if j.resource='listings' and payload ? 'reconcile_active_before' then
+   update fulfillment_private.ebay_records set data=data||'{"catalog_present":false}'::jsonb where store_id=target and resource='listings' and data#>>'{listing,listingTerms,lifecycleTerms,listingStatus}'='ACTIVE' and updated_at<(payload->>'reconcile_active_before')::timestamptz;
+  end if;
   update fulfillment_private.ebay_sync_jobs set cursor=coalesce(payload->'cursor','{}'),
    watermark=case when (payload->>'done')::boolean then (payload->>'watermark')::timestamptz else watermark end,
    last_success=case when (payload->>'done')::boolean then now() else last_success end,

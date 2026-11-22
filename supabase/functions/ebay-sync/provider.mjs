@@ -25,17 +25,18 @@ const listingFields=`listings { listingId listing { marketplace sellerProduct { 
 export async function readPage(job,token,fetcher=fetch,now=Date.now()){
  const c=job.cursor||{},end=c.end||date(now),offset=c.offset||0;
  const get=(url,options)=>request(url,token,options,fetcher);
- let rows,next=null;
+ let rows,next=null,reconcileActive;
  if(job.resource==='listings'){
   const phase=c.phase||'active',field=phase+'Listings',input='Seller'+phase[0].toUpperCase()+phase.slice(1)+'ListingSearchInput';
   const filters=job.watermark?{modifiedAtRange:{startAt:date(Date.parse(job.watermark)-5*60000),endAt:end}}:undefined;
   const result=await get('https://graphqlapi.ebay.com/graphql',{method:'POST',body:JSON.stringify({query:`query MirrorListings($input: ${input}) { sellerListingSearch { ${field}(searchInput: $input) { __typename ... on SellerListings { ${listingFields} } } } }`,variables:{input:{filters,pagination:{maxPageSize:100,...(c.pageCursor?{pageCursor:c.pageCursor}:{})}}}})});
   const page=result.data?.sellerListingSearch?.[field];
   if(page?.__typename!=='SellerListings'||!Array.isArray(page.listings))throw new ProviderError('eBay listing response could not be validated');
-  rows=page.listings.map(data=>({id:data.listingId,data:{...data,syncCategory:phase}}));
+  rows=page.listings.map(data=>({id:data.listingId,data:{...data,syncCategory:phase,catalog_present:true}}));
   if(page.pagination?.nextCursor)next={end,phase,pageCursor:page.pagination.nextCursor};
   else if(phase==='active')next={end,phase:'ended'};
   else if(phase==='ended')next={end,phase:'scheduled'};
+  if(phase==='active'&&!page.pagination?.nextCursor&&!job.watermark)reconcileActive=end;
  } else if(job.resource==='traffic'||job.resource==='listing_traffic'){
   const perListing=job.resource==='listing_traffic';
   const finish=c.reportEnd?Date.parse(c.reportEnd):Date.parse(end)-DAY;
@@ -70,5 +71,5 @@ export async function readPage(job,token,fetcher=fetch,now=Date.now()){
   if(entries.length===100)next={start,end,offset:offset+100};
  }
  if(rows.some(r=>!r.id||r.id.endsWith(':undefined')))throw new ProviderError('Missing eBay record identifier');
- return {records:rows,cursor:next||{},done:!next,watermark:end};
+ return {records:rows,cursor:next||{},done:!next,watermark:end,...(reconcileActive?{reconcile_active_before:reconcileActive}:{})};
 }
