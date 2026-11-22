@@ -9,7 +9,7 @@ window.OrderTitleTooltip={mount(container){
  const over=e=>{const el=e.target.closest('[data-full-title]');if(el&&container.contains(el))show(el);};
  const out=e=>{const el=e.target.closest('[data-full-title]');if(!el||el.contains(e.relatedTarget)||tip.contains(e.relatedTarget))return;later();};
  const focus=e=>{const el=e.target.closest('[data-full-title]');if(el)show(el);};
- const blur=e=>{if(!tip.contains(e.relatedTarget))later();};
+ const blur=e=>{if(!tip.contains(e.relatedTarget)&&!tip.matches(':hover'))later();};
  const key=e=>{if(e.key==='Escape')hide();};
  const outside=e=>{if(!tip.contains(e.target)&&!active?.contains(e.target))hide();};
  tip.addEventListener('pointerenter',cancel);tip.addEventListener('pointerleave',later);tip.addEventListener('pointerdown',cancel);
