@@ -121,3 +121,12 @@
 /* Restore the missing Order ID action; keep the SELL ID styling untouched. */
 .om .commerce-orders .commerce-order-identities .commerce-add-product{color:rgb(38,120,217);font:400 13px/21px CommerceAction,CommerceInter,sans-serif;justify-content:space-between;gap:4px}
 .om .commerce-orders .commerce-order-identities .commerce-id-separator{display:inline-block;transform:scaleX(1.5);transform-origin:center;flex:none}
+
+/* Match the Dashboard expense-close hover palette across Order ID states. */
+.om .commerce-orders .commerce-order-identities :is(.commerce-add-product,.commerce-brand-link){border-radius:4px;transition:background .18s,color .18s,box-shadow .18s}
+.om .commerce-orders .commerce-order-identities :is(.commerce-add-product,.commerce-brand-link):is(:hover,:focus-visible){background:#edf3fa;color:#253746;box-shadow:0 0 0 1px #bacbdb;text-decoration:none}
+/* Give every status, including Label Created, its full readable width. */
+.om .commerce-orders .ebay-table{width:1692px;min-width:1692px}
+.om .commerce-orders .commerce-status-edit.sheet-chip.sheet-select-frame{width:100%;max-width:100%;height:30px;min-height:30px;margin:0;padding:4px 8px;gap:6px}
+.om .commerce-orders .commerce-status-edit .sheet-selected-value{flex:1;gap:6px;min-width:0}
+.om .commerce-orders .commerce-status-edit .sheet-selected-value>span{white-space:nowrap;overflow:visible;text-overflow:clip}
