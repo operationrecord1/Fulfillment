@@ -27,6 +27,12 @@
 .om .orders-picker-months button:hover,.om .orders-picker-years button:hover{background:#f1f4f8;border-color:#dce2e8}
 .om .orders-period-popup button[aria-pressed=true]{background:#eaf1fc;border-color:#b4c9e5;color:#174ea6}
 .om .orders-picker-full{background:#f5f8fb;color:#3e5b78;border-color:#dce4ed}.om .orders-picker-full:hover{background:#eaf1fc;border-color:#b4c9e5}
+/* Borderless period controls and a left-aligned year heading. */
+.om .orders-period-trigger,.om .orders-period-trigger:hover,.om .orders-period-trigger[aria-expanded=true]{border-color:transparent;box-shadow:none}
+.om .orders-period-popup{border:0}
+.om .orders-picker-head{justify-content:flex-start;gap:10px}
+.om .orders-picker-year-label{font-size:12px;color:#697c6e}
+.om .orders-picker-year{border-color:transparent;min-width:80px;background:#f5f7f9}
 /* Isolate chart headings from the public site's global header styling. */
 .om .orders-chart>header{display:block;position:static;inset:auto;height:auto;min-height:0;width:auto;padding:0;margin:0;border:0;background:transparent;box-shadow:none;backdrop-filter:none;z-index:auto}
 .om .orders-chart>header h3{display:block;margin:0 0 5px}.om .orders-chart>header p{display:block;margin:0;line-height:1.5}
