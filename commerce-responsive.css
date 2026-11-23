@@ -232,3 +232,12 @@
  .om .commerce-orders .overview-charts.om-charts{grid-template-columns:minmax(0,1fr)}
  .om .commerce-orders .ebay-table tbody td:nth-child(8){display:none}
 }
+@media(max-width:1100px){
+ .om .commerce-orders .commerce-order-identities .commerce-platform-logo{display:none}
+ .om .commerce-orders .order-row-tools [data-note-tooltip]::after{left:auto;right:0;transform:none}
+ .om .commerce-orders .overview-kpis .om-kpi-icon{overflow:hidden}
+ .om .commerce-orders .commerce-image{padding:0;overflow:hidden}
+}
+@media(max-width:360px){
+ .om .commerce-orders .commerce-status-edit{font-size:10px;padding-inline:5px;gap:4px}
+}
