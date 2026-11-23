@@ -1,4 +1,7 @@
 import {refreshAccess,readPage,ProviderError} from './provider.mjs';
+import {XMLParser} from 'npm:fast-xml-parser@4.5.3';
+import {readDelivery} from './delivery.mjs';
+const deliveryParser=new XMLParser({ignoreAttributes:true,removeNSPrefix:true,parseTagValue:false,processEntities:false});
 const base=Deno.env.get('SUPABASE_URL')!;
 const keys=JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')||'{}');
 const key=keys.default||Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'';
@@ -27,7 +30,8 @@ Deno.serve(async(req:Request)=>{
     };
     if(Date.parse(job.access_expires_at)<=Date.now()+60000)await renew();
     let page;
-    try{page=await readPage(job,token);}catch(e){if(e instanceof ProviderError&&e.status===401&&!refreshed){await renew();page=await readPage(job,token);}else throw e;}
+    const read=()=>job.resource==='delivery_tracking'?readDelivery(job,token,fetch,xml=>deliveryParser.parse(xml)):readPage(job,token);
+    try{page=await read();}catch(e){if(e instanceof ProviderError&&e.status===401&&!refreshed){await renew();page=await read();}else throw e;}
     await work('commit',{...identity,...page});completed++;
    }catch(e){
     const known=e instanceof ProviderError;

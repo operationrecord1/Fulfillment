@@ -14,9 +14,10 @@ function orderStatus(row){
  const openReturns=returns.filter(r=>r.state!=='CLOSED');
  if(openReturns.some(r=>r.tracking?.active===true&&(r.tracking.deliveryStatus==='DELIVERED'||r.tracking.markAsReceived===true)))return 'Due Refund';
  if(openReturns.some(r=>r.tracking?.active===true&&r.tracking.labelDate?.value))return 'Label Created';
+ if(row.delivery?.source==='ebay_get_orders'&&row.delivery.deliveredAt&&Number.isFinite(Date.parse(row.delivery.deliveredAt)))return 'Delivered';
  // Retain manually confirmed delivery/return stages until a verified later event exists.
  if(['Delivered','Cancelled','Label Created'].includes(manual))return manual;
- if(d.orderFulfillmentStatus==='FULFILLED')return 'Shipped';
+ if(d.orderFulfillmentStatus==='FULFILLED'||(row.delivery?.source==='ebay_get_orders'&&row.delivery.hasTracking===true))return 'Shipped';
  const purchase=Object.hasOwn(edit,'purchase_id')?edit.purchase_id:values(records,'purchase_id').join('');
  if(String(purchase||'').trim()&&(!manual||manual==='Pending'))return 'Ordered';
  return manual==='Processed'?'Ordered':manual||'Pending';
