@@ -125,7 +125,7 @@ body.focused-auth .auth-submit:focus-visible,body.focused-auth .password-toggle:
 <script src="order-product-page.js?v=2"></script>
 <script src="order-row-actions.js?v=4"></script>
 <script src="commerce-refresh.js?v=1"></script>
-<script src="ebay-workspace.js?v=header-customer-3"></script><script src="dashboard.js?v=commerce-180"></script>
+<script src="ebay-workspace.js?v=commerce-pagination-1"></script><script src="dashboard.js?v=commerce-180"></script>
 <link rel="stylesheet" href="dashboard-cards.css?v=profile-logo-113">
 <link rel="stylesheet" href="workspace-pages.css?v=target-layout-111">
 <link rel="stylesheet" href="settings-gallery.css?v=platform-unified-115">
@@ -560,6 +560,20 @@ body.info-open .info-view{display:block}
 .om .commerce-orders .order-customer-lines{display:grid;grid-template-rows:32px 32px;align-items:center;min-width:0}
 .om .commerce-orders .order-customer-lines>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 13px/21px CommerceInter,Inter,sans-serif;color:#787b80;user-select:text}
 .om .commerce-orders .order-customer-lines>span:hover{color:#253746}
+
+/* Bounded commerce canvas: only table content scrolls horizontally. */
+.om .ebay-workspace:is(.commerce-orders,.commerce-listings){overflow-x:hidden;overflow-y:auto}
+.om .ebay-workspace :is(.orders-page-canvas,.listings-page-canvas){width:100%;min-width:0!important;max-width:1800px;margin-inline:auto;box-sizing:border-box}
+.om .commerce-orders .orders-overview{position:static;width:100%;min-width:0;max-width:100%}
+.om .ebay-workspace .ebay-table-scroll{width:100%;max-width:100%;overflow:auto;max-height:75dvh;min-height:180px;overscroll-behavior-x:contain}
+.om .ebay-workspace .commerce-pagination{width:100%;max-width:100%;box-sizing:border-box}
+.om .commerce-orders .order-tracking-lines{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:0}
+.om .commerce-orders .order-tracking-lines>span{max-width:100%;overflow-wrap:anywhere;white-space:normal;text-align:center}
+.om .orders-kpis.om-kpis{width:100%;min-width:0;grid-template-columns:repeat(6,minmax(0,1fr))}
+.om .orders-charts.om-charts{width:100%;min-width:0;grid-template-columns:200px 200px minmax(0,1fr)}
+.om .orders-trend-chart,.om .orders-trend-chart svg{width:100%;min-width:0!important;max-width:100%}
+@media(max-width:900px){.om .orders-kpis.om-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.om .orders-charts.om-charts{grid-template-columns:repeat(2,minmax(0,1fr))}.om .orders-charts.om-charts>.om-panel{grid-row:auto;grid-column:auto}.om .orders-charts.om-charts>.om-panel:last-child{grid-column:1/-1}}
+@media(max-width:550px){.om .orders-kpis.om-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.om .orders-charts.om-charts{grid-template-columns:minmax(0,1fr)}.om .orders-charts.om-charts>.om-panel{grid-column:1!important}.om .ebay-workspace .ebay-table-scroll{max-height:70dvh}}
 </style>
 <script src="public-site.js?v=brand-3"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
