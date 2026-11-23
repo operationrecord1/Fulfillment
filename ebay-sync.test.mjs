@@ -7,8 +7,14 @@ test('financial history uses actual transactions with durable bounded windows',a
  const page=await readPage({resource:'transactions_history',cursor:{}},'token',async url=>{const u=new URL(url);assert.equal(u.hostname,'apiz.ebay.com');assert.match(u.searchParams.get('filter'),/^transactionDate:/);return Response.json({transactions:[{transactionId:'fee-1',bookingEntry:'DEBIT',amount:{value:'0.70'}}],total:1});},Date.parse('2026-11-22T12:00:00Z'));
  assert.equal(page.records[0].id,'fee-1');assert.equal(page.records[0].data.amount.value,'0.70');assert.ok(page.cursor.end);assert.equal(page.done,false);
 });
-test('financial refresh overlaps seven days for delayed fees',async()=>{
- await readPage({resource:'transactions',cursor:{},watermark:'2026-11-22T12:00:00Z'},'token',async url=>{assert.match(new URL(url).searchParams.get('filter'),/2026-11-15T12:00:00.000Z/);return Response.json({transactions:[],total:0});});
+test('financial refresh uses small overlap and daily 60-day reconciliation',async()=>{
+ const now=Date.parse('2026-11-22T12:02:00Z');
+ const recent=await readPage({resource:'transactions',cursor:{},watermark:'2026-11-22T12:00:00Z',last_full_scan:'2026-11-22T00:00:00Z'},'token',async url=>{assert.match(new URL(url).searchParams.get('filter'),/2026-11-22T11:55:00.000Z/);return Response.json({transactions:[],total:0});},now);
+ assert.equal(recent.finance_reconcile,undefined);
+ const full=await readPage({resource:'transactions',cursor:{},watermark:'2026-11-22T12:00:00Z'},'token',async url=>{assert.equal(new URL(url).searchParams.get('filter'),'transactionDate:['+new Date(now-60*86400000).toISOString()+'..'+new Date(now).toISOString()+']');return Response.json({transactions:[{transactionId:'a'}],total:2});},now);
+ assert.equal(full.cursor.financeReconcile,true);assert.equal(full.done,false);
+ const next=await readPage({resource:'transactions',cursor:full.cursor,watermark:'2026-11-22T12:00:00Z'},'token',async url=>{assert.equal(new URL(url).searchParams.get('offset'),'1');return Response.json({transactions:[{transactionId:'b'}],total:2});},now+86400000);
+ assert.equal(next.finance_reconcile,true);assert.equal(next.done,true);assert.equal(next.watermark,full.watermark);
 });
 test('refresh preserves long-lived token by returning access fields only',async()=>{
  const token=await refreshAccess({ebay_client_id:'id',ebay_client_secret:'secret'},'refresh',async(url,init)=>{

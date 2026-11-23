@@ -29,6 +29,7 @@ export async function readPage(job,token,fetcher=fetch,now=Date.now()){
  if(job.resource==='orders_history'||job.resource==='transactions_history')return readHistory(job,token,fetcher,now);
  const get=(url,options)=>request(url,token,options,fetcher);
  let rows,next=null,reconcileActive,snapshot;
+ const financeReconcile=job.resource==='transactions'&&(c.financeReconcile??(!job.last_full_scan||now-Date.parse(job.last_full_scan)>=DAY));
  if(job.resource==='listings'){
   const phase=c.phase||'active',field=phase+'Listings',input='Seller'+phase[0].toUpperCase()+phase.slice(1)+'ListingSearchInput';
   const filters=job.watermark?{modifiedAtRange:{startAt:date(Date.parse(job.watermark)-5*60000),endAt:end}}:undefined;
@@ -56,7 +57,7 @@ export async function readPage(job,token,fetcher=fetch,now=Date.now()){
   if(perListing&&job.listing_ids.length===50)next={end,after:job.listing_ids.at(-1)};
   if(!perListing&&!job.watermark&&start>floor)next={end,reportEnd:date(start-DAY)};
  } else {
-  const start=c.start||(job.resource==='orders'&&job.watermark?date(Date.parse(job.watermark)-5*60000):job.resource==='transactions'&&job.watermark?date(Date.parse(job.watermark)-7*DAY):date(now-89*DAY));
+  const start=c.start||(job.resource==='orders'&&job.watermark?date(Date.parse(job.watermark)-5*60000):job.resource==='transactions'&&job.watermark?date(financeReconcile?now-60*DAY:Date.parse(job.watermark)-5*60000):date(now-89*DAY));
   let url,key,id;
   const params=new URLSearchParams({limit:'100',offset:String(offset)});
   if(job.resource==='orders'){
@@ -74,10 +75,10 @@ export async function readPage(job,token,fetcher=fetch,now=Date.now()){
   const entries=data[key]||[];
   rows=entries.map(data=>({id:String(data[id]||''),data}));
   // Fetch one extra empty page when the API does not expose a total.
-  if(data.next||(Number.isFinite(data.total)?offset+entries.length<data.total:entries.length===100)){if(!entries.length)throw new ProviderError('Order pagination returned an incomplete page');next={start,end,offset:offset+entries.length};}
+  if(data.next||(Number.isFinite(data.total)?offset+entries.length<data.total:entries.length===100)){if(!entries.length)throw new ProviderError('Order pagination returned an incomplete page');next={start,end,offset:offset+entries.length,...(job.resource==='transactions'?{financeReconcile}:{})};}
  }
  if(rows.some(r=>!r.id||r.id.endsWith(':undefined')))throw new ProviderError('Missing eBay record identifier');
- return {records:rows,cursor:next||{},done:!next,watermark:end,...(snapshot?{snapshot}:{}),...(reconcileActive?{reconcile_active_before:reconcileActive}:{})};
+ return {records:rows,cursor:next||{},done:!next,watermark:end,...(financeReconcile?{finance_reconcile:true}:{}),...(snapshot?{snapshot}:{}),...(reconcileActive?{reconcile_active_before:reconcileActive}:{})};
 }
 
 // Independent, resumable history traversal; current-order sync stays available.

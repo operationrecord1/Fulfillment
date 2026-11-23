@@ -210,3 +210,6 @@
 [data-tip-placement=bottom] .note-tooltip-arrow{bottom:auto;top:calc(50% + 11px)}
 .om .order-row-popup textarea,.om .order-row-popup textarea:focus{background:#fff;box-shadow:none;outline:none}
 .om .order-row-popup textarea:focus{border-color:#8696a5}
+
+.om .commerce-orders .commerce-profit.loss,.om .commerce-orders .commerce-sell-amount.loss{color:#eb4242}
+.commerce-sell-amount{position:relative;display:inline-block}.commerce-sell-minus{position:absolute;right:100%;top:0;font-size:10px;line-height:inherit}
