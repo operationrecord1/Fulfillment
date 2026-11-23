@@ -280,7 +280,260 @@ body.info-open .info-view{display:block}
   </div>
 </section>
 
-<link rel="stylesheet" href="public-site.css?v=2"><link rel="stylesheet" href="orders-overview.css?v=commerce-150"><link rel="stylesheet" href="commerce-rows.css?v=commerce-195">
+<link rel="stylesheet" href="public-site.css?v=2"><link rel="stylesheet" href="orders-overview.css?v=commerce-150"><!-- Orders/Listings presentation is inline so a failed secondary CSS request cannot expose the base layout. Edit this style block directly. -->
+<style id="commerce-presentation">
+@font-face{font-family:CommerceInter;font-style:normal;font-weight:400;font-display:swap;src:url(fonts/inter-400.ttf) format("truetype")}
+@font-face{font-family:CommerceInter;font-style:normal;font-weight:500;font-display:swap;src:url(fonts/inter-500.ttf) format("truetype")}
+@font-face{font-family:CommerceInter;font-style:normal;font-weight:600;font-display:swap;src:url(fonts/inter-600.ttf) format("truetype")}
+.om .commerce-orders .ebay-table{width:1647px;min-width:1647px;table-layout:fixed;font-family:CommerceInter,Inter,sans-serif}
+.om .commerce-orders .ebay-table th{width:auto!important;font:600 13px/21px CommerceInter,Inter,sans-serif;color:#343b43}
+.om .commerce-orders .ebay-table td{font:400 13px/21px CommerceInter,Inter,sans-serif;color:#343b43;background:#fff}
+.om .commerce-orders .commerce-title{font:400 13px/21px CommerceInter,Inter,sans-serif;max-height:42px;-webkit-line-clamp:2;color:#26323c}
+.om .commerce-orders .commerce-field>div,.om .commerce-orders .commerce-link,.om .commerce-orders .commerce-unlinked{font:400 13px/21px CommerceInter,Inter,sans-serif}
+.om .commerce-orders .commerce-field>span{font:500 10px/18px CommerceInter,Inter,sans-serif}
+.om .commerce-orders .commerce-field{margin-top:2px}
+.om .commerce-orders .ebay-badge{font:500 12px/20px CommerceInter,Inter,sans-serif}
+.om .commerce-orders .commerce-add-product{border:0;background:none;color:#267561;font:400 13px/21px CommerceInter,Inter,sans-serif;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+.om .commerce-orders .ebay-table th:nth-child(6),.om .commerce-orders .ebay-table td:nth-child(6){border-right:1px solid #dfe5e2}
+@media(min-width:1150px){
+.om .commerce-orders .ebay-table td:nth-child(-n+6){position:sticky;z-index:2;background:#fff}
+.om .commerce-orders .ebay-table th:nth-child(-n+6){z-index:5}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(1){left:0px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(2){left:286px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(3){left:362px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(4){left:612px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(5){left:757px}
+.om .commerce-orders .ebay-table :is(td,th):nth-child(6){left:857px;box-shadow:3px 0 4px -4px #24372f}
+.om .commerce-orders .ebay-table td:has(.commerce-status[open]){z-index:6}
+}
+.om .commerce-orders .ebay-table .commerce-selected td{background:#eef6f2}
+.commerce-product-dialog{width:min(440px,calc(100vw - 32px));max-height:85vh;overflow:auto;padding:26px;border:1px solid #e0e5e2;border-radius:12px;background:white;color:#26323c;box-shadow:0 15px 60px #0002;font-family:CommerceInter,Inter,sans-serif}
+.commerce-product-dialog::backdrop{background:#172d2644}
+.om .commerce-product-dialog h2{font-size:20px;margin:0 0 24px}
+.commerce-product-dialog label{display:grid;gap:8px;font-size:13px}
+.om .commerce-product-dialog input{width:100%;padding:11px;border:1px solid #ccd5d0;border-radius:6px;font-size:14px}
+.commerce-product-dialog form>div{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+.om .commerce-product-dialog button{padding:9px 15px;border:1px solid #ccd5d0;border-radius:6px;background:white;cursor:pointer}
+.om .commerce-product-dialog button[type=submit]{background:#23604c;color:white;border-color:#23604c}
+.commerce-product-dialog .product-error{color:#b63e3e;font-size:12px;line-height:1.5}
+
+.om .commerce-orders .commerce-identities .commerce-field>div{white-space:nowrap}.om .commerce-orders .commerce-identities .commerce-link span{display:none}.om .commerce-orders .commerce-add-product[aria-label]{font-size:11px;margin-left:2px}.om .commerce-orders .commerce-identities .commerce-unlinked{font-size:12px}
+
+/* Orders title matches the measured AutoDS title block. */
+.om .commerce-orders .ebay-product{column-gap:7px}
+.om .commerce-orders .ebay-product>div{flex:0 0 165px;width:165px;min-width:0}
+.om .commerce-orders .commerce-title{font:600 13px/21px CommerceInter,Inter,sans-serif;text-align:left;max-height:42px;-webkit-line-clamp:2;text-decoration:none}
+.om .commerce-orders .commerce-title:hover,.om .commerce-orders .commerce-title:active{color:#26323c;text-decoration:none}
+
+.om .commerce-orders .commerce-title{word-break:normal;overflow-wrap:normal;white-space:normal;hyphens:none;cursor:default}
+.order-title-tooltip{position:fixed;z-index:10000;box-sizing:border-box;width:250px;max-width:calc(100vw - 16px);padding:6px 8px;border:0;border-radius:4px;background:rgb(9,14,53);color:white;font:400 13px/21px CommerceInter,Inter,sans-serif;text-align:left;white-space:normal;word-break:normal;overflow-wrap:break-word;user-select:text;cursor:text;box-shadow:0 6px 16px #00000014,0 3px 6px -4px #0000001f,0 9px 28px 8px #0000000d}
+.order-title-tooltip[hidden]{display:none}.order-title-tooltip::after{content:'';position:absolute;left:var(--arrow-left);width:8px;height:8px;background:inherit;transform:translateX(-50%) rotate(45deg)}.order-title-tooltip[data-placement=top]::after{bottom:-4px}.order-title-tooltip[data-placement=bottom]::after{top:-4px}
+.order-title-tooltip::before{content:'';position:absolute;left:0;right:0;height:14px}.order-title-tooltip[data-placement=top]::before{top:100%}.order-title-tooltip[data-placement=bottom]::before{bottom:100%}
+
+/* Listings use the same title treatment with 1.6x the Orders text width. */
+.om .commerce-listings .ebay-product{column-gap:7px}
+.om .commerce-listings .ebay-product>div{flex:0 0 264px;width:264px;min-width:0}
+.om .commerce-listings .commerce-title{font:600 13px/21px CommerceInter,Inter,sans-serif;text-align:left;max-height:42px;-webkit-line-clamp:2;text-decoration:none;color:#26323c;word-break:normal;overflow-wrap:normal;white-space:normal;hyphens:none;cursor:default}
+.om .commerce-listings .commerce-title:hover,.om .commerce-listings .commerce-title:active{color:#26323c;text-decoration:none}
+.om .commerce-listings .ebay-table{width:1480px;min-width:1480px}
+.om .commerce-listings .ebay-table th:first-child,.om .commerce-listings .ebay-table td:first-child{width:390px}
+
+.om .commerce-listings .commerce-title{user-select:text;-webkit-user-select:text;cursor:text}
+
+/* Larger unframed source images, shared by Orders and Listings. */
+.om .ebay-workspace .commerce-image,.om .ebay-workspace .ebay-product img,.om .ebay-workspace .ebay-image-empty{width:80px;height:80px;flex:0 0 80px;border:0;border-radius:0;background:transparent;box-shadow:none}
+.om .ebay-workspace .ebay-product img{padding:0;object-fit:contain;display:block;mix-blend-mode:multiply}
+.om .ebay-workspace .commerce-image{overflow:hidden;display:flex;align-items:center;justify-content:center;isolation:auto}
+.om .ebay-workspace .ebay-image-empty{color:#a3afa7;font-size:28px}
+.om .ebay-workspace .ebay-table tbody td{height:100px}
+
+/* Plain quantity, positioned relative to the measured title block. */
+.om .commerce-orders .commerce-quantity{display:inline;font:600 13px/21px CommerceInter,Inter,sans-serif;padding:0;min-width:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.om .commerce-orders .ebay-table td:nth-child(2){text-align:center;padding:10px 20px;vertical-align:middle}
+
+.om .commerce-orders .commerce-quantity{width:auto;height:auto}
+
+.om .commerce-orders .ebay-table th:nth-child(2){text-align:center;padding-left:20px;padding-right:20px}
+.om .commerce-orders .commerce-quantity{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* Reference-matched commerce identity rows. */
+.om .commerce-orders .ebay-table :is(th,td):nth-child(2){text-align:left;padding-left:8px;padding-right:8px}
+.om .commerce-orders .ebay-table td:nth-child(2){padding-left:27px}
+.om .ebay-workspace .commerce-identities .commerce-field{grid-template-columns:30px minmax(0,1fr);gap:8px;align-items:center;margin-top:4px}
+.om .ebay-workspace .commerce-identities .commerce-field>span{font:600 10px/16px CommerceInter,Inter,sans-serif;background:#f2f2f2;color:#5a5859;padding:0;text-align:center;border-radius:2px}
+.om .ebay-workspace .commerce-brand-link{display:inline-flex;gap:5px;align-items:center;vertical-align:middle;color:#26323c;white-space:nowrap}
+.om .ebay-workspace .commerce-platform-logo{width:24px;height:24px;object-fit:contain;flex:none}
+.om .commerce-orders .commerce-profit.gain{color:rgb(89,206,136)}
+.om .commerce-orders .commerce-profit.loss{color:#d83a43}
+.om .commerce-orders .commerce-add-product{font:400 13px/21px CommerceInter,Inter,sans-serif;color:#267561;white-space:nowrap}
+
+.om .commerce-orders .ebay-table :is(th,td):nth-child(2){padding-left:4px;padding-right:4px;text-align:center}
+.om .ebay-workspace .commerce-identities .commerce-field{gap:4px}
+.om .ebay-workspace .commerce-brand-link{gap:4px}
+.om .ebay-workspace .commerce-platform-logo[alt="Amazon"]{opacity:.48}
+.om .commerce-orders .commerce-status-edit{cursor:pointer;font:13.3333px Arial,sans-serif}
+
+/* Missing identity actions share the connected SELL link's column edges. */
+.om .ebay-workspace .commerce-identities{display:grid;grid-template-columns:30px max-content;column-gap:4px;row-gap:4px;align-items:center;width:max-content;max-width:100%}
+.om .ebay-workspace .commerce-identities .commerce-field{display:contents}
+.om .ebay-workspace .commerce-identities .commerce-field>div{min-width:0}
+.om .ebay-workspace .commerce-identities .commerce-add-product{display:flex;justify-content:space-between;gap:3px;width:100%;border:0;padding:0;background:none;color:rgb(38,120,217);font:700 13px/21px CommerceInter,Inter,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer}
+.om .ebay-workspace .commerce-identities .commerce-add-product:hover{color:#69b1ff}
+.om .commerce-orders .commerce-unlinked.commerce-missing-amount{font-size:26px;line-height:21px;vertical-align:middle}
+
+@font-face{font-family:CommerceAction;src:url(fonts/inter-bold-reference.woff2) format("woff2");font-weight:400;font-display:swap}
+.om .ebay-workspace .commerce-identities .commerce-add-product{font-family:CommerceAction,CommerceInter,sans-serif;font-weight:400;transition:color .3s}
+.om .ebay-workspace .commerce-identities .commerce-add-product:hover{color:rgb(228,158,76)}
+
+/* Order IDs follow the measured AutoDS Item ID row, without stretched action text. */
+.om .commerce-orders .commerce-order-identities{display:block;width:max-content;max-width:100%}
+.om .commerce-orders .commerce-order-identities .commerce-field{display:flex;align-items:center;gap:5px;height:32px;margin:0}
+.om .commerce-orders .commerce-order-identities .commerce-field>span{flex:0 0 30px}
+.om .commerce-orders .commerce-order-identities .commerce-add-product{display:inline-flex;justify-content:center;align-items:center;gap:8px;width:auto;height:32px;line-height:normal}
+.om .commerce-orders .commerce-order-identities .commerce-brand-link{font:400 13px/21px CommerceInter,Inter,sans-serif;color:rgb(90,88,89);text-decoration:none;transition:color .3s}
+.om .commerce-orders .commerce-order-identities .commerce-brand-link:hover{color:rgb(105,177,255);text-decoration:none}
+.om .commerce-orders .commerce-order-identities .commerce-brand-link{gap:5px}
+.om .commerce-orders .commerce-order-identities .commerce-field{flex-direction:row}.om .commerce-orders .commerce-order-identities .commerce-field>span{height:16px}
+
+/* Shared ID column keeps missing BUY actions aligned with the SELL identity. */
+.om .commerce-orders .commerce-order-identities{display:grid;grid-template-columns:30px max-content;column-gap:5px;row-gap:0}
+.om .commerce-orders .commerce-order-identities .commerce-field{display:contents}
+.om .commerce-orders .commerce-order-identities .commerce-field>div{display:flex;align-items:center;min-height:32px}
+.om .commerce-orders .commerce-order-identities .commerce-brand-link{font-weight:500;color:#787b80}
+.om .commerce-orders .commerce-order-identities .commerce-add-product{width:100%;justify-content:space-between;gap:5px;font:500 13px/21px CommerceInter,Inter,sans-serif;color:#787b80}
+
+/* Restore the missing Order ID action; keep the SELL ID styling untouched. */
+.om .commerce-orders .commerce-order-identities .commerce-add-product{color:rgb(38,120,217);font:400 13px/21px CommerceAction,CommerceInter,sans-serif;justify-content:space-between;gap:4px}
+.om .commerce-orders .commerce-order-identities .commerce-id-separator{display:inline-block;transform:scaleX(1.5);transform-origin:center;flex:none}
+
+/* Order ID hover changes text color only. */
+.om .commerce-orders .commerce-order-identities :is(.commerce-add-product,.commerce-brand-link){transition:color .18s}
+.om .commerce-orders .commerce-order-identities :is(.commerce-add-product,.commerce-brand-link):is(:hover,:focus-visible){color:#253746;text-decoration:none}
+/* Give every status, including Label Created, its full readable width. */
+.om .commerce-orders .ebay-table{width:1692px;min-width:1692px}
+.om .commerce-orders .commerce-status-edit.sheet-chip.sheet-select-frame{width:100%;max-width:100%;height:30px;min-height:30px;margin:0;padding:4px 8px;gap:6px}
+.om .commerce-orders .commerce-status-edit .sheet-selected-value{flex:1;gap:6px;min-width:0}
+.om .commerce-orders .commerce-status-edit .sheet-selected-value>span{white-space:nowrap;overflow:visible;text-overflow:clip}
+
+/* Strong, left-aligned status labels with consistently sized icons. */
+.om .commerce-orders .commerce-status-edit.sheet-chip.sheet-select-frame{font:600 13px/21px CommerceInter,Inter,sans-serif;padding:2px 8px;justify-content:flex-start}
+.om .commerce-orders .commerce-status-edit .sheet-selected-value{justify-content:flex-start;gap:8px}
+.om .commerce-orders .commerce-status-edit .sheet-selected-value>span{text-align:left;font-weight:600}
+.om .commerce-orders .commerce-status-edit .status-symbol{width:24px;height:24px;min-width:24px;stroke-width:1.8}
+
+/* Stable column gutters: ID/Price 10px; Price/Profit and Profit/Status 20px. */
+.om .commerce-orders .ebay-table{width:1691px;min-width:1691px}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(3){padding-left:8px;padding-right:5px}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(4){padding-left:5px;padding-right:10px}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(5){padding-left:10px;padding-right:10px;white-space:nowrap}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(6){padding-left:10px;padding-right:12px}
+.om .commerce-orders .ebay-table td:is(:nth-child(4),:nth-child(5)){font-variant-numeric:tabular-nums}
+.om .commerce-orders .ebay-table td:nth-child(4) .commerce-field>div{font-variant-numeric:tabular-nums}
+@media(min-width:1150px){.om .commerce-orders .ebay-table :is(th,td):nth-child(4){left:596px}.om .commerce-orders .ebay-table :is(th,td):nth-child(5){left:741px}.om .commerce-orders .ebay-table :is(th,td):nth-child(6){left:856px}}
+
+/* Gutters begin after the measured maximum formatted ID/amount footprint. */
+.om .commerce-orders .ebay-table :is(th,td):nth-child(3){padding-left:8px;padding-right:10px}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(4){padding-left:0;padding-right:15px;text-align:left}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(5){padding-left:0;padding-right:15px;text-align:left}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(6){padding-left:0;padding-right:12px}
+.om .commerce-orders .commerce-order-identities .commerce-brand-link{font-variant-numeric:tabular-nums}
+.om .commerce-orders .ebay-table td:nth-child(4) .commerce-identities{grid-template-columns:30px var(--order-money-width);column-gap:4px}
+.om .commerce-orders .commerce-profit{width:var(--order-profit-width);font-weight:600;text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(min-width:1150px){.om .commerce-orders .ebay-table :is(th,td):nth-child(4){left:var(--order-price-left)}.om .commerce-orders .ebay-table :is(th,td):nth-child(5){left:var(--order-profit-left)}.om .commerce-orders .ebay-table :is(th,td):nth-child(6){left:var(--order-status-left)}}
+
+/* Same 32px BUY/SELL tracks as the reference; profit stays at their midpoint. */
+.om .commerce-orders .ebay-table td:nth-child(4) .commerce-identities{grid-template-rows:32px 32px;row-gap:0}
+.om .commerce-orders .ebay-table td:nth-child(4) .commerce-field>div{font:500 13px/21px CommerceInter,Inter,sans-serif;font-variant-numeric:tabular-nums;color:#787b80}
+.om .commerce-orders .ebay-table td:is(:nth-child(3),:nth-child(4),:nth-child(5)){vertical-align:middle}
+.om .commerce-orders .commerce-profit{position:relative}
+.om .commerce-orders .commerce-profit-minus{position:absolute;right:100%;top:0;font:inherit;color:inherit}
+.om .commerce-orders .commerce-order-identities .commerce-id-separator{transform:none;font:400 26px/21px CommerceInter,Inter,sans-serif}
+
+.order-row-tools{display:flex;align-items:center;gap:8px}.order-row-tools button{border:0;background:transparent;color:#5a5859;width:28px;height:30px;padding:3px;cursor:pointer;font-size:24px}.order-row-tools svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7}.order-row-tools button:hover,.order-row-tools .has-note{color:#2678d9}.order-row-popup{position:fixed;z-index:10000;box-sizing:border-box;width:210px;max-width:calc(100vw - 16px);padding:12px;background:#fff;color:#5a5859;border-radius:8px;box-shadow:0 6px 20px #0003;font:500 13px/21px CommerceInter,Inter,sans-serif}.order-row-popup label{display:block}.order-row-popup textarea{box-sizing:border-box;display:block;width:100%;resize:vertical;min-height:68px;max-height:180px;padding:7px 10px;border:1px solid #d9d9d9;border-radius:4px;font:inherit;color:inherit}.order-row-popup form>button{width:100%;margin-top:10px;height:32px;border:0;border-radius:4px;background:#e49e4c;color:#fff;font-size:19px;cursor:pointer}.order-row-popup [role=alert]{margin:0;color:#b10202;white-space:normal}.order-row-popup[role=menu]{padding:4px;width:180px}.order-row-popup[role=menu] button{display:block;width:100%;text-align:left;border:0;background:#fff;color:#5a5859;border-radius:4px;padding:7px 12px;font:inherit;cursor:pointer}.order-row-popup[role=menu] button:hover{background:#f2f2f2}.order-row-popup[role=menu] button:disabled{color:#b7b7b7;cursor:default}
+.order-product-page{padding:16px 10px 30px;background:#fff;font:400 14px/1.6 CommerceInter,Inter,sans-serif;color:#253746;max-width:1200px;margin:auto}.order-product-page .product-back{color:#2678d9;text-decoration:none}.order-product-page h1{font-size:22px;margin:14px 0 0}.order-product-page article{border:1px solid #e3e8ed;border-radius:8px;padding:24px;margin-top:16px}.order-product-page article header{display:flex;align-items:center;gap:20px}.order-product-page article img{width:110px;height:110px;object-fit:contain}.order-product-page h2{font-size:18px;font-weight:600;margin:0}.order-product-page h3{font-size:15px}.order-product-page dl{display:flex;flex-wrap:wrap;gap:40px;border-top:1px solid #e3e8ed;border-bottom:1px solid #e3e8ed;padding:16px 0}.order-product-page dt{color:#787b80}.order-product-page dd{margin:3px 0;font-size:18px;font-weight:500}.order-product-page .product-description{white-space:pre-line;overflow-wrap:anywhere}.order-product-page .product-page-status{color:#787b80;margin:4px 0 14px}.order-product-page .product-retry{border:1px solid #d9d9d9;padding:8px 16px;background:white;border-radius:4px;cursor:pointer}@media(max-width:600px){.order-product-page article{padding:16px}.order-product-page article header{align-items:flex-start}.order-product-page article img{width:70px;height:70px}.order-product-page dl{gap:20px}}
+
+.order-product-page article header{background:transparent;border:0;padding:0;position:static}.order-product-page .product-back{display:inline-block;scroll-margin-top:80px}
+.om .order-product-page{margin-top:var(--mobile-header-height,70px);height:calc(100dvh - var(--mobile-header-height,70px));overflow:auto;width:100%;box-sizing:border-box}
+.order-row-tools button{color:#8a8a8a}.order-row-tools button:hover,.order-row-tools .has-note{color:#5a5859}.order-row-popup{box-shadow:0 4px 16px #5a585926;border:1px solid #e8e8e8}.order-row-popup[role=menu] button:hover{background:#f1f1f1;color:#484848}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(6){border-right:0;box-shadow:none}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(7){padding-left:8px;padding-right:8px;border-right:1px solid #dfe5e2}
+@media(min-width:1150px){.om .commerce-orders .ebay-table td:nth-child(7){position:sticky;left:calc(var(--order-status-left) + 190px);z-index:2;background:#fff;box-shadow:3px 0 4px -4px #24372f}.om .commerce-orders .ebay-table th:nth-child(7){left:calc(var(--order-status-left) + 190px);z-index:5}}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(6){padding-right:0}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(7){padding:0 9px 0 10px;border-right:1px solid #dfe5e2}
+.order-row-tools{gap:10px}.order-row-tools button{width:22px;min-width:22px;padding:0;flex:0 0 22px}
+@media(min-width:1150px){.om .commerce-orders .ebay-table :is(th,td):nth-child(7){left:calc(var(--order-status-left) + 168px)}}
+.om .status-choice-menu{box-sizing:border-box;min-width:0;padding:4px;overflow:auto;overscroll-behavior:contain}
+.om .status-choice-menu button{box-sizing:border-box;min-width:0;max-width:100%;padding:5px 6px;gap:8px;justify-content:flex-start}
+.om .status-choice-menu .sheet-chip{min-width:0;max-width:100%;margin:0;flex:0 1 auto}
+/* Tight SVG bounds make spacing refer to visible ink, not glyph side bearings. */
+.om .commerce-orders .ebay-table :is(th,td):nth-child(7){padding:0 10px}
+.order-row-tools{gap:10px;height:30px;align-items:center}
+.order-row-tools button{display:flex;align-items:center;justify-content:center;height:30px;min-width:0;flex:none;padding:0;line-height:1}
+.order-row-tools [data-note-order]{width:16px}.order-row-tools [data-more-order]{width:4px}
+.order-row-tools .order-note-icon{display:block;width:16px;height:20px;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
+.order-row-tools .order-more-icon{display:block;width:4px;height:20px;stroke:none;fill:currentColor}
+.order-row-tools [data-note-order]{width:14px}.order-row-tools [data-more-order]{width:2.5px}
+.order-row-tools .order-note-icon{width:14px;height:18px;stroke-width:1.2}
+.order-row-tools .order-more-icon{width:2.5px;height:14px}
+.order-row-tools button{position:relative;color:#8a8a8a}
+.order-row-tools button::before{content:'';position:absolute;inset:0 -5px}
+.order-row-popup{font-weight:400;box-shadow:0 3px 10px #5a585918;border-color:#e8e8e8;border-radius:6px}
+.order-row-popup[role=menu] button{font-weight:400}
+
+/* Match the reference note tone without changing action geometry. */
+.order-row-tools [data-note-order],.order-row-tools [data-note-order]:hover{color:#5a5859;opacity:1}
+.order-row-tools .order-note-icon{opacity:1}
+.order-row-tools [data-note-tooltip]::after{content:attr(data-note-tooltip);position:absolute;bottom:calc(50% + 15px);left:50%;transform:translateX(-50%);padding:6px 8px;border-radius:4px;background:rgb(9,14,53);color:#fff;font:400 13px/21px CommerceInter,Inter,sans-serif;white-space:nowrap;pointer-events:none;visibility:hidden;opacity:0;z-index:10000}
+.order-row-tools [data-note-tooltip]:hover::after,.order-row-tools [data-note-tooltip]:focus-visible::after{visibility:visible;opacity:1}
+
+.order-row-tools [data-note-order],.order-row-tools [data-note-order]:hover{color:#b7b7b7}
+.order-row-tools [data-note-tooltip]::after{font-size:11px;line-height:18px;font-weight:400;padding:5px 8px}
+.note-tooltip-arrow{display:none;position:absolute;left:50%;bottom:calc(50% + 11px);width:8px;height:8px;transform:translateX(-50%) rotate(45deg);background:#090e35;pointer-events:none;z-index:10000}
+[data-note-tooltip]:is(:hover,:focus-visible) .note-tooltip-arrow{display:block}
+.order-row-tools [data-tip-placement=bottom]::after{bottom:auto;top:calc(50% + 15px)}
+[data-tip-placement=bottom] .note-tooltip-arrow{bottom:auto;top:calc(50% + 11px)}
+.om .order-row-popup textarea,.om .order-row-popup textarea:focus{background:#fff;box-shadow:none;outline:none}
+.om .order-row-popup textarea:focus{border-color:#8696a5}
+
+.om .commerce-orders .commerce-profit.loss,.om .commerce-orders .commerce-sell-amount.loss{color:#eb4242}
+.commerce-sell-amount{position:relative;display:inline-block}.commerce-sell-minus{position:absolute;right:100%;top:0;font-size:10px;line-height:inherit}
+.om .commerce-orders .commerce-sell-amount .commerce-sell-minus{font-size:10px;transform:scaleX(.65);transform-origin:right center}
+
+/* Order details follow the frozen status and action columns. */
+.om .commerce-orders .ebay-table :is(th,td):nth-child(n+8){text-align:left;padding-left:12px;padding-right:12px;vertical-align:middle}
+.om .commerce-orders .order-detail-date{white-space:nowrap}
+.om .commerce-orders :is(.order-customer-name,.order-shipping-address){font:500 13px/21px CommerceInter,Inter,sans-serif;overflow-wrap:anywhere;white-space:normal}
+
+/* Simple black selection and consistent order-detail typography. */
+.om .commerce-orders :is(.commerce-select-all,.commerce-select-row){accent-color:#000!important}
+.om .commerce-orders .ebay-table .commerce-selected td{background:#fff}
+.om .commerce-orders .commerce-selection{color:#000}
+.om .commerce-orders .ebay-table td:nth-child(n+8),
+.om .commerce-orders :is(.order-detail-date,.order-customer-name,.order-shipping-address),
+.om .commerce-orders .ebay-table td:nth-child(n+8) .commerce-brand-link{font:500 13px/21px CommerceInter,Inter,sans-serif;color:#787b80;font-variant-numeric:tabular-nums}
+.om .commerce-orders .ebay-table td:nth-child(n+8) .commerce-brand-link{text-decoration:none;transition:color .18s}
+.om .commerce-orders .ebay-table td:nth-child(n+8) :is(.commerce-brand-link,.commerce-add-product):is(:hover,:focus-visible){color:#253746;background:transparent;text-decoration:none}
+.om .commerce-orders .ebay-table td:nth-child(n+8) .commerce-add-product{color:rgb(38,120,217)}
+.om .commerce-orders :is(.order-detail-date,.order-customer-name,.order-shipping-address):hover{color:#253746}
+.om .commerce-orders .ebay-table td:nth-child(12):hover{color:#253746}
+
+/* Listings share the Orders typography and selection language. */
+.om .commerce-listings .ebay-table{width:2110px;min-width:2110px;table-layout:fixed;font-family:CommerceInter,Inter,sans-serif}
+.om .commerce-listings .ebay-table th{font:600 13px/21px CommerceInter,Inter,sans-serif;color:#343b43}
+.om .commerce-listings .ebay-table td,.om .commerce-listings .commerce-brand-link{font:500 13px/21px CommerceInter,Inter,sans-serif;color:#787b80;font-variant-numeric:tabular-nums}
+.om .commerce-listings .ebay-table :is(th,td){padding:10px 12px;vertical-align:middle;text-align:left}
+.om .commerce-listings .ebay-table th:nth-child(2){width:220px}.om .commerce-listings .ebay-table th:nth-child(3){width:130px}.om .commerce-listings .ebay-table th:nth-child(4){width:180px}.om .commerce-listings .ebay-table th:nth-child(5){width:85px}
+.om .commerce-listings .ebay-table th:nth-child(n+6){width:135px}.om .commerce-listings .ebay-table th:last-child{width:45px}
+.om .commerce-listings .commerce-identities{display:grid;grid-template-columns:30px 1fr;grid-template-rows:32px 32px;column-gap:4px;align-items:center}
+.om .commerce-listings .commerce-identities .commerce-field{display:contents}.om .commerce-listings .commerce-field>span{font:500 10px/18px CommerceInter,Inter,sans-serif}
+.om .commerce-listings .commerce-brand-link{text-decoration:none;transition:color .18s}
+.om .commerce-listings .commerce-identities :is(.commerce-brand-link,.commerce-add-product):is(:hover,:focus-visible){color:#253746;background:transparent;text-decoration:none}
+.om .commerce-listings :is(.commerce-select-all,.commerce-select-row){accent-color:#000!important}
+.om .commerce-listings .ebay-table .commerce-selected td{background:#fff}.om .commerce-listings .commerce-selection{color:#000}
+
+.om .commerce-listings .ebay-table th:first-child{padding-left:116px}
+
+</style>
 <script src="public-site.js?v=brand-3"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
