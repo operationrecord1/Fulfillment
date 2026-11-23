@@ -156,3 +156,11 @@
 .om .commerce-orders .ebay-table td:nth-child(4) .commerce-identities{grid-template-columns:30px var(--order-money-width);column-gap:4px}
 .om .commerce-orders .commerce-profit{width:var(--order-profit-width);font-weight:600;text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums}
 @media(min-width:1150px){.om .commerce-orders .ebay-table :is(th,td):nth-child(4){left:var(--order-price-left)}.om .commerce-orders .ebay-table :is(th,td):nth-child(5){left:var(--order-profit-left)}.om .commerce-orders .ebay-table :is(th,td):nth-child(6){left:var(--order-status-left)}}
+
+/* Same 32px BUY/SELL tracks as the reference; profit stays at their midpoint. */
+.om .commerce-orders .ebay-table td:nth-child(4) .commerce-identities{grid-template-rows:32px 32px;row-gap:0}
+.om .commerce-orders .ebay-table td:nth-child(4) .commerce-field>div{font:500 13px/21px CommerceInter,Inter,sans-serif;font-variant-numeric:tabular-nums;color:#787b80}
+.om .commerce-orders .ebay-table td:is(:nth-child(3),:nth-child(4),:nth-child(5)){vertical-align:middle}
+.om .commerce-orders .commerce-profit{position:relative}
+.om .commerce-orders .commerce-profit-minus{position:absolute;right:100%;top:0;font:inherit;color:inherit}
+.om .commerce-orders .commerce-order-identities .commerce-id-separator{transform:none;font:400 26px/21px CommerceInter,Inter,sans-serif}
