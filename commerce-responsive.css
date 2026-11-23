@@ -186,3 +186,23 @@
  .om .commerce-orders .commerce-order-identities .commerce-add-product{height:auto;min-height:20px;width:auto}
  .om .commerce-orders .commerce-order-identities .commerce-add-product>span{flex-shrink:0}
 }
+
+/* Compact record refinements: retain the item identifier and align status to BUY. */
+@media(max-width:1100px){
+ .om .commerce-orders .commerce-mobile-details{display:none}
+ .om .commerce-orders .commerce-title-item-id{display:block;margin-top:5px;width:auto;height:auto;text-align:left;user-select:text}
+ .om .commerce-orders .order-row-tools [data-more-order]{display:none}
+ .om .commerce-orders .ebay-table tbody td:nth-child(6){align-self:start;margin-top:-5px;align-items:flex-start}
+ .om .commerce-orders .ebay-table tbody td:nth-child(5){grid-area:3/2/4/3;justify-content:center;align-self:center}
+ .om .commerce-orders .ebay-table tbody td:nth-child(8){grid-area:3/3/4/4}
+ .om .commerce-orders .commerce-order-identities .commerce-brand-link{display:flex;gap:4px;align-items:center;overflow-wrap:anywhere;word-break:normal}
+ .om .commerce-orders .commerce-title-item-id>span{font-size:11px;line-height:16px}
+}
+@media(max-width:600px){
+ .om .commerce-orders .ebay-table tbody td:nth-child(5){grid-area:3/1/4/3;justify-content:flex-end;padding-right:34px!important}
+ .om .commerce-orders .ebay-table tbody td:nth-child(7){grid-area:3/2/4/3;justify-content:flex-end;justify-self:end}
+ .om .commerce-orders .ebay-table tbody td:nth-child(8){display:none}
+ .om .commerce-orders .commerce-profit-stack{max-width:100%;min-width:0}
+ .om .commerce-orders .commerce-order-identities .commerce-field>div{display:block}
+ .om .commerce-orders .commerce-order-identities .commerce-add-product{max-width:100%;display:flex;gap:3px;flex-wrap:wrap;line-height:16px}
+}
