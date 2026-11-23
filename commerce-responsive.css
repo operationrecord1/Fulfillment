@@ -122,3 +122,6 @@
 .om .overview-charts .om-performance-legend .om-progress-row{margin:0}
 .om .orders-data-basis{display:none}
 @media(max-width:599.98px){.om .overview-kpis.om-kpis{grid-template-columns:repeat(6,minmax(0,calc((var(--workspace-view-width) - 4px)/2)))}.om .overview-kpis .orders-period-trigger{font-size:clamp(16px,4.5vw,24px)}}
+
+.om .overview-kpi{position:relative}
+.om .overview-kpi .orders-add-expense{position:absolute;top:auto;bottom:5px;right:8px;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:550;padding:3px 5px;border:0;background:transparent;color:#586b75}
