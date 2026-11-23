@@ -1,0 +1,16 @@
+(function(){'use strict';
+window.OrderRowActions={mount({container,client,storeId,getRow,onSave,onEdit}){
+let popup=null,anchor=null,busy=false;
+const close=()=>{if(busy)return;popup?.remove();popup=null;if(anchor?.isConnected){anchor.setAttribute('aria-expanded','false');}anchor=null;};
+function position(){if(!popup||!anchor)return;const r=anchor.getBoundingClientRect(),w=popup.offsetWidth,h=popup.offsetHeight;popup.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px';popup.style.top=Math.max(8,r.top-h-8>=8?r.top-h-8:Math.min(innerHeight-h-8,r.bottom+8))+'px';}
+function open(button,note){close();anchor=button;const row=getRow(button.dataset.noteOrder||button.dataset.moreOrder);if(!row)return;popup=document.createElement('div');popup.className='order-row-popup';popup.setAttribute('role',note?'dialog':'menu');popup.setAttribute('aria-label',note?'Internal Note':'Order Actions');button.setAttribute('aria-expanded','true');
+if(note){popup.innerHTML='<form><label>Note<textarea aria-label="Internal Note" placeholder="Enter note" maxlength="2000" rows="3"></textarea></label><p role="alert"></p><button type="submit" aria-label="Save Note">✓</button></form>';const form=popup.querySelector('form'),input=form.querySelector('textarea');input.value=window.EbayPresentation.order(row).note.join('\n');form.onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;const save=form.querySelector('button');save.disabled=true;try{const {data,error}=await client.rpc('ebay_order_edit_save',{target:storeId,order_id:row.id,changes:{note:input.value.trim()},expected_revision:row.edit?.revision||0});if(error)throw error;row.edit=data;busy=false;close();await onSave(row);}catch(err){form.querySelector('[role=alert]').textContent=err.message||'Could Not Save Note';}finally{busy=false;save.disabled=false;}};
+}else{popup.innerHTML='<button type="button" role="menuitem">Edit Order</button><button type="button" role="menuitem" disabled title="Available in a future update">Edit Product</button>';popup.firstElementChild.onclick=()=>{close();onEdit(row);};}
+container.append(popup);position();(popup.querySelector('textarea')||popup.querySelector('button')).focus();}
+const click=e=>{const b=e.target.closest('[data-note-order],[data-more-order]');if(b&&!busy){if(anchor===b){close();return;}open(b,b.hasAttribute('data-note-order'));}};
+const outside=e=>{if(popup&&!popup.contains(e.target)&&!anchor?.contains(e.target))close();};
+const key=e=>{if(!popup)return;if(e.key==='Escape'){e.preventDefault();const target=anchor;close();target?.focus();}if(popup.getAttribute('role')==='menu'&&['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();popup.querySelector('button:not(:disabled)')?.focus();}};
+container.addEventListener('click',click);document.addEventListener('pointerdown',outside);document.addEventListener('keydown',key);window.addEventListener('resize',position);window.addEventListener('scroll',position,true);
+return {isOpen:()=>!!popup,dispose(){busy=false;close();container.removeEventListener('click',click);document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',key);window.removeEventListener('resize',position);window.removeEventListener('scroll',position,true);}};
+}};
+})();
