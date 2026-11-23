@@ -341,8 +341,17 @@
  .om .commerce-orders .commerce-profit-stack :is(.commerce-profit,.commerce-profit-margin){font-size:10px!important}
  .om .commerce-orders .ebay-table tbody td:nth-child(4) .commerce-field{font-size:11px;grid-template-columns:23px minmax(0,1fr);gap:2px}
 }
-.om .orders-overview[data-loading=true] :is(.orders-kpi-scroll,.orders-chart-scroll){visibility:hidden}
-.om .orders-overview[data-loading=true]::before{content:'Loading performance overview…';display:block;color:#6b7280;font-size:12px;padding:12px 0}
+.om .orders-overview[data-loading=true] :is(.orders-kpi-scroll,.orders-chart-scroll){visibility:visible}
+.om .orders-overview[data-loading=true] .overview-kpi strong{color:transparent!important;background:#edf0f3;border-radius:6px;min-width:90px;max-width:55%;margin-inline:auto}
+.om .orders-overview[data-loading=true] :is(.orders-size-chart,.orders-profit-chart,.overview-trend-chart){color:transparent;background:linear-gradient(110deg,#f4f6f8 25%,#e9edf1 45%,#f4f6f8 65%);background-size:200% 100%;border-radius:10px;min-height:220px;animation:commerce-loading 1.5s ease-in-out infinite}
+.om .orders-overview[data-loading=true] :is(.overview-size-legend,.overview-profit-legend,.orders-profit-caption){visibility:hidden}
+.om .overview-kpis .om-period-card{display:flex;align-items:center;justify-content:center}
+.om .overview-kpis .orders-period-trigger{position:static;inset:auto;margin:0;min-height:0;width:100%;justify-content:center;padding:8px;line-height:1.2}
+.om .overview-kpi strong{display:block;width:100%;text-align:center}
+.om .ebay-loading .ebay-table-scroll{opacity:1}
+.om .ebay-loading .ebay-table-scroll:has(tbody:empty){min-height:360px;background:repeating-linear-gradient(to bottom,#fff 0 20px,#f2f4f7 20px 74px,#fff 74px 96px)}
+@keyframes commerce-loading{to{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){.om .orders-overview[data-loading=true] :is(.orders-size-chart,.orders-profit-chart,.overview-trend-chart){animation:none}}
 /* Date uses the same identifier typography at each compact breakpoint. */
 @media(max-width:1100px){
  .om .commerce-orders .order-detail-date::after{font-family:CommerceInter,Inter,sans-serif;font-size:12px;line-height:20px;font-weight:500;font-variant-numeric:tabular-nums}

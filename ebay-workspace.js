@@ -16,7 +16,8 @@ window.EbayWorkspace={mount({container,client,storeId,view='orders',navigate,wor
  if(view==='orders')Promise.all(['400','500','600'].map(weight=>document.fonts.load(weight+' 13px CommerceInter'))).then(sizeOrderColumns);
 
  if(view==='orders'){$('.ebay-sync-time').classList.add('orders-sync-history');container.prepend($('.ebay-sync-time'));}
- let size=100,overview=null;
+ const sizeKey='fulfillment-commerce-page-size:'+view;let savedSize;try{savedSize=Number(localStorage.getItem(sizeKey));}catch{}
+ let size=[50,100,200].includes(savedSize)?savedSize:100,overview=null;
  if(view==='orders'){const overviewHost=document.createElement('section');overviewHost.className='orders-overview';$('.ebay-metrics').before(overviewHost);$('.ebay-metrics').hidden=true;overview=window.OrdersOverview.mount(overviewHost,{initial:workspace,read:readWorkspace,onExpenses,onPeriod:()=>{resetSelection();page=1;rows=[];rowSignature='';$('tbody').replaceChildren();$('.commerce-pagination').textContent='Loading selected period…';load();}});}
  {const canvas=document.createElement('div');canvas.className=view==='orders'?'orders-page-canvas':'listings-page-canvas';while(container.firstChild)canvas.append(container.firstChild);container.append(canvas);}
 
@@ -34,7 +35,7 @@ window.EbayWorkspace={mount({container,client,storeId,view='orders',navigate,wor
  }
  const canvasResize=new ResizeObserver(sizeScrollCanvas);canvasResize.observe(container);sizeScrollCanvas();
  const pagerProto=window.OrderSheetGrid.prototype;
- const pager={host:container,scroll:container,showPopup:pagerProto.showPopup,closePopup:pagerProto.closePopup,async changePage(next,nextSize=size){if(inflight)return;this.closePopup();size=nextSize;page=Math.max(1,Math.min(Math.ceil(total/size)||1,Math.trunc(next)||1));await load();}};
+ const pager={host:container,scroll:container,showPopup:pagerProto.showPopup,closePopup:pagerProto.closePopup,async changePage(next,nextSize=size){if(inflight)return;this.closePopup();size=nextSize;try{localStorage.setItem(sizeKey,String(size));}catch{}page=Math.max(1,Math.min(Math.ceil(total/size)||1,Math.trunc(next)||1));await load();}};
  function paintPagination(){pager.page=page;pager.pageSize=size;pager.totalPages=Math.max(1,Math.ceil(total/size));pagerProto.paintPagination.call(pager);}
  const pagerOutside=e=>{if(pager.popup&&!pager.popup.contains(e.target)&&!pager.popupAnchor?.contains(e.target))pager.closePopup();};
  document.addEventListener('pointerdown',pagerOutside);
