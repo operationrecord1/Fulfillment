@@ -299,3 +299,47 @@
  .om .commerce-orders .ebay-table-scroll{margin-left:-10px;margin-right:0}
 }
 @media(max-width:1100px){.om .commerce-orders .ebay-table-scroll{left:0}}
+/* Two aligned detail lines: IDs | prices | profit/date | status + note. */
+@media(max-width:1100px){
+ .om .commerce-orders .ebay-table tbody tr{grid-template-columns:minmax(170px,1.5fr) minmax(85px,.8fr) minmax(100px,1fr) 128px 18px;grid-template-rows:auto 28px 28px;gap:5px 10px}
+ .om .commerce-orders .ebay-table tbody td:first-child{grid-area:1/1/2/-1;margin-bottom:10px}
+ .om .commerce-orders .commerce-order-identities .commerce-field:first-child{grid-area:2/1/3/2;width:100%}
+ .om .commerce-orders .commerce-order-identities .commerce-field:last-child{grid-area:3/1/4/2}
+ .om .commerce-orders .ebay-table tbody td:nth-child(4){display:contents}
+ .om .commerce-orders .ebay-table tbody td:nth-child(4)>.commerce-identities{display:contents}
+ .om .commerce-orders .ebay-table tbody td:nth-child(4) .commerce-field{display:grid;grid-template-columns:26px minmax(0,1fr);align-items:center;gap:4px;height:28px!important;font-size:12px;font-weight:500}
+ .om .commerce-orders .ebay-table tbody td:nth-child(4) .commerce-field:first-child{grid-area:2/2/3/3}
+ .om .commerce-orders .ebay-table tbody td:nth-child(4) .commerce-field:last-child{grid-area:3/2/4/3}
+ .om .commerce-orders .ebay-table tbody td:nth-child(5){grid-area:2/3/3/4}
+ .om .commerce-orders .ebay-table tbody td:nth-child(8){grid-area:3/3/4/4;text-align:center}
+ .om .commerce-orders .ebay-table tbody td:nth-child(6){grid-area:2/4/4/5;align-self:center;width:128px!important}
+ .om .commerce-orders .ebay-table tbody td:nth-child(7){grid-area:2/5/4/6;align-self:center}
+ .om .commerce-orders .commerce-order-identities :is(.commerce-link,.commerce-buy-text,.commerce-add-product){font-size:12px!important;font-weight:500!important;line-height:20px!important}
+ .om .commerce-orders .commerce-order-identities .commerce-add-product{display:inline-flex!important;align-items:center;gap:3px;flex-wrap:nowrap!important}
+ .om .commerce-orders .commerce-order-identities .commerce-id-separator{display:inline-flex;align-items:center;align-self:center;line-height:20px;margin:0}
+ .om .commerce-orders .commerce-profit-stack :is(.commerce-profit,.commerce-profit-margin){font-size:12px!important;font-weight:500!important}
+ .om .commerce-orders .order-detail-date::after{font-size:11px;font-weight:500}
+ .om .commerce-orders .commerce-buy-placeholder{display:inline-block!important;position:static!important;margin:0 0 0 7px!important;transform:none!important}
+}
+@media(max-width:699.98px){
+ .om .commerce-orders .ebay-table tbody tr{grid-template-columns:minmax(65px,1fr) minmax(85px,1.1fr) 112px 16px;column-gap:6px}
+ .om .commerce-orders .commerce-order-identities,.om .commerce-orders .commerce-order-identities .commerce-field{display:none!important}
+ .om .commerce-orders .ebay-table tbody td:nth-child(4) .commerce-field:first-child{grid-area:2/1/3/2}
+ .om .commerce-orders .ebay-table tbody td:nth-child(4) .commerce-field:last-child{grid-area:3/1/4/2}
+ .om .commerce-orders .ebay-table tbody td:nth-child(5){grid-area:2/2/3/3}
+ .om .commerce-orders .ebay-table tbody td:nth-child(8){grid-area:3/2/4/3}
+ .om .commerce-orders .ebay-table tbody td:nth-child(6){grid-area:2/3/4/4;width:112px!important}
+ .om .commerce-orders .ebay-table tbody td:nth-child(7){grid-area:2/4/4/5}
+ .om .commerce-orders .commerce-status-edit{width:112px!important;font-size:10px!important}
+ .om .commerce-orders .commerce-title-item-id{margin-top:9px!important}
+}
+@media(max-width:360px){
+ .om .commerce-orders .ebay-table tbody tr{grid-template-columns:minmax(62px,1fr) minmax(75px,1fr) 100px 14px;column-gap:4px}
+ .om .commerce-orders .ebay-table tbody td:nth-child(6),.om .commerce-orders .commerce-status-edit{width:100px!important}
+ .om .commerce-orders .commerce-status-edit{padding-inline:4px!important;font-size:9px!important}
+ .om .commerce-orders .commerce-status-edit .status-symbol{width:13px!important;height:13px!important;flex-basis:13px!important}
+ .om .commerce-orders .commerce-profit-stack :is(.commerce-profit,.commerce-profit-margin){font-size:10px!important}
+ .om .commerce-orders .ebay-table tbody td:nth-child(4) .commerce-field{font-size:11px;grid-template-columns:23px minmax(0,1fr);gap:2px}
+}
+.om .orders-overview[data-loading=true] :is(.orders-kpi-scroll,.orders-chart-scroll){visibility:hidden}
+.om .orders-overview[data-loading=true]::before{content:'Loading performance overview…';display:block;color:#6b7280;font-size:12px;padding:12px 0}
