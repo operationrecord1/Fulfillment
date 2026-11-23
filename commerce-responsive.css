@@ -83,3 +83,14 @@
  body.order-workspace .om[data-surface=settings]>.om-head{display:flex!important}
  .om[data-surface=settings] .om-settings-surface{padding-top:68px;padding-bottom:78px}
 }
+@media(max-width:700px){
+ .om .order-edit-dialog header.order-edit-summary{position:static!important;height:auto!important;min-height:0;max-height:none;padding:10px;display:flex;flex-wrap:nowrap;align-items:flex-start;box-shadow:none;backdrop-filter:none;border:0}
+ .om .order-edit-dialog .order-edit-summary strong{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:17px}
+ .om .order-edit-dialog .order-sold-meta{font-size:10px;gap:3px;margin-top:5px}
+ .om .order-edit-dialog [role=tabpanel]{overflow:auto!important;min-height:0;overscroll-behavior:contain}
+ .om .order-edit-dialog nav{width:100%;min-width:0}
+ .om .order-edit-dialog [role=tab]{width:33.333%;padding:12px 0}
+ .om .order-edit-dialog .order-tab-indicator{width:33.333%}
+ .om .order-edit-dialog footer{padding:8px 0 0;min-height:0;gap:6px}
+ .om .order-edit-dialog footer>span{font-size:9px}
+}
