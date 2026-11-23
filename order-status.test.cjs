@@ -59,3 +59,5 @@ assert.equal(orderStatus(r),'Pending');assert.equal(JSON.stringify(r),before);
 r.edit.data.purchase_id='buy';assert.equal(orderStatus(r),'Ordered');
 }
 });
+
+test('FBA and arbitrary nonempty buy IDs start ordering without overriding exceptions',()=>{for(const purchase_id of ['FBA Order','fba order','Custom Reference']){assert.equal(orderStatus(row('Pending',{}, {purchase_id})),'Ordered');for(const s of ['Alert','OOS','Refunded','Due Refund'])assert.equal(orderStatus(row(s,{}, {purchase_id})),s);}assert.equal(orderStatus(row('Pending',{}, {purchase_id:'   '})),'Pending');});
