@@ -9,6 +9,8 @@ function orderStatus(row){
  const edit=row.edit?.data||{},records=row.workspace_rows||[],d=row.data||{};
  const manual=Object.hasOwn(edit,'status')?edit.status:values(records,'status')[0];
  if(['Alert','OOS','Refunded','Due Refund'].includes(manual))return manual;
+ // Full refund is an explicit eBay payment state, never inferred from holds or zero earnings.
+ if(d.orderPaymentStatus==='FULLY_REFUNDED')return 'Refunded';
  if(d.cancelStatus?.cancelState==='CANCELED')return 'Cancelled';
  const returns=row.returns||[];
  const openReturns=returns.filter(r=>r.state!=='CLOSED');

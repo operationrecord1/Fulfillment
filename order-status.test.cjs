@@ -27,3 +27,19 @@ test('only active return delivery triggers due refund; label and outgoing shipme
 const r=row('Ordered',{orderFulfillmentStatus:'FULFILLED'});r.returns=[{state:'ITEM_SHIPPED',tracking:{active:true,labelDate:{value:'2026-11-18T09:29:37Z'},deliveryStatus:'IN_TRANSIT'}}];
 assert.equal(orderStatus(r),'Label Created');r.returns[0].tracking.deliveryStatus='DELIVERED';assert.equal(orderStatus(r),'Due Refund');r.edit.data.status='Alert';assert.equal(orderStatus(r),'Alert');r.edit.data.status='';r.returns[0].tracking.active=false;assert.equal(orderStatus(r),'Shipped');
 });
+
+test('confirmed full refund supersedes delivery and return stages while preserving manual exception locks',()=>{
+ for(const status of ['Pending','Ordered','Shipped','Delivered','Label Created','Cancelled','']){
+ const r=row(status,{orderPaymentStatus:'FULLY_REFUNDED',orderFulfillmentStatus:'FULFILLED'});
+ r.delivery={source:'ebay_get_orders',deliveredAt:'2026-11-20T00:00:00Z'};
+ r.returns=[{state:'ITEM_SHIPPED',tracking:{active:true,deliveryStatus:'DELIVERED'}}];
+ assert.equal(orderStatus(r),'Refunded');
+ }
+ for(const status of ['Alert','OOS','Refunded','Due Refund'])assert.equal(orderStatus(row(status,{orderPaymentStatus:'FULLY_REFUNDED'})),status);
+});
+test('partial, pending or failed refunds and zero earnings do not imply a full refund',()=>{
+ for(const payment of ['PARTIALLY_REFUNDED','REFUND_PENDING','FAILED','PAID']){
+ const r=row('Ordered',{orderPaymentStatus:payment});r.earnings={value:0};
+ assert.equal(orderStatus(r),'Ordered');
+ }
+});
