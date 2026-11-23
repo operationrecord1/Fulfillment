@@ -125,7 +125,7 @@ body.focused-auth .auth-submit:focus-visible,body.focused-auth .password-toggle:
 <script src="order-product-page.js?v=2"></script>
 <script src="order-row-actions.js?v=4"></script>
 <script src="commerce-refresh.js?v=1"></script>
-<script src="ebay-workspace.js?v=header-customer-2"></script><script src="dashboard.js?v=commerce-180"></script>
+<script src="ebay-workspace.js?v=header-customer-3"></script><script src="dashboard.js?v=commerce-180"></script>
 <link rel="stylesheet" href="dashboard-cards.css?v=profile-logo-113">
 <link rel="stylesheet" href="workspace-pages.css?v=target-layout-111">
 <link rel="stylesheet" href="settings-gallery.css?v=platform-unified-115">
@@ -547,13 +547,15 @@ body.info-open .info-view{display:block}
 .om .commerce-orders .commerce-profit-stack:has(.commerce-profit.neutral) .commerce-profit-divider::after{content:"—";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:500 12px/21px CommerceInter,Inter,sans-serif}
 .om .commerce-orders .commerce-buy-placeholder{display:inline-block;margin-left:8px;font:500 12px/21px CommerceInter,Inter,sans-serif;color:#787b80;white-space:nowrap}
 
+.om .commerce-orders .ebay-table th:nth-child(5) .commerce-header-label{width:max-content;position:relative;left:calc(5ch + 5.75px);transform:translateX(-50%);font-variant-numeric:tabular-nums}
+.om .commerce-orders .order-tracking-empty{display:block;width:100%;text-align:center;color:#8b969c}
 /* Orders header anchors follow the corresponding content, without resizing columns. */
 .om .commerce-orders .ebay-table th .commerce-header-label{display:block;text-align:left}
 .om .commerce-orders .ebay-table th:first-child{padding-left:116px;text-align:left}
 .om .commerce-orders .ebay-table th:nth-child(3) .commerce-header-label{margin-left:35px}
 .om .commerce-orders .ebay-table th:nth-child(9) .commerce-header-label{margin-left:34px}
 .om .commerce-orders .ebay-table th:nth-child(6) .commerce-header-label{margin-left:9px}
-.om .commerce-orders .ebay-table th:is(:nth-child(2),:nth-child(5),:nth-child(10)) .commerce-header-label{text-align:center}
+.om .commerce-orders .ebay-table th:nth-child(2) .commerce-header-label{text-align:center}
 .om .commerce-orders .ebay-table td:nth-child(9) .commerce-identities{grid-template-rows:32px 32px;row-gap:0}
 .om .commerce-orders .order-customer-lines{display:grid;grid-template-rows:32px 32px;align-items:center;min-width:0}
 .om .commerce-orders .order-customer-lines>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 13px/21px CommerceInter,Inter,sans-serif;color:#787b80;user-select:text}
