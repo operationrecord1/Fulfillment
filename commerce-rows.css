@@ -221,7 +221,7 @@
 .om .commerce-orders :is(.order-customer-name,.order-shipping-address){font:500 13px/21px CommerceInter,Inter,sans-serif;overflow-wrap:anywhere;white-space:normal}
 
 /* Simple black selection and consistent order-detail typography. */
-.om .commerce-orders :is(.commerce-select-all,.commerce-select-row){accent-color:#000}
+.om .commerce-orders :is(.commerce-select-all,.commerce-select-row){accent-color:#000!important}
 .om .commerce-orders .ebay-table .commerce-selected td{background:#fff}
 .om .commerce-orders .commerce-selection{color:#000}
 .om .commerce-orders .ebay-table td:nth-child(n+8),
