@@ -539,6 +539,7 @@ body.info-open .info-view{display:block}
 .om .commerce-orders .commerce-profit-stack{display:flex;align-items:center;gap:4px;white-space:nowrap}
 .om .commerce-orders .commerce-profit-margin{font:500 12px/21px CommerceInter,Inter,sans-serif;color:#787b80;text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums}
 .om .commerce-orders .commerce-profit-stack .commerce-profit{width:auto;flex:none}.om .commerce-orders .commerce-profit-divider{color:#787b80;font:500 12px/21px CommerceInter,Inter,sans-serif}
+.om .commerce-orders .commerce-profit-stack:has(.commerce-profit.neutral) :is(.commerce-profit,.commerce-profit-divider){visibility:hidden}
 </style>
 <script src="public-site.js?v=brand-3"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
