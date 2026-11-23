@@ -177,3 +177,12 @@
  .om .commerce-orders .commerce-add-product{font-size:11px;gap:3px;flex-wrap:wrap}
  .om .commerce-orders :is(.commerce-image,.ebay-product img,.ebay-image-empty){width:60px;height:60px;flex:0 0 60px}
 }
+
+@media(max-width:1100px){
+ .om .commerce-orders .ebay-table tbody td:nth-child(4){display:none}
+ .om .commerce-orders .commerce-order-identities{display:flex;flex-direction:column;gap:6px;height:auto}
+ .om .commerce-orders .commerce-order-identities .commerce-field{width:100%;height:auto;min-height:20px}
+ .om .commerce-orders .commerce-order-identities .commerce-field>div{min-width:0;height:auto;flex-wrap:wrap}
+ .om .commerce-orders .commerce-order-identities .commerce-add-product{height:auto;min-height:20px;width:auto}
+ .om .commerce-orders .commerce-order-identities .commerce-add-product>span{flex-shrink:0}
+}
