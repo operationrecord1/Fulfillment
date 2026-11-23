@@ -125,7 +125,7 @@ body.focused-auth .auth-submit:focus-visible,body.focused-auth .password-toggle:
 <script src="order-product-page.js?v=2"></script>
 <script src="order-row-actions.js?v=4"></script>
 <script src="commerce-refresh.js?v=1"></script>
-<script src="ebay-workspace.js?v=commerce-pagination-2"></script><script src="dashboard.js?v=commerce-180"></script>
+<script src="ebay-workspace.js?v=single-scroll-1"></script><script src="dashboard.js?v=commerce-180"></script>
 <link rel="stylesheet" href="dashboard-cards.css?v=profile-logo-113">
 <link rel="stylesheet" href="workspace-pages.css?v=target-layout-111">
 <link rel="stylesheet" href="settings-gallery.css?v=platform-unified-115">
@@ -574,6 +574,13 @@ body.info-open .info-view{display:block}
 .om .orders-trend-chart,.om .orders-trend-chart svg{width:100%;min-width:0!important;max-width:100%}
 @media(max-width:900px){.om .orders-kpis.om-kpis>[data-metric]{grid-area:auto}.om .orders-kpis.om-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.om .orders-charts.om-charts{grid-template-columns:repeat(2,minmax(0,1fr))}.om .orders-charts.om-charts>.om-panel{grid-row:auto;grid-column:auto}.om .orders-charts.om-charts>.om-panel:last-child{grid-column:1/-1}}
 @media(max-width:550px){.om .orders-kpis.om-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.om .orders-charts.om-charts{grid-template-columns:minmax(0,1fr)}.om .orders-charts.om-charts>.om-panel{grid-column:1!important}.om .ebay-workspace .ebay-table-scroll{max-height:70dvh}}
+
+/* One page scroll owner; summary stops when its own horizontal extent is exhausted. */
+.om .ebay-workspace:is(.commerce-orders,.commerce-listings){overflow:auto}
+.om .ebay-workspace :is(.orders-page-canvas,.listings-page-canvas){width:max-content;min-width:100%!important;max-width:none;margin:0}
+.om .ebay-workspace .ebay-table-scroll{overflow:visible;max-height:none;min-height:180px;width:100%;max-width:none;scrollbar-gutter:auto}
+.om .commerce-orders .orders-overview{position:sticky;left:var(--commerce-summary-left,10px);width:var(--commerce-summary-width);max-width:none;margin-left:var(--commerce-summary-margin,0px);margin-right:0}
+.om .ebay-workspace :is(.ebay-toolbar,.commerce-selection,.commerce-pagination,.ebay-footnote){position:sticky;left:var(--commerce-summary-left,10px);width:var(--commerce-summary-width);max-width:none;box-sizing:border-box;margin-left:var(--commerce-summary-margin,0px);margin-right:0}
 </style>
 <script src="public-site.js?v=brand-3"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
