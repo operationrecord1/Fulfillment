@@ -57,3 +57,4 @@
 .order-edit-dialog .order-add-tracking[hidden]{visibility:hidden;pointer-events:none}
 .order-edit-dialog .order-extra-trackings:empty{display:none}
 @media(max-width:699.98px){.order-edit-dialog .order-meta-id{display:none}}
+.order-edit-dialog .order-add-tracking[hidden]{display:inline-block!important;visibility:hidden!important}
