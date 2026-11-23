@@ -79,3 +79,7 @@
 }
 @media(min-width:701px){.commerce-mobile-details{display:none}}
 @media(min-width:701px){.om .ebay-workspace .ebay-table{min-width:100%!important}}
+@media(max-width:700px){
+ body.order-workspace .om[data-surface=settings]>.om-head{display:flex!important}
+ .om[data-surface=settings] .om-settings-surface{padding-top:68px;padding-bottom:78px}
+}
