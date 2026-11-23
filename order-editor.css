@@ -39,3 +39,8 @@
 .order-edit-dialog .editor-status-colors .order-status-trigger:not(:has(svg)) span{margin-left:0}
 
 .om .order-edit-dialog .order-meta-tip::after{left:50%;right:auto;transform:translateX(-50%);translate:none;width:max-content;max-width:none;text-align:center}
+
+/* Helper labels sit directly beneath their calendar and clock icons. */
+.om .order-edit-dialog .order-meta-tip::after{left:7.5px;font-size:11px;line-height:18px;font-weight:400;padding:5px 8px;top:calc(100% + 6px)}
+.om .order-edit-dialog .order-meta-tip::before{content:'';display:none;position:absolute;left:7.5px;top:calc(100% + 2px);width:8px;height:8px;transform:translateX(-50%) rotate(45deg);background:#090e35;pointer-events:none;z-index:5}
+.om .order-edit-dialog .order-meta-tip:is(:hover,:focus)::before{display:block}

@@ -201,3 +201,12 @@
 .order-row-tools .order-note-icon{opacity:1}
 .order-row-tools [data-note-tooltip]::after{content:attr(data-note-tooltip);position:absolute;bottom:calc(50% + 15px);left:50%;transform:translateX(-50%);padding:6px 8px;border-radius:4px;background:rgb(9,14,53);color:#fff;font:400 13px/21px CommerceInter,Inter,sans-serif;white-space:nowrap;pointer-events:none;visibility:hidden;opacity:0;z-index:10000}
 .order-row-tools [data-note-tooltip]:hover::after,.order-row-tools [data-note-tooltip]:focus-visible::after{visibility:visible;opacity:1}
+
+.order-row-tools [data-note-order],.order-row-tools [data-note-order]:hover{color:#b7b7b7}
+.order-row-tools [data-note-tooltip]::after{font-size:11px;line-height:18px;font-weight:400;padding:5px 8px}
+.note-tooltip-arrow{display:none;position:absolute;left:50%;bottom:calc(50% + 11px);width:8px;height:8px;transform:translateX(-50%) rotate(45deg);background:#090e35;pointer-events:none;z-index:10000}
+[data-note-tooltip]:is(:hover,:focus-visible) .note-tooltip-arrow{display:block}
+.order-row-tools [data-tip-placement=bottom]::after{bottom:auto;top:calc(50% + 15px)}
+[data-tip-placement=bottom] .note-tooltip-arrow{bottom:auto;top:calc(50% + 11px)}
+.om .order-row-popup textarea,.om .order-row-popup textarea:focus{background:#fff;box-shadow:none;outline:none}
+.om .order-row-popup textarea:focus{border-color:#8696a5}

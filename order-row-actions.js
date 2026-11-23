@@ -8,9 +8,10 @@ if(note){popup.innerHTML='<form><label>Note<textarea aria-label="Internal Note" 
 }else{popup.innerHTML='<button type="button" role="menuitem">Edit Order</button><button type="button" role="menuitem">Edit Product</button>';popup.firstElementChild.onclick=()=>{close();onEdit(row);};popup.lastElementChild.onclick=()=>{close();onProduct(row);};}
 container.append(popup);position();(popup.querySelector('textarea')||popup.querySelector('button')).focus();}
 const click=e=>{const b=e.target.closest('[data-note-order],[data-more-order]');if(b&&!busy){if(anchor===b){close();return;}open(b,b.hasAttribute('data-note-order'));}};
+const tipPlacement=e=>{const b=e.target.closest('[data-note-tooltip]');if(b)b.dataset.tipPlacement=b.getBoundingClientRect().top<48?'bottom':'top';};
 const outside=e=>{if(popup&&!popup.contains(e.target)&&!anchor?.contains(e.target))close();};
 const key=e=>{if(!popup)return;if(e.key==='Escape'){e.preventDefault();const target=anchor;close();target?.focus();}if(popup.getAttribute('role')==='menu'&&['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();const items=Array.from(popup.querySelectorAll('button:not(:disabled)')),i=items.indexOf(document.activeElement);items[(i+(e.key==='ArrowDown'?1:items.length-1))%items.length]?.focus();}};
-container.addEventListener('click',click);document.addEventListener('pointerdown',outside);document.addEventListener('keydown',key);window.addEventListener('resize',position);window.addEventListener('scroll',position,true);
-return {isOpen:()=>!!popup,dispose(){busy=false;close();container.removeEventListener('click',click);document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',key);window.removeEventListener('resize',position);window.removeEventListener('scroll',position,true);}};
+container.addEventListener('pointerover',tipPlacement);container.addEventListener('focusin',tipPlacement);container.addEventListener('click',click);document.addEventListener('pointerdown',outside);document.addEventListener('keydown',key);window.addEventListener('resize',position);window.addEventListener('scroll',position,true);
+return {isOpen:()=>!!popup,dispose(){busy=false;close();container.removeEventListener('pointerover',tipPlacement);container.removeEventListener('focusin',tipPlacement);container.removeEventListener('click',click);document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',key);window.removeEventListener('resize',position);window.removeEventListener('scroll',position,true);}};
 }};
 })();
