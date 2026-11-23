@@ -177,7 +177,14 @@
 .om .commerce-orders .ebay-table :is(th,td):nth-child(6){padding-right:0}
 .om .commerce-orders .ebay-table :is(th,td):nth-child(7){padding:0 9px 0 10px;border-right:1px solid #dfe5e2}
 .order-row-tools{gap:10px}.order-row-tools button{width:22px;min-width:22px;padding:0;flex:0 0 22px}
-@media(min-width:1150px){.om .commerce-orders .ebay-table :is(th,td):nth-child(7){left:calc(var(--order-status-left) + 178px)}}
+@media(min-width:1150px){.om .commerce-orders .ebay-table :is(th,td):nth-child(7){left:calc(var(--order-status-left) + 168px)}}
 .om .status-choice-menu{box-sizing:border-box;min-width:0;padding:4px;overflow:auto;overscroll-behavior:contain}
 .om .status-choice-menu button{box-sizing:border-box;min-width:0;max-width:100%;padding:5px 6px;gap:8px;justify-content:flex-start}
 .om .status-choice-menu .sheet-chip{min-width:0;max-width:100%;margin:0;flex:0 1 auto}
+/* Tight SVG bounds make spacing refer to visible ink, not glyph side bearings. */
+.om .commerce-orders .ebay-table :is(th,td):nth-child(7){padding:0 10px}
+.order-row-tools{gap:10px;height:30px;align-items:center}
+.order-row-tools button{display:flex;align-items:center;justify-content:center;height:30px;min-width:0;flex:none;padding:0;line-height:1}
+.order-row-tools [data-note-order]{width:16px}.order-row-tools [data-more-order]{width:4px}
+.order-row-tools .order-note-icon{display:block;width:16px;height:20px;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
+.order-row-tools .order-more-icon{display:block;width:4px;height:20px;stroke:none;fill:currentColor}
