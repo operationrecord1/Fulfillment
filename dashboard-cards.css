@@ -10,8 +10,8 @@
 .om .om-period-card .om-month-trigger{position:relative;justify-content:center;padding:12px 16px 12px 4px;border:0;background:transparent;color:#193e34;border-radius:0;font-size:clamp(21px,1.65vw,28px);font-weight:650;line-height:1.25;min-height:65px;text-align:center;box-shadow:none}
 .om .om-period-card .om-month-trigger:hover,.om .om-period-card .om-month-trigger[aria-expanded=true]{background:transparent;border:0}
 .om .om-period-card .om-month-trigger:after{position:absolute;right:1px;top:50%;width:5px;height:5px;color:#8d9c97;margin:0;flex:none}
-.om .om-kpi #om-expenses{position:absolute;top:auto;bottom:5px;right:8px;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:550;padding:3px 5px;border:0;background:transparent;color:#586b75}
-.om #om-expenses svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.7}
+.om .om-kpi :is(#om-expenses,.orders-add-expense){position:absolute;top:auto;bottom:5px;right:8px;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:550;padding:3px 5px;border:0;background:transparent;color:#586b75}
+.om :is(#om-expenses,.orders-add-expense) svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.7}
 .om .om-kpi button:focus-visible,.om .om-dialog :focus-visible{outline:2px solid #798a99;outline-offset:2px;box-shadow:none}
 .om .om-dialog{width:min(720px,calc(100vw - 24px));max-height:calc(100dvh - 32px);padding:20px;border:1px solid #dce2e7;border-radius:14px;color:#273841}
 .om .om-dialog::backdrop{background:#13212c55}
@@ -351,7 +351,7 @@ html[data-om-theme=dark] .om .negative,html[data-om-theme=dark] .om-kpi-details 
 
 .om .om-kpi-title>span{flex:1;min-width:0;white-space:nowrap}
 html[data-om-theme=dark] .om .om-canvas,html[data-om-theme=dark] .om .om-main{background:#14181d}
-html[data-om-theme=dark] .om .om-month-trigger,html[data-om-theme=dark] .om .om-progress-row,html[data-om-theme=dark] .om .sheet-tools button,html[data-om-theme=dark] .om .sheet-tools input,html[data-om-theme=dark] .om #om-expenses{color:#e8eaed}
+html[data-om-theme=dark] .om .om-month-trigger,html[data-om-theme=dark] .om .om-progress-row,html[data-om-theme=dark] .om .sheet-tools button,html[data-om-theme=dark] .om .sheet-tools input,html[data-om-theme=dark] .om :is(#om-expenses,.orders-add-expense){color:#e8eaed}
 html[data-om-theme=dark] .om svg text[fill="#72817d"]{fill:#aeb8c3}
 html[data-om-theme=dark] .om .om-donut-total,html[data-om-theme=dark] .om .om-profit-value{fill:#e8eaed}
 html[data-om-theme=dark] .om .om-loss-value{fill:#ff8c98}
@@ -416,7 +416,7 @@ html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-edit-exp
 html[data-om-theme=dark] .om .om-expense-table .om-expense-record [data-delete-expense]{color:#ff9aa6;background:transparent;border-color:#525c68}
 /* Consistent expense actions and readable compact labels. */
 .om .om-expense-dialog #om-close,.om .om-expense-note-tooltip header button{display:grid;place-items:center;width:34px;height:32px;min-width:34px;padding:0;border:1px solid #dce3e9;border-radius:4px;line-height:1;font-size:22px;background:#fff;color:#53616d}
-.om .om-expense-dialog #om-close:hover,.om .om-expense-note-tooltip header button:hover,.om .om-expense-table [data-edit-expense]:hover,.om .om-expense-table [data-delete-expense]:hover,.om #om-expenses:hover,.om .om-expense-actions button:hover{background:#edf3fa;border-color:#bacbdb}
+.om .om-expense-dialog #om-close:hover,.om .om-expense-note-tooltip header button:hover,.om .om-expense-table [data-edit-expense]:hover,.om .om-expense-table [data-delete-expense]:hover,.om :is(#om-expenses,.orders-add-expense):hover,.om .om-expense-actions button:hover{background:#edf3fa;border-color:#bacbdb}
 .om .om-expense-dialog #om-close:focus-visible,.om .om-expense-actions button:focus-visible{outline:2px solid #bacbdb;outline-offset:1px}
 .om .om-expense-fields select,.om .om-date-trigger,.om #om-date-options button{font-size:14px!important;font-family:Arial,sans-serif;font-weight:400}
 .om .om-expense-table th{text-align:center}

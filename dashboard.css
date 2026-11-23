@@ -87,3 +87,6 @@ body.order-workspace .om .om-main,body.order-workspace .om.om-sidebar-collapsed 
 /* Cards sharing a row share their top and bottom edges. */
 .om .om-charts{align-items:stretch}
 .om .om-charts>.om-panel:nth-child(-n+2),.om .om-charts>.om-panel:last-child{align-self:stretch}
+
+/* The Orders overview inherits the Dashboard typography, not commerce table typography. */
+.om .orders-overview{font:13px/1.45 Inter,"Segoe UI",sans-serif;color:#1b302d}
