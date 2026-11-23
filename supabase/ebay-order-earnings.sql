@@ -1,3 +1,12 @@
+-- A payment hold/release moves available funds; it is not an order expense.
+-- Keep the raw ledger records. Actual refunds, fees and final debits still count.
+create or replace function fulfillment_private.ebay_is_temporary_hold(d jsonb)
+returns boolean language sql immutable set search_path='' as $$
+ select coalesce(d->>'transactionType'='DISPUTE' and d->>'transactionId' ~ '^DISPUTE_(HOLD|RELEASE)-',false);
+$$;
+revoke all on function fulfillment_private.ebay_is_temporary_hold(jsonb) from public,anon,authenticated;
+
+
 -- Order-level net earnings from the seller's actual Finances ledger.
 create or replace function fulfillment_private.ebay_transaction_order_id(d jsonb) returns text language sql immutable set search_path='' as $$
  select coalesce(nullif(d->>'orderId',''),(select x->>'referenceId' from jsonb_array_elements(coalesce(d->'references','[]')) x where x->>'referenceType'='ORDER_ID' limit 1));
@@ -111,7 +120,7 @@ begin
  and bool_and(t.data->>'bookingEntry' in ('CREDIT','DEBIT') and coalesce(t.data#>>'{amount,value}','') ~ '^-?[0-9]+([.][0-9]+)?$' and t.data->>'transactionType' in ('SALE','REFUND','CREDIT','DISPUTE','NON_SALE_CHARGE','SHIPPING_LABEL','ADJUSTMENT'))
  then sum(case when t.data->>'bookingEntry'='DEBIT' then -1 else 1 end * case when coalesce(t.data#>>'{amount,value}','') ~ '^-?[0-9]+([.][0-9]+)?$' then (t.data#>>'{amount,value}')::numeric end) end as earning,
  min(t.data#>>'{amount,currency}') currency,max(t.updated_at) updated_at
- from records r left join fulfillment_private.ebay_records t on t.store_id=target and t.resource='transactions' and fulfillment_private.ebay_transaction_order_id(t.data)=r.external_id
+ from records r left join fulfillment_private.ebay_records t on t.store_id=target and t.resource='transactions' and fulfillment_private.ebay_transaction_order_id(t.data)=r.external_id and not fulfillment_private.ebay_is_temporary_hold(t.data)
  group by r.external_id
  ), filtered as (select * from records where (status_filter='' or state=status_filter) and (query_text='' or external_id ilike '%'||left(query_text,160)||'%' or title ilike '%'||left(query_text,160)||'%' or data->'buyer'->>'username' ilike '%'||left(query_text,160)||'%')),
  paged as (select * from filtered order by created desc nulls last,external_id desc limit size offset (n-1)*size)
