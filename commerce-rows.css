@@ -188,3 +188,10 @@
 .order-row-tools [data-note-order]{width:16px}.order-row-tools [data-more-order]{width:4px}
 .order-row-tools .order-note-icon{display:block;width:16px;height:20px;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
 .order-row-tools .order-more-icon{display:block;width:4px;height:20px;stroke:none;fill:currentColor}
+.order-row-tools [data-note-order]{width:14px}.order-row-tools [data-more-order]{width:2.5px}
+.order-row-tools .order-note-icon{width:14px;height:18px;stroke-width:1.2}
+.order-row-tools .order-more-icon{width:2.5px;height:14px}
+.order-row-tools button{position:relative;color:#8a8a8a}
+.order-row-tools button::before{content:'';position:absolute;inset:0 -5px}
+.order-row-popup{font-weight:400;box-shadow:0 3px 10px #5a585918;border-color:#e8e8e8;border-radius:6px}
+.order-row-popup[role=menu] button{font-weight:400}
