@@ -108,3 +108,17 @@
 /* Match the Dashboard legend density rather than stretching the chart row. */
 .om .orders-charts .om-performance-legend .om-progress-list{margin:0}
 .om .orders-charts .om-performance-legend .om-progress-row{padding:5px 2px}
+
+/* Orders uses the same Dashboard component selectors; only its scroll bands differ. */
+.om .overview-kpis.om-kpis{width:100%;margin:0 0 4px;gap:4px}
+.om .overview-charts.om-charts{width:100%;margin:0 0 4px;gap:4px}
+.om .overview-trend-chart{margin-top:0}
+.om .overview-trend-chart svg{display:block;width:100%;height:auto;min-width:0!important}
+.om .overview-kpi small[hidden]{display:none}
+.om .overview-kpi strong{margin:0;letter-spacing:normal}
+.om .overview-kpis .om-period-card{padding:0}
+.om .overview-kpis .orders-period-trigger{font-size:clamp(21px,1.65vw,28px)}
+.om .overview-charts .om-performance-legend .om-progress-list{margin:0}
+.om .overview-charts .om-performance-legend .om-progress-row{margin:0}
+.om .orders-data-basis{display:none}
+@media(max-width:599.98px){.om .overview-kpis.om-kpis{grid-template-columns:repeat(6,minmax(0,calc((var(--workspace-view-width) - 4px)/2)))}.om .overview-kpis .orders-period-trigger{font-size:clamp(16px,4.5vw,24px)}}

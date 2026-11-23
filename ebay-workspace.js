@@ -21,9 +21,11 @@ window.EbayWorkspace={mount({container,client,storeId,view='orders',navigate,wor
  {const canvas=document.createElement('div');canvas.className=view==='orders'?'orders-page-canvas':'listings-page-canvas';while(container.firstChild)canvas.append(container.firstChild);container.append(canvas);}
 
  function sizeScrollCanvas(){
-  const available=Math.max(260,container.clientWidth-20),mobile=window.innerWidth<=700,all=container.classList.contains('commerce-all-metrics'),limit=2200;
-  const kpi=mobile?(all?available:available*2+8):Math.min(limit,Math.max(1280,available));
-  const charts=mobile?1020:Math.min(limit,Math.max(1320,available));
+  const available=Math.max(260,container.clientWidth-20),mobile=window.innerWidth<=700,all=false,limit=Math.max(2200,available);
+  const referenceWidth=window.innerWidth>=1600?available:Math.max(2000,available);
+  const kpi=window.innerWidth<600?available*3+8:referenceWidth;
+  const charts=referenceWidth;
+  container.style.setProperty('--workspace-view-width',available+'px');
   const table=mobile?available:(view==='orders'?parseFloat($('.ebay-table').style.width)||2180:1420);
   const width=Math.max(Math.min(limit,available),table,all?available:kpi,all?available:charts),margin=Math.max(0,(available-width)/2);
   container.style.setProperty('--commerce-canvas-width',width+'px');container.style.setProperty('--commerce-canvas-margin',margin+'px');
@@ -31,11 +33,6 @@ window.EbayWorkspace={mount({container,client,storeId,view='orders',navigate,wor
   for(const [name,value] of [['kpi',kpi],['chart',charts]]){container.style.setProperty('--commerce-'+name+'-width',value+'px');container.style.setProperty('--commerce-'+name+'-left',(10+Math.min(0,available-value))+'px');}
  }
  const canvasResize=new ResizeObserver(sizeScrollCanvas);canvasResize.observe(container);sizeScrollCanvas();
- if(view==='orders'){
-  const controls=document.createElement('div');controls.className='commerce-mobile-overview-actions';controls.innerHTML='<button type="button" class="commerce-view-metrics">View All KPI Cards</button><span>Swipe to see more</span>';
-  $('.orders-kpi-scroll').after(controls);
-  controls.querySelector('button').onclick=()=>{const all=container.classList.toggle('commerce-all-metrics');controls.querySelector('button').textContent=all?'Back to Orders':'View All KPI Cards';controls.querySelector('button').setAttribute('aria-expanded',String(all));sizeScrollCanvas();container.scrollTo({top:0,left:0});};
- }
  const pagerProto=window.OrderSheetGrid.prototype;
  const pager={host:container,scroll:container,showPopup:pagerProto.showPopup,closePopup:pagerProto.closePopup,async changePage(next,nextSize=size){if(inflight)return;this.closePopup();size=nextSize;page=Math.max(1,Math.min(Math.ceil(total/size)||1,Math.trunc(next)||1));await load();}};
  function paintPagination(){pager.page=page;pager.pageSize=size;pager.totalPages=Math.max(1,Math.ceil(total/size));pagerProto.paintPagination.call(pager);}
