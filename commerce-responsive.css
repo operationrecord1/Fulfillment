@@ -343,3 +343,7 @@
 }
 .om .orders-overview[data-loading=true] :is(.orders-kpi-scroll,.orders-chart-scroll){visibility:hidden}
 .om .orders-overview[data-loading=true]::before{content:'Loading performance overview…';display:block;color:#6b7280;font-size:12px;padding:12px 0}
+/* Date uses the same identifier typography at each compact breakpoint. */
+@media(max-width:1100px){
+ .om .commerce-orders .order-detail-date::after{font-family:CommerceInter,Inter,sans-serif;font-size:12px;line-height:20px;font-weight:500;font-variant-numeric:tabular-nums}
+}
