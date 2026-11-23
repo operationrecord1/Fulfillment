@@ -124,7 +124,7 @@ body.focused-auth .auth-submit:focus-visible,body.focused-auth .password-toggle:
 <script src="order-editor.js?v=16"></script>
 <script src="order-product-page.js?v=2"></script>
 <script src="order-row-actions.js?v=4"></script>
-<script src="ebay-workspace.js?v=order-profit-margin-1"></script><script src="dashboard.js?v=commerce-180"></script>
+<script src="ebay-workspace.js?v=order-profit-inline-1"></script><script src="dashboard.js?v=commerce-180"></script>
 <link rel="stylesheet" href="dashboard-cards.css?v=profile-logo-113">
 <link rel="stylesheet" href="workspace-pages.css?v=target-layout-111">
 <link rel="stylesheet" href="settings-gallery.css?v=platform-unified-115">
@@ -536,8 +536,9 @@ body.info-open .info-view{display:block}
 /* Title first line shares the BUY row baseline: 80px image, 64px ID tracks. */
 .om .commerce-orders .ebay-product>div{align-self:flex-start;box-sizing:border-box;min-height:80px;padding-top:13.5px}
 .om .commerce-orders .commerce-title-item-id{display:block;margin-top:3px;color:#767676;font:500 11px/16px CommerceInter,Inter,sans-serif;text-align:left;white-space:nowrap;user-select:text;-webkit-user-select:text;cursor:text}
-.om .commerce-orders .commerce-profit-stack{display:grid;grid-template-rows:32px 32px;align-items:center}
-.om .commerce-orders .commerce-profit-margin{font:500 11px/21px CommerceInter,Inter,sans-serif;color:#787b80;text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums}
+.om .commerce-orders .commerce-profit-stack{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.om .commerce-orders .commerce-profit-margin{font:500 12px/21px CommerceInter,Inter,sans-serif;color:#787b80;text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums}
+.om .commerce-orders .commerce-profit-stack .commerce-profit{width:auto;flex:none}.om .commerce-orders .commerce-profit-divider{color:#787b80;font:500 12px/21px CommerceInter,Inter,sans-serif}
 </style>
 <script src="public-site.js?v=brand-3"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
