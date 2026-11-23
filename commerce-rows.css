@@ -170,3 +170,7 @@
 
 .order-product-page article header{background:transparent;border:0;padding:0;position:static}.order-product-page .product-back{display:inline-block;scroll-margin-top:80px}
 .om .order-product-page{margin-top:var(--mobile-header-height,70px);height:calc(100dvh - var(--mobile-header-height,70px));overflow:auto;width:100%;box-sizing:border-box}
+.order-row-tools button{color:#8a8a8a}.order-row-tools button:hover,.order-row-tools .has-note{color:#5a5859}.order-row-popup{box-shadow:0 4px 16px #5a585926;border:1px solid #e8e8e8}.order-row-popup[role=menu] button:hover{background:#f1f1f1;color:#484848}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(6){border-right:0;box-shadow:none}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(7){padding-left:8px;padding-right:8px;border-right:1px solid #dfe5e2}
+@media(min-width:1150px){.om .commerce-orders .ebay-table td:nth-child(7){position:sticky;left:calc(var(--order-status-left) + 190px);z-index:2;background:#fff;box-shadow:3px 0 4px -4px #24372f}.om .commerce-orders .ebay-table th:nth-child(7){left:calc(var(--order-status-left) + 190px);z-index:5}}
