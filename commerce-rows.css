@@ -219,3 +219,16 @@
 .om .commerce-orders .ebay-table :is(th,td):nth-child(n+8){text-align:left;padding-left:12px;padding-right:12px;vertical-align:middle}
 .om .commerce-orders .order-detail-date{white-space:nowrap}
 .om .commerce-orders :is(.order-customer-name,.order-shipping-address){font:500 13px/21px CommerceInter,Inter,sans-serif;overflow-wrap:anywhere;white-space:normal}
+
+/* Simple black selection and consistent order-detail typography. */
+.om .commerce-orders :is(.commerce-select-all,.commerce-select-row){accent-color:#000}
+.om .commerce-orders .ebay-table .commerce-selected td{background:#fff}
+.om .commerce-orders .commerce-selection{color:#000}
+.om .commerce-orders .ebay-table td:nth-child(n+8),
+.om .commerce-orders :is(.order-detail-date,.order-customer-name,.order-shipping-address),
+.om .commerce-orders .ebay-table td:nth-child(n+8) .commerce-brand-link{font:500 13px/21px CommerceInter,Inter,sans-serif;color:#787b80;font-variant-numeric:tabular-nums}
+.om .commerce-orders .ebay-table td:nth-child(n+8) .commerce-brand-link{text-decoration:none;transition:color .18s}
+.om .commerce-orders .ebay-table td:nth-child(n+8) :is(.commerce-brand-link,.commerce-add-product):is(:hover,:focus-visible){color:#253746;background:transparent;text-decoration:none}
+.om .commerce-orders .ebay-table td:nth-child(n+8) .commerce-add-product{color:rgb(38,120,217)}
+.om .commerce-orders :is(.order-detail-date,.order-customer-name,.order-shipping-address):hover{color:#253746}
+.om .commerce-orders .ebay-table td:nth-child(12):hover{color:#253746}
