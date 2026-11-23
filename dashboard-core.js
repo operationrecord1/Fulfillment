@@ -1,8 +1,8 @@
 (function(root){
 'use strict';
 const statusLabel=value=>/^buyer cancel(?:led)?$/i.test(value||'')?'Cancelled':/^processed$/i.test(value||'')?'Ordered':value;
-const statusColors={'Pending':['#ffcfc9','#b10202'],'Ordered':['#cae2ff','#5a5859'],'Shipped':['#68a1e5','#ffffff'],'Delivered':['#11734b','#ffffff'],'Label Created':['#ffe5a0','#473821'],'Cancelled':['#ffcfc9','#b10202'],'Refunded':['#b10202','#ffffff'],'OOS':['#b10202','#ffffff'],'Alert':['#b10202','#ffffff']};
-const statuses=['Delivered','Shipped','Ordered','Pending','Refunded','OOS','Alert','Label Created','Cancelled'];
+const statusColors={'Due Refund':['#ffcfc9','#b10202'],'Pending':['#ffcfc9','#b10202'],'Ordered':['#cae2ff','#5a5859'],'Shipped':['#68a1e5','#ffffff'],'Delivered':['#11734b','#ffffff'],'Label Created':['#ffe5a0','#473821'],'Cancelled':['#ffcfc9','#b10202'],'Refunded':['#b10202','#ffffff'],'OOS':['#b10202','#ffffff'],'Alert':['#b10202','#ffffff']};
+const statuses=['Delivered','Shipped','Ordered','Pending','Due Refund','Refunded','OOS','Alert','Label Created','Cancelled'];
 const columns=[['order_id','Order ID'],['quantity','Quantity','number'],['earning','Order Earning','money'],['purchase_id','Purchase ID'],['supplier','Supplier Reference'],['note','Note'],['platform','Platform','select'],['tracking','Tracking'],['secondary_tracking','Secondary Tracking'],['status','Order Status','select'],['product_cost','Product Cost','money'],['shipping_cost','Shipping Cost','money'],['additional_cost','Additional Cost','money'],['gross','Gross Profit','computed'],['margin','Profit Margin','computed'],['id','Unique ID','computed'],['date','Order Date','date']];
 const investorFields=new Set(columns.map(c=>c[0]).filter(k=>!['purchase_id','platform'].includes(k)));
 const present=v=>v!==''&&v!==null&&v!==undefined;
@@ -59,6 +59,7 @@ function aggregateYear(rows,expenses,investor=false,taxPercentage=15){
 }
 function duplicates(rows,fields=['order_id','purchase_id']){const marks=new Set();for(const key of fields){const runs=new Map();let prev='',month=null,position=null;for(const r of rows){const value=r.data[key]||'';if(value){if(!runs.has(value))runs.set(value,[]);if(value!==prev||month!==r.month||(r.position!==undefined&&position!==null&&r.position!==position+1))runs.get(value).push([]);runs.get(value).at(-1).push(r);}prev=value;month=r.month;position=r.position??null;}for(const run of runs.values())if(run.length>1)run.flat().forEach(r=>marks.add(r.id||r._key));}return marks;}
 const statusPaths={
+    due_refund:'<path d="M5 3h14M5 21h14M6 3v4c0 2 3 4 6 5-3 1-6 3-6 5v4M18 3v4c0 2-3 4-6 5 3 1 6 3 6 5v4"/>',
     delivered:'<path d="m3 7 7-4 7 4-7 4-7-4Z"/><path d="M3 7v9l7 4V11m7-4v5M6.5 5l7 4"/><path d="m14 17 2 2 5-5"/>',
     pending:'<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>',
     refunded:'<path d="m8 5-5 5 5 5M3 10h11a6 6 0 0 1 0 12"/><path d="M14 16h4"/>',
@@ -74,7 +75,7 @@ const statusPaths={
     search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/>',
     bookmark:'<path d="M6 4h12v17l-6-4-6 4V4Z"/>'
   };
-const statusIcon=value=>{const key=({'Label Created':'label','Clear Selection':'clear'})[value]||String(value).toLowerCase();return statusPaths[key]?'<svg class="status-symbol" viewBox="0 0 24 24" aria-hidden="true">'+statusPaths[key]+'</svg>':'';};
+const statusIcon=value=>{const key=({'Due Refund':'due_refund','Label Created':'label','Clear Selection':'clear'})[value]||String(value).toLowerCase();return statusPaths[key]?'<svg class="status-symbol" viewBox="0 0 24 24" aria-hidden="true">'+statusPaths[key]+'</svg>':'';};
 const statusOrder=values=>[...values].sort((a,b)=>(statuses.indexOf(a)<0?99:statuses.indexOf(a))-(statuses.indexOf(b)<0?99:statuses.indexOf(b)));
 const api={statusColors,statusIcon,statusOrder,statusLabel,statuses,columns,investorFields,present,cents,link,groups,aggregate,aggregateYear,duplicates};root.OrderCore=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
