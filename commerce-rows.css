@@ -246,3 +246,5 @@
 .om .commerce-listings .commerce-identities :is(.commerce-brand-link,.commerce-add-product):is(:hover,:focus-visible){color:#253746;background:transparent;text-decoration:none}
 .om .commerce-listings :is(.commerce-select-all,.commerce-select-row){accent-color:#000!important}
 .om .commerce-listings .ebay-table .commerce-selected td{background:#fff}.om .commerce-listings .commerce-selection{color:#000}
+
+.om .commerce-listings .ebay-table th:first-child{padding-left:116px}
