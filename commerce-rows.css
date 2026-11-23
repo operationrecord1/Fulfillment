@@ -214,3 +214,8 @@
 .om .commerce-orders .commerce-profit.loss,.om .commerce-orders .commerce-sell-amount.loss{color:#eb4242}
 .commerce-sell-amount{position:relative;display:inline-block}.commerce-sell-minus{position:absolute;right:100%;top:0;font-size:10px;line-height:inherit}
 .om .commerce-orders .commerce-sell-amount .commerce-sell-minus{font-size:10px;transform:scaleX(.65);transform-origin:right center}
+
+/* Order details follow the frozen status and action columns. */
+.om .commerce-orders .ebay-table :is(th,td):nth-child(n+8){text-align:left;padding-left:12px;padding-right:12px;vertical-align:middle}
+.om .commerce-orders .order-detail-date{white-space:nowrap}
+.om .commerce-orders :is(.order-customer-name,.order-shipping-address){font:500 13px/21px CommerceInter,Inter,sans-serif;overflow-wrap:anywhere;white-space:normal}
