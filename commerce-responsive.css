@@ -94,3 +94,8 @@
  .om .order-edit-dialog footer{padding:8px 0 0;min-height:0;gap:6px}
  .om .order-edit-dialog footer>span{font-size:9px}
 }
+@media(max-width:700px){
+ .om .commerce-orders .ebay-product>div{text-align:left}
+ .om .commerce-orders .ebay-table tbody td:nth-child(6){width:min(168px,calc(var(--commerce-visible-width) - 66px))!important}
+ .om .commerce-orders .order-row-tools button::before{inset:0}
+}
