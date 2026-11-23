@@ -22,3 +22,8 @@ test('fulfilled never claims delivered and cancellation requests are not cancell
 test('existing delivery and return stages do not regress on old outbound shipment data',()=>{
  for(const s of ['Delivered','Label Created'])assert.equal(orderStatus(row(s,{orderFulfillmentStatus:'FULFILLED'})),s);
 });
+
+test('only active return delivery triggers due refund; label and outgoing shipment stay distinct',()=>{
+const r=row('Ordered',{orderFulfillmentStatus:'FULFILLED'});r.returns=[{state:'ITEM_SHIPPED',tracking:{active:true,labelDate:{value:'2026-11-18T09:29:37Z'},deliveryStatus:'IN_TRANSIT'}}];
+assert.equal(orderStatus(r),'Label Created');r.returns[0].tracking.deliveryStatus='DELIVERED';assert.equal(orderStatus(r),'Due Refund');r.edit.data.status='Alert';assert.equal(orderStatus(r),'Alert');r.edit.data.status='';r.returns[0].tracking.active=false;assert.equal(orderStatus(r),'Shipped');
+});

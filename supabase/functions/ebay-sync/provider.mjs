@@ -1,3 +1,4 @@
+import {readEarnings} from './earnings.mjs';
 export class ProviderError extends Error {
  constructor(code,status=0,retryAfter=0){super(code);this.status=status;this.retryAfter=retryAfter;}
 }
@@ -27,6 +28,7 @@ const listingFields=`listings { listingId listing { marketplace sellerProduct { 
 export async function readPage(job,token,fetcher=fetch,now=Date.now()){
  const c=job.cursor||{},end=c.end||date(now),offset=c.offset||0;
  if(job.resource==='orders_history'||job.resource==='transactions_history')return readHistory(job,token,fetcher,now);
+ if(job.resource==='order_earnings_recent'||job.resource==='order_earnings_reconcile')return readEarnings(job,token,(url,t)=>request(url,t,{},fetcher),now);
  const get=(url,options)=>request(url,token,options,fetcher);
  let rows,next=null,reconcileActive,snapshot;
  const financeReconcile=job.resource==='transactions'&&(c.financeReconcile??(!job.last_full_scan||now-Date.parse(job.last_full_scan)>=DAY));
@@ -59,7 +61,7 @@ export async function readPage(job,token,fetcher=fetch,now=Date.now()){
  } else {
   const start=c.start||(job.resource==='orders'&&job.watermark?date(Date.parse(job.watermark)-5*60000):job.resource==='transactions'&&job.watermark?date(financeReconcile?now-60*DAY:Date.parse(job.watermark)-5*60000):date(now-89*DAY));
   let url,key,id;
-  const params=new URLSearchParams({limit:'100',offset:String(offset)});
+  const params=new URLSearchParams({limit:job.resource==='returns'?'5':'100',offset:String(offset)});
   if(job.resource==='orders'){
    params.set('filter',`${job.watermark?'lastmodifieddate':'creationdate'}:[${start}..${end}]`);
    url='https://api.ebay.com/sell/fulfillment/v1/order';key='orders';id='orderId';
@@ -74,8 +76,14 @@ export async function readPage(job,token,fetcher=fetch,now=Date.now()){
   if(!Array.isArray(data[key])&&data.total!==0)throw new ProviderError('eBay '+job.resource+' response could not be validated');
   const entries=data[key]||[];
   rows=entries.map(data=>({id:String(data[id]||''),data}));
+  if(job.resource==='returns')for(const row of rows){
+   if(row.data.state==='CLOSED')continue;
+   const detail=await get('https://api.ebay.com/post-order/v2/return/'+encodeURIComponent(row.id),{headers:{Authorization:'IAF '+token}});
+   const t=detail.detail?.returnShipmentInfo?.shipmentTracking;
+   row.data={...row.data,_returnTracking:t?{active:t.active,deliveryStatus:t.deliveryStatus,markAsReceived:t.markAsReceived,labelDate:t.labelDate,trackingNumber:t.trackingNumber}:null};
+  }
   // Fetch one extra empty page when the API does not expose a total.
-  if(data.next||(Number.isFinite(data.total)?offset+entries.length<data.total:entries.length===100)){if(!entries.length)throw new ProviderError('Order pagination returned an incomplete page');next={start,end,offset:offset+entries.length,...(job.resource==='transactions'?{financeReconcile}:{})};}
+  if(data.next||(Number.isFinite(data.total)?offset+entries.length<data.total:entries.length===(job.resource==='returns'?5:100))){if(!entries.length)throw new ProviderError('Order pagination returned an incomplete page');next={start,end,offset:offset+entries.length,...(job.resource==='transactions'?{financeReconcile}:{})};}
  }
  if(rows.some(r=>!r.id||r.id.endsWith(':undefined')))throw new ProviderError('Missing eBay record identifier');
  return {records:rows,cursor:next||{},done:!next,watermark:end,...(financeReconcile?{finance_reconcile:true}:{}),...(snapshot?{snapshot}:{}),...(reconcileActive?{reconcile_active_before:reconcileActive}:{})};

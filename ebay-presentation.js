@@ -10,6 +10,10 @@ function orderStatus(row){
  const manual=Object.hasOwn(edit,'status')?edit.status:values(records,'status')[0];
  if(['Alert','OOS','Refunded','Due Refund'].includes(manual))return manual;
  if(d.cancelStatus?.cancelState==='CANCELED')return 'Cancelled';
+ const returns=row.returns||[];
+ const openReturns=returns.filter(r=>r.state!=='CLOSED');
+ if(openReturns.some(r=>r.tracking?.active===true&&(r.tracking.deliveryStatus==='DELIVERED'||r.tracking.markAsReceived===true)))return 'Due Refund';
+ if(openReturns.some(r=>r.tracking?.active===true&&r.tracking.labelDate?.value))return 'Label Created';
  // Retain manually confirmed delivery/return stages until a verified later event exists.
  if(['Delivered','Cancelled','Label Created'].includes(manual))return manual;
  if(d.orderFulfillmentStatus==='FULFILLED')return 'Shipped';
