@@ -298,3 +298,4 @@
 @media(max-width:1100px){
  .om .commerce-orders .ebay-table-scroll{margin-left:-10px;margin-right:0}
 }
+@media(max-width:1100px){.om .commerce-orders .ebay-table-scroll{left:0}}
