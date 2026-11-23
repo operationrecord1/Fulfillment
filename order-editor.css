@@ -52,3 +52,8 @@
 .order-add-tracking{justify-self:start;border:1px solid #d9dde1;border-radius:4px;background:#fff;color:#515455;font:500 12px/18px CommerceInter,Inter,sans-serif;padding:6px 10px;cursor:pointer}
 .order-add-tracking[hidden]{display:none}
 @media(max-width:700px){.order-edit-dialog .order-earnings-field{display:none}.order-edit-dialog .order-edit-three{grid-template-columns:1fr!important}}
+/* Reserve the add-action slot so typing never shifts the form. */
+.order-edit-dialog .order-add-tracking,.order-edit-dialog .order-add-tracking[hidden]{display:inline-block;min-height:32px;box-sizing:border-box;margin-top:4px}
+.order-edit-dialog .order-add-tracking[hidden]{visibility:hidden;pointer-events:none}
+.order-edit-dialog .order-extra-trackings:empty{display:none}
+@media(max-width:699.98px){.order-edit-dialog .order-meta-id{display:none}}
