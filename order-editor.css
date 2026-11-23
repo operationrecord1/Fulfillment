@@ -44,3 +44,11 @@
 .om .order-edit-dialog .order-meta-tip::after{left:7.5px;font-size:11px;line-height:18px;font-weight:400;padding:5px 8px;top:calc(100% + 6px)}
 .om .order-edit-dialog .order-meta-tip::before{content:'';display:none;position:absolute;left:7.5px;top:calc(100% + 2px);width:8px;height:8px;transform:translateX(-50%) rotate(45deg);background:#090e35;pointer-events:none;z-index:5}
 .om .order-edit-dialog .order-meta-tip:is(:hover,:focus)::before{display:block}
+.order-edit-dialog .order-meta-tip::before,.order-edit-dialog .order-meta-tip::after{display:none!important}
+.order-meta-icon-tip{position:relative;display:inline-flex;align-items:center}
+.order-meta-icon-tip:is(:hover,:focus)::after{content:attr(data-tip);position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#090e35;color:#fff;white-space:nowrap;padding:5px 8px;border-radius:4px;font:400 11px/18px CommerceInter,Inter,sans-serif;z-index:10}
+.order-meta-icon-tip:is(:hover,:focus)::before{content:'';position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%) rotate(45deg);width:8px;height:8px;background:#090e35;z-index:10}
+.order-tracking-editor,.order-extra-trackings{display:grid;gap:12px;min-width:0}
+.order-add-tracking{justify-self:start;border:1px solid #d9dde1;border-radius:4px;background:#fff;color:#515455;font:500 12px/18px CommerceInter,Inter,sans-serif;padding:6px 10px;cursor:pointer}
+.order-add-tracking[hidden]{display:none}
+@media(max-width:700px){.order-edit-dialog .order-earnings-field{display:none}.order-edit-dialog .order-edit-three{grid-template-columns:1fr!important}}
