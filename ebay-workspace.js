@@ -21,8 +21,8 @@ window.EbayWorkspace={mount({container,client,storeId,view='orders',navigate,wor
  {const canvas=document.createElement('div');canvas.className=view==='orders'?'orders-page-canvas':'listings-page-canvas';while(container.firstChild)canvas.append(container.firstChild);container.append(canvas);}
 
  function sizeScrollCanvas(){
-  const available=Math.max(260,container.clientWidth-20),mobile=window.innerWidth<=700,all=false,limit=Math.max(2200,available);
-  const referenceWidth=window.innerWidth>=1600?available:Math.max(2000,available);
+  const available=Math.max(260,container.clientWidth-20),mobile=window.innerWidth<=700,all=false,limit=2200;
+  const referenceWidth=Math.min(limit,window.innerWidth>=1600?available:Math.max(2000,available));
   const kpi=window.innerWidth<600?available*3+8:referenceWidth;
   const charts=referenceWidth;
   container.style.setProperty('--workspace-view-width',available+'px');

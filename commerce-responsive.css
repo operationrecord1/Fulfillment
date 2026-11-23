@@ -125,3 +125,10 @@
 
 .om .overview-kpi{position:relative}
 
+/* Keep desktop KPI pairs in the same order on phones as well. */
+.om .om-kpis>[data-kpi=period]{grid-area:1/1}.om .om-kpis>[data-kpi=count]{grid-area:2/1}
+.om .om-kpis>[data-kpi=revenue]{grid-area:1/2}.om .om-kpis>[data-kpi=cost]{grid-area:2/2}
+.om .om-kpis>[data-kpi=gross]{grid-area:1/3}.om .om-kpis>[data-kpi=net]{grid-area:2/3}
+.om .om-kpis>[data-kpi=tax]{grid-area:1/4}.om .om-kpis>[data-kpi=expense]{grid-area:2/4}
+.om .om-kpis>[data-kpi=avgOrder]{grid-area:1/5}.om .om-kpis>[data-kpi=avgProfit]{grid-area:2/5}
+.om .om-kpis>[data-kpi=margin]{grid-area:1/6}.om .om-kpis>[data-kpi=avgDaily]{grid-area:2/6}
