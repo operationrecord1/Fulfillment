@@ -104,3 +104,7 @@
  .om .commerce-orders .ebay-table tbody td:nth-child(6){width:min(168px,calc(var(--commerce-visible-width) - 66px))!important}
  .om .commerce-orders .order-row-tools button::before{inset:0}
 }
+
+/* Match the Dashboard legend density rather than stretching the chart row. */
+.om .orders-charts .om-performance-legend .om-progress-list{margin:0}
+.om .orders-charts .om-performance-legend .om-progress-row{padding:5px 2px}
