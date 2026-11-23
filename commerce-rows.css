@@ -195,3 +195,9 @@
 .order-row-tools button::before{content:'';position:absolute;inset:0 -5px}
 .order-row-popup{font-weight:400;box-shadow:0 3px 10px #5a585918;border-color:#e8e8e8;border-radius:6px}
 .order-row-popup[role=menu] button{font-weight:400}
+
+/* Match the reference note tone without changing action geometry. */
+.order-row-tools [data-note-order],.order-row-tools [data-note-order]:hover{color:#5a5859;opacity:1}
+.order-row-tools .order-note-icon{opacity:1}
+.order-row-tools [data-note-tooltip]::after{content:attr(data-note-tooltip);position:absolute;bottom:calc(50% + 15px);left:50%;transform:translateX(-50%);padding:6px 8px;border-radius:4px;background:rgb(9,14,53);color:#fff;font:400 13px/21px CommerceInter,Inter,sans-serif;white-space:nowrap;pointer-events:none;visibility:hidden;opacity:0;z-index:10000}
+.order-row-tools [data-note-tooltip]:hover::after,.order-row-tools [data-note-tooltip]:focus-visible::after{visibility:visible;opacity:1}
