@@ -32,5 +32,5 @@ export async function readNotes(token,fetcher=fetch){
 export async function writeNote(lineIds,note,token,fetcher=fetch){
  if(!Array.isArray(lineIds)||!lineIds.length||lineIds.some(x=>!/^\d+-\d+$/.test(x)))throw Error('Order Line IDs Are Not Available');
  if([...note].length>255)throw Error('eBay Notes Allow Up to 255 Characters');
- for(const id of lineIds)await trading('SetUserNotes',`<Action>${note?'AddOrUpdate':'Delete'}</Action><ItemID>${xml(id.split('-')[0])}</ItemID>${note?'<NoteText>'+xml(note)+'</NoteText>':''}<OrderLineItemID>${xml(id)}</OrderLineItemID>`,token,fetcher);
+ for(const id of lineIds)await trading('SetUserNotes',`<Action>${note?'AddOrUpdate':'Delete'}</Action><ItemID>${xml(id.split('-')[0])}</ItemID>${note?'<NoteText>'+xml(note)+'</NoteText>':''}<TransactionID>${xml(id.split('-')[1])}</TransactionID>`,token,fetcher);
 }
