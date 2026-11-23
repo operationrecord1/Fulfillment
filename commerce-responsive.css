@@ -295,3 +295,6 @@
  .om .commerce-orders .ebay-table tbody td:nth-child(6){width:116px!important}
  .om .commerce-orders .commerce-order-identities .commerce-field>span{font-size:9px!important}
 }
+@media(max-width:1100px){
+ .om .commerce-orders .ebay-table-scroll{margin-left:-10px;margin-right:0}
+}
