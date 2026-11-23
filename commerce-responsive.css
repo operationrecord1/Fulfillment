@@ -6,15 +6,20 @@
 .om .orders-kpi-scroll{width:var(--commerce-kpi-width);left:var(--commerce-kpi-left)}
 .om .orders-chart-scroll{width:var(--commerce-chart-width);left:var(--commerce-chart-left)}
 .om .orders-kpis.om-kpis{width:100%;min-width:0;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,auto);gap:8px}
-.om .orders-charts.om-charts{width:100%;min-width:0;grid-template-columns:minmax(240px,1fr) minmax(240px,1fr) minmax(600px,2.7fr);gap:10px;align-items:stretch}
-.om .orders-charts.om-charts>.om-panel{grid-column:auto;grid-row:auto;padding:16px;min-width:0}
-.om .orders-charts>.om-panel:nth-child(-n+2)>.om-chart{width:100%;max-width:320px;margin-inline:auto}
+.om .orders-charts.om-charts{width:100%;min-width:0;grid-template-columns:minmax(224px,17.5fr) minmax(224px,17.5fr) minmax(0,65fr);gap:10px;align-items:stretch}
+.om .orders-charts.om-charts>.om-panel{grid-column:auto;grid-row:auto;padding:12px 10px 10px;min-width:0}
+.om .orders-charts>.om-panel:nth-child(-n+2)>.om-chart{width:100%;max-width:210px;margin-inline:auto}
 .om .orders-charts>.om-panel:nth-child(-n+2)>.om-chart svg{width:100%;height:auto;max-width:none}
-.om .orders-charts>.om-panel:nth-child(-n+2){grid-template-rows:42px 36px auto auto;align-content:start}
+.om .orders-charts>.om-panel:nth-child(-n+2){grid-template-rows:minmax(20px,auto) minmax(36px,auto) auto auto;align-content:start}
 .om .orders-trend-chart,.om .orders-trend-chart svg{width:100%;min-width:0!important;max-width:100%;overflow:visible}
 .om .ebay-workspace :is(.ebay-toolbar,.commerce-selection,.commerce-pagination,.ebay-footnote,.orders-data-basis,.orders-overview-notice){position:sticky;left:10px;width:var(--commerce-visible-width);max-width:100%;margin-left:0;margin-right:0;box-sizing:border-box}
 .om .ebay-workspace .ebay-table-scroll{width:100%;overflow:visible;max-height:none;min-height:0}
 .om .commerce-mobile-overview-actions,.om .workspace-mobile-settings{display:none}
+/* Pagination ends the page without implementation or source notes. */
+.om .ebay-workspace .ebay-footnote{display:none}
+.om .orders-charts h2{margin:0;font-size:15px;line-height:1.4}
+.om .orders-charts>.om-panel>p{margin:5px 0;font-size:12px}
+.om .orders-trend-chart{margin-top:16px}
 @media(min-width:701px) and (max-width:900px){
  .om .orders-kpis.om-kpis>[data-metric]{grid-area:auto}
  .om .orders-kpis.om-kpis{grid-auto-flow:column;grid-template-rows:repeat(2,auto)}
@@ -32,7 +37,7 @@
  .om .commerce-mobile-overview-actions button{font:600 12px CommerceInter,Inter,sans-serif;border:1px solid #dfe3e7;border-radius:7px;padding:9px;background:#fff;color:#374151}
  .om .orders-charts.om-charts{grid-template-columns:250px 250px 500px;gap:10px}
  .om .orders-charts.om-charts>.om-panel{grid-column:auto!important;grid-row:auto;padding:12px}
- .om .orders-charts>.om-panel:nth-child(-n+2)>.om-chart{max-width:220px}
+ .om .orders-charts>.om-panel:nth-child(-n+2)>.om-chart{max-width:210px}
  .om .orders-data-basis{font-size:9px}
  .om .commerce-all-metrics .orders-kpis.om-kpis{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;grid-auto-flow:row}
  .om .commerce-all-metrics .orders-kpis.om-kpis>[data-metric]:nth-child(n){display:flex}
