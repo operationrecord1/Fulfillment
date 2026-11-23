@@ -70,3 +70,11 @@
  .om .om-head>.om-profile{margin-left:auto!important}
  .om .ebay-detail,.om .order-edit-dialog{max-width:calc(100vw - 16px)}
 }
+@media(max-width:700px){
+ .om .ebay-workspace:is(.commerce-orders,.commerce-listings){height:calc(100dvh - 126px)!important;max-height:calc(100dvh - 126px);flex:none}
+ .om .commerce-orders .order-row-tools [data-note-tooltip]::after{left:auto;right:0;transform:none}
+ .om .order-edit-dialog .order-edit-grid,.om .order-edit-dialog .order-edit-three,.om .order-edit-dialog .buyer-grid{grid-template-columns:1fr;gap:12px}
+ .om .order-edit-dialog{padding-inline:16px}
+ .om .commerce-mobile-details{display:inline-block;margin-top:5px;font:500 11px CommerceInter,Inter,sans-serif;color:#787b80;background:none;border:0;padding:3px 0;text-decoration:underline}
+}
+@media(min-width:701px){.commerce-mobile-details{display:none}}
