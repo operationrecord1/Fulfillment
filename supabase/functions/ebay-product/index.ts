@@ -22,5 +22,5 @@ Deno.serve(async(req:Request)=>{
    const item=d.Item;items.push({id:line.legacyItemId,title:item.Title||line.title,description:item.Description||'',order_quantity:line.quantity,quantity:item.Quantity,quantity_sold:item.SellingStatus?.QuantitySold,image:Array.isArray(item.PictureDetails?.PictureURL)?item.PictureDetails.PictureURL[0]:item.PictureDetails?.PictureURL});
   }
   return Response.json({items},{headers});
- }catch{return Response.json({error:'Product Details Could Not Load from eBay. Please Try Again.'},{status:502,headers});}
+ }catch(e){console.error('Product detail:',e.message);return Response.json({error:'Product Details Could Not Load from eBay. Please Try Again.'},{status:502,headers});}
 });

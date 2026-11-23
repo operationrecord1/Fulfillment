@@ -1,7 +1,7 @@
 (function(){'use strict';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 window.OrderProductPage={mount({container,client,storeId,orderId}){
- let disposed=false;
+ let disposed=false;for(let p=container.parentElement;p;p=p.parentElement){p.scrollTop=0;p.scrollLeft=0;}window.scrollTo(0,0);
  container.className='order-product-page';
  container.innerHTML='<a href="#workspace/orders" class="product-back">← Back to Orders</a><h1>Edit Product</h1><p class="product-page-status" role="status">Loading Product Information…</p><div class="product-page-items"></div><button type="button" class="product-retry" hidden>Try Again</button>';
  async function load(){
