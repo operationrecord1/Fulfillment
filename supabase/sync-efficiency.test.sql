@@ -1,0 +1,24 @@
+begin;
+do $$ declare s uuid;oid text;before_rev bigint;after_rev bigint;begin
+ select store_id,external_id into s,oid from fulfillment_private.ebay_records where resource='orders' and external_id='26-15401-29635';
+ if s is null then raise exception 'Missing fixture';end if;
+ insert into fulfillment_private.ebay_order_edits(store_id,order_id,data) values(s,oid,'{"status":"Due Refund"}') on conflict(store_id,order_id) do update set data=excluded.data;
+ update fulfillment_private.ebay_records set data=jsonb_set(data,'{deliveredAt}','null') where store_id=s and resource='delivery_tracking' and external_id=oid;
+ perform fulfillment_private.schedule_delivery(s,oid,true);
+ if not exists(select 1 from fulfillment_private.delivery_due where store_id=s and order_id=oid and next_check between now()+interval '4 minutes' and now()+interval '6 minutes') then raise exception 'Active due refund delivery schedule failed';end if;
+ select revision into before_rev from fulfillment_private.commerce_versions where store_id=s;
+ update fulfillment_private.ebay_records set data=data||jsonb_build_object('observedAt',now()) where store_id=s and resource='delivery_tracking' and external_id=oid;
+ select revision into after_rev from fulfillment_private.commerce_versions where store_id=s;
+ if before_rev<>after_rev then raise exception 'Observation-only poll invalidates screen';end if;
+ update fulfillment_private.ebay_records set data=data||'{"deliveredAt":"2026-11-23T12:00:00Z"}' where store_id=s and resource='delivery_tracking' and external_id=oid;
+ if exists(select 1 from fulfillment_private.delivery_due where store_id=s and order_id=oid) then raise exception 'Delivered order still polled';end if;
+ if not exists(select 1 from fulfillment_private.refund_dirty where store_id=s and order_id=oid) then raise exception 'Delivery missed refund queue';end if;
+ update fulfillment_private.ebay_records set data=jsonb_set(data,'{deliveredAt}','null') where store_id=s and resource='delivery_tracking' and external_id=oid;
+ update fulfillment_private.ebay_order_edits set data='{"status":"Alert"}' where store_id=s and order_id=oid;
+ if exists(select 1 from fulfillment_private.delivery_due where store_id=s and order_id=oid) then raise exception 'Alert polled';end if;
+ update fulfillment_private.ebay_order_edits set data='{"status":"Pending"}' where store_id=s and order_id=oid;
+ if not exists(select 1 from fulfillment_private.delivery_due where store_id=s and order_id=oid) then raise exception 'Clearing exception failed to resume';end if;
+ if has_function_privilege('anon','public.ebay_workspace_revision(uuid)','EXECUTE') then raise exception 'Public revision access';end if;
+end $$;
+rollback;
+select 'Passed: queue timing, delivered removal, unchanged-data suppression, refund dirty event, exception/resume, access restrictions; rolled back' result;

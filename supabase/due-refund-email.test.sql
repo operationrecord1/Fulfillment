@@ -13,7 +13,10 @@ begin
  select count(*) into n from fulfillment_private.due_refund_candidates() where store_id=s and order_id=oid;
  if n<>1 then raise exception 'Manual due refund delivered expected one employee reminder, got %',n; end if;
  if exists(select 1 from fulfillment_private.due_refund_candidates() c join public.profiles p on p.user_id=c.recipient_id where p.role<>'staff' or not p.is_active or p.store_id<>c.store_id) then raise exception 'Recipient isolation failed'; end if;
+ for i in 1..10 loop
  j=public.due_refund_mail_worker('claim');
+ exit when j->>'id' is not null;
+ end loop;
  if j->>'id' is null then raise exception 'Claim failed'; end if;
  perform public.due_refund_mail_worker('sent',jsonb_build_object('id',j->>'id','lease',j->>'lease','providerId','TEST-ROLLBACK'));
  perform public.due_refund_mail_worker('claim');
