@@ -213,3 +213,4 @@
 
 .om .commerce-orders .commerce-profit.loss,.om .commerce-orders .commerce-sell-amount.loss{color:#eb4242}
 .commerce-sell-amount{position:relative;display:inline-block}.commerce-sell-minus{position:absolute;right:100%;top:0;font-size:10px;line-height:inherit}
+.om .commerce-orders .commerce-sell-amount .commerce-sell-minus{font-size:10px;transform:scaleX(.65);transform-origin:right center}
