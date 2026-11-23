@@ -136,3 +136,13 @@
 .om .commerce-orders .commerce-status-edit .sheet-selected-value{justify-content:flex-start;gap:8px}
 .om .commerce-orders .commerce-status-edit .sheet-selected-value>span{text-align:left;font-weight:600}
 .om .commerce-orders .commerce-status-edit .status-symbol{width:24px;height:24px;min-width:24px;stroke-width:1.8}
+
+/* Stable column gutters: ID/Price 10px; Price/Profit and Profit/Status 20px. */
+.om .commerce-orders .ebay-table{width:1691px;min-width:1691px}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(3){padding-left:8px;padding-right:5px}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(4){padding-left:5px;padding-right:10px}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(5){padding-left:10px;padding-right:10px;white-space:nowrap}
+.om .commerce-orders .ebay-table :is(th,td):nth-child(6){padding-left:10px;padding-right:12px}
+.om .commerce-orders .ebay-table td:is(:nth-child(4),:nth-child(5)){font-variant-numeric:tabular-nums}
+.om .commerce-orders .ebay-table td:nth-child(4) .commerce-field>div{font-variant-numeric:tabular-nums}
+@media(min-width:1150px){.om .commerce-orders .ebay-table :is(th,td):nth-child(4){left:596px}.om .commerce-orders .ebay-table :is(th,td):nth-child(5){left:741px}.om .commerce-orders .ebay-table :is(th,td):nth-child(6){left:856px}}
