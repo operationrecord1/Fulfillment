@@ -78,3 +78,4 @@
  .om .commerce-mobile-details{display:inline-block;margin-top:5px;font:500 11px CommerceInter,Inter,sans-serif;color:#787b80;background:none;border:0;padding:3px 0;text-decoration:underline}
 }
 @media(min-width:701px){.commerce-mobile-details{display:none}}
+@media(min-width:701px){.om .ebay-workspace .ebay-table{min-width:100%!important}}
