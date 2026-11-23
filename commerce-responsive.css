@@ -241,3 +241,11 @@
 @media(max-width:360px){
  .om .commerce-orders .commerce-status-edit{font-size:10px;padding-inline:5px;gap:4px}
 }
+@media(max-width:1100px){
+ .om .commerce-orders .ebay-table tbody tr{grid-template-columns:minmax(0,1fr) minmax(0,.85fr) 14px 60px;column-gap:6px}
+ .om .commerce-orders .ebay-table tbody td:nth-child(6){grid-area:2/2/3/5}
+ .om .commerce-orders .ebay-table tbody td:nth-child(8){display:block;grid-area:3/4/4/5;text-align:right;align-self:center}
+ .om .commerce-orders .order-detail-date{font-size:0;white-space:normal}
+ .om .commerce-orders .order-detail-date::after{content:attr(data-compact-date);font-size:10px;line-height:14px}
+ .om .commerce-orders .commerce-profit-stack{flex-wrap:wrap;justify-content:center;row-gap:0}
+}
