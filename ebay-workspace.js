@@ -26,7 +26,7 @@ window.EbayWorkspace={mount({container,client,storeId,view='orders',navigate,wor
   const kpi=window.innerWidth<600?available*3+8:referenceWidth;
   const charts=referenceWidth;
   container.style.setProperty('--workspace-view-width',available+'px');
-  const table=mobile?available:(view==='orders'?parseFloat($('.ebay-table').style.width)||2180:1420);
+  const table=(view==='orders'?window.innerWidth<=1100:mobile)?available:(view==='orders'?parseFloat($('.ebay-table').style.width)||2180:1420);
   const width=Math.max(Math.min(limit,available),table,all?available:kpi,all?available:charts),margin=Math.max(0,(available-width)/2);
   container.style.setProperty('--commerce-canvas-width',width+'px');container.style.setProperty('--commerce-canvas-margin',margin+'px');
   container.style.setProperty('--commerce-visible-width',Math.min(available,limit)+'px');
