@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 global.OrderCore=require('./dashboard-core.js');
-const {summarize}=require('./orders-overview.js');
+const {summarize,orderCountRows}=require('./orders-overview.js');
 const data={rows:[{data:{earning:999999}}],expenses:[{date:'2026-10-01',amount:10},{date:'2026-11-01',amount:2},{date:'2025-11-01',amount:1000}],options:{tax_percentage:10}};
 const oct={metric_date:'2026-10-05',count:1,revenue:10000,cost:6000,gross:4000,margin_sum:40,margin_count:1,profit_count:1};
 const nov={metric_date:'2026-11-05',count:1,revenue:2000,cost:800,gross:1200,margin_sum:60,margin_count:1,profit_count:1};
@@ -9,6 +9,32 @@ test('monthly Orders source ignores Dashboard sales and filters expenses',()=>{c
 test('full year uses annual tax; chart shows monthly net results',()=>{const {a,points}=summarize(data,2026,0,metrics(0,[oct,nov]));assert.equal(a.count,2);assert.equal(a.revenue,12000);assert.equal(a.net,3600);assert.equal(points.length,12);assert.equal(points[9].value,2700);assert.equal(points[10].value,900);});
 test('empty period clears all order metrics',()=>{const {a,points}=summarize(data,2026,12,metrics(12,[]));assert.equal(a.count,0);assert.equal(a.net,0);assert.ok(points.every(p=>p.value===0));});
 test('rejects stale period metrics during selector changes',()=>{assert.equal(summarize(data,2026,10,metrics(11,[nov])),null);assert.equal(summarize(data,2025,11,metrics(11,[nov])),null);assert.equal(summarize(data,2026,11),null);});
+test('monthly Total Orders details retain the order count and selected period',()=>{
+ const summary=summarize(data,2026,11,metrics(11,[nov]));
+ assert.deepEqual(orderCountRows(summary,2026,11),[['Orders','1'],['Period','November 2026']]);
+ const empty=summarize(data,2026,12,metrics(12,[]));
+ assert.deepEqual(orderCountRows(empty,2026,12),[['Orders','0'],['Period','December 2026']]);
+});
+test('yearly Total Orders details aggregate active months newest first and put the total last',()=>{
+ const days=[{metric_date:'2024-01-02',count:9},{metric_date:'2024-10-05',count:7},{metric_date:'2024-11-01',count:'1000'},{metric_date:'2024-11-25',count:25}];
+ const summary=summarize({expenses:[]},2024,0,{year:2024,month:0,days});
+ const chartPoints=structuredClone(summary.points);
+ assert.deepEqual(orderCountRows(summary,2024,0),[['November 2024','1,025'],['October 2024','7'],['January 2024','9'],['Total Orders','1,041']]);
+ assert.equal(summary.points.reduce((total,p)=>total+p.count,0),summary.a.count);
+ assert.deepEqual(summary.points,chartPoints,'opening the popup must not reorder chart data');
+});
+test('yearly Total Orders details include every active month in a complete year',()=>{
+ const days=Array.from({length:12},(_,i)=>({metric_date:'2026-'+String(i+1).padStart(2,'0')+'-01',count:i+1}));
+ const summary=summarize(data,2026,0,metrics(0,days)),rows=orderCountRows(summary,2026,0);
+ assert.equal(rows.length,13);
+ assert.deepEqual(rows[0],['December 2026','12']);
+ assert.deepEqual(rows[11],['January 2026','1']);
+ assert.deepEqual(rows[12],['Total Orders','78']);
+});
+test('empty full year shows a zero total without inventing month rows',()=>{
+ const summary=summarize(data,2026,0,metrics(0,[]));
+ assert.deepEqual(orderCountRows(summary,2026,0),[['Total Orders','0']]);
+});
 test('gross includes all order costs; missing costs do not create fictional profit',()=>{const {a}=summarize({expenses:[]},2026,11,metrics(11,[{...nov,count:3,revenue:10000,cost:2000,shipping:300,additional:200,gross:1500,pending_cost:2,profit_count:1,margin_sum:37.5,margin_count:1}]));assert.equal(a.gross,1500);assert.equal(a.shipping,300);assert.equal(a.additional,200);assert.equal(a.pendingCost,2);assert.equal(a.avgProfit,500);assert.equal(a.margin,37.5);});
 test('yearly loss offsets profit before annual tax as in Dashboard',()=>{const {a}=summarize({expenses:[],options:{tax_percentage:15}},2026,0,metrics(0,[{...oct,gross:10000},{...nov,gross:-9000}]));assert.equal(a.gross,1000);assert.equal(a.tax,150);assert.equal(a.net,850);});
 test('same order amounts reproduce Dashboard financial formula',()=>{const rows=[{year:2026,month:11,data:{order_id:'a',date:'2026-11-05',earning:20,product_cost:8,shipping_cost:2,additional_cost:1}}],expenses=[{date:'2026-11-06',amount:2}],expected=global.OrderCore.aggregate(rows,expenses,false,15);const {a}=summarize({expenses},2026,11,metrics(11,[{...nov,cost:800,shipping:200,additional:100,gross:900,margin_sum:45}]));for(const k of ['revenue','gross','net','expense','tax','avgOrder','avgProfit','margin'])assert.equal(a[k],expected[k],k);assert.equal(a.cost,1100);assert.equal(a.baseCost,800);});

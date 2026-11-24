@@ -21,6 +21,11 @@ function summarize(data,year,month,metrics){
  return {a,points,expenses,taxRate};
 }
 
+function orderCountRows({a,points},year,month){
+ if(month)return [['Orders',num(a.count)],['Period',months[month-1]+' '+year]];
+ return points.filter(p=>p.count>0).reverse().map(p=>[p.full,num(p.count)]).concat([['Total Orders',num(a.count)]]);
+}
+
 function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit'}).formatToParts(new Date()),currentYear=Number(today.find(p=>p.type==='year').value);let year=currentYear,month=Number(today.find(p=>p.type==='month').value),disposed=false,request=0,busy=false,signature='',imported=null;const cache=new Map();if(initial)cache.set(initial.year,initial);
  const periodKey='fulfillment-orders-period';try{const saved=JSON.parse(root.localStorage.getItem(periodKey)||'null');if(saved&&Number.isInteger(saved.year)&&saved.year>=2000&&saved.year<=currentYear&&Number.isInteger(saved.month)&&saved.month>=0&&saved.month<=12){year=saved.year;month=saved.month;}}catch{}
  host.dataset.loading='true';host.setAttribute('aria-busy','true');
@@ -37,9 +42,9 @@ function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.Dat
  const chartResize=new ResizeObserver(()=>{drawDaily();fitTitles();});chartResize.observe($('.overview-charts'));chartResize.observe($('.overview-kpis'));
  for(const [key,title] of definitions){const card=$('[data-metric="'+key+'"]'),button=card.querySelector('button');button.onclick=()=>{const data=cache.get(year),summary=data&&summarize(data,year,month,imported?.metrics),pairs=items=>'<dl class="om-detail-pairs">'+items.map(([k,v])=>'<div><dt>'+k+'</dt><dd>'+v+'</dd></div>').join('')+'</dl>';let html='<p>Loading selected period…</p>';
  if(summary){const {a,expenses,taxRate}=summary,periodLabel=month?months[month-1]+' '+year:'Report of '+year;
- const items={count:[['Orders',num(a.count)],['Period',periodLabel]],revenue:[['Period',periodLabel],['Recorded Order Earnings',money(a.revenue)],['Orders Awaiting Earnings',num(a.pendingEarnings)]],cost:[['Period',periodLabel],['Buying Price',money(a.baseCost)],['Shipping Cost',money(a.shipping)],['Additional Cost',money(a.additional)],['Total Buying Cost',money(a.cost)],['Orders Awaiting Buying Price',num(a.pendingCost)]],gross:[['Period',periodLabel],['Orders with Earnings and Buying Price',num(a.profitCount)],['Gross Profit',money(a.gross)],['Formula','Earnings − buying price − shipping − additional cost']],margin:[['Orders with Calculated Margin',num(a.marginCount)],['Average Profit Margin',num(a.margin)+'%']],avgDaily:[['Orders',num(a.count)],['Elapsed Calendar Days',num(imported.elapsedDays)],['Average Daily Orders',num(imported.averageDaily)]]};
+ const items={count:orderCountRows(summary,year,month),revenue:[['Period',periodLabel],['Recorded Order Earnings',money(a.revenue)],['Orders Awaiting Earnings',num(a.pendingEarnings)]],cost:[['Period',periodLabel],['Buying Price',money(a.baseCost)],['Shipping Cost',money(a.shipping)],['Additional Cost',money(a.additional)],['Total Buying Cost',money(a.cost)],['Orders Awaiting Buying Price',num(a.pendingCost)]],gross:[['Period',periodLabel],['Orders with Earnings and Buying Price',num(a.profitCount)],['Gross Profit',money(a.gross)],['Formula','Earnings − buying price − shipping − additional cost']],margin:[['Orders with Calculated Margin',num(a.marginCount)],['Average Profit Margin',num(a.margin)+'%']],avgDaily:[['Orders',num(a.count)],['Elapsed Calendar Days',num(imported.elapsedDays)],['Average Daily Orders',num(imported.averageDaily)]]};
  html=items[key]?pairs(items[key]):root.DashboardInsights.details(key,a,[],expenses,false,taxRate);
- }insights.open(button,title,card.querySelector('strong').textContent,html);};}
+ }insights.open(button,title,key==='count'&&month===0?null:card.querySelector('strong').textContent,html);};}
 
  popup.setAttribute("popover","manual");popup.style.margin="0";
  let choosingYear=false;
@@ -78,5 +83,5 @@ function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.Dat
  function change(){try{root.localStorage.setItem(periodKey,JSON.stringify({year,month}));}catch{}insights.close();dailyKey='';imported=null;signature='';paint();onPeriod();refresh();}
  paint();if(!cache.has(year))refresh();return {setImported(value){imported=value;paint();},period:()=>({year,month}),refresh,dispose(){disposed=true;request++;chartResize.disconnect();insights.destroy();document.removeEventListener('pointerdown',outside);root.removeEventListener('resize',reposition);document.removeEventListener('scroll',reposition,true);closePicker();}};
 }
-root.OrdersOverview={mount,summarize};if(typeof module!=='undefined')module.exports={summarize};
+root.OrdersOverview={mount,summarize};if(typeof module!=='undefined')module.exports={summarize,orderCountRows};
 })(typeof window==='undefined'?globalThis:window);

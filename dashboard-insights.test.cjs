@@ -1,4 +1,5 @@
 const assert=require('node:assert/strict'),C=require('./dashboard-core'),I=require('./dashboard-insights');
+const test=require('node:test');
 const row=(position,order_id,earning,product_cost,status,purchase_id='')=>({position,month:11,data:{order_id,earning,product_cost,status,purchase_id}});
 const rows=[row(1,'A',10,15,'Refunded'),row(2,'B',12,5,'Delivered'),row(3,'B',3,1,'Delivered'),row(4,'C',30,10,'Pending'),row(5,'D',0,0,'Buyer Cancelled')];
 const a=C.aggregate(rows,[]);
@@ -16,3 +17,31 @@ assert.match(I.details('count',a,rows,[],false,15),/>-\$5\.00<\/span>/);
 assert.match(I.details('count',a,rows,[],false,15),/>\$9\.00<\/span>/);
 
 assert.equal(C.statusLabel('Buyer Cancelled'),'Cancelled');assert.equal(I.statusBreakdown([row(1,'C',10,2,'Buyer Cancelled')])[0].status,'Cancelled');
+
+test('details popup omits only a null heading value and preserves normal and zero values',()=>{
+ const oldDocument=global.document,oldWindow=global.window,listeners={};let opened=false,insights;
+ const closeButton={focus(){}};
+ const pop={style:{},scrollWidth:240,offsetWidth:242,offsetHeight:160,setAttribute(){},remove(){},
+  addEventListener(name,fn){listeners[name]=fn;},matches(){return opened;},showPopover(){opened=true;},
+  hidePopover(){listeners.beforetoggle?.({newState:'closed'});opened=false;},
+  querySelector(selector){return selector==='button'?closeButton:null;}};
+ const host={append(){},addEventListener(){},removeEventListener(){}};
+ const button={setAttribute(){},closest(){return {getBoundingClientRect(){return {left:20,top:40,width:240};}};}};
+ const body='<dl class="om-detail-pairs"><div><dt>Total Orders</dt><dd>1,041</dd></div></dl>';
+ const heading=value=>'<div class="om-details-heading"><div><h3>Total Orders</h3>'+value+'</div><button type="button" aria-label="Close details">×</button></div>';
+ try{
+  global.document={createElement(){return pop;}};
+  global.window={innerWidth:1024,innerHeight:768,addEventListener(){},removeEventListener(){}};
+  insights=I.bind(host);
+  insights.open(button,'Total Orders',null,body);
+  assert.equal(pop.innerHTML,heading('')+body);
+  insights.close();insights.open(button,'Total Orders','1,041',body);
+  assert.equal(pop.innerHTML,heading('<strong>1,041</strong>')+body);
+  insights.close();insights.open(button,'Total Orders',0,body);
+  assert.equal(pop.innerHTML,heading('<strong>0</strong>')+body);
+ }finally{
+  insights?.destroy();
+  if(oldDocument===undefined)delete global.document;else global.document=oldDocument;
+  if(oldWindow===undefined)delete global.window;else global.window=oldWindow;
+ }
+});
