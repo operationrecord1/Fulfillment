@@ -15,11 +15,11 @@ test('monthly Total Orders details retain the order count and selected period',(
  const empty=summarize(data,2026,12,metrics(12,[]));
  assert.deepEqual(orderCountRows(empty,2026,12),[['Orders','0'],['Period','December 2026']]);
 });
-test('yearly Total Orders details put the total above active months in calendar order',()=>{
+test('yearly Total Orders details put the total below active months in calendar order',()=>{
  const days=[{metric_date:'2024-01-02',count:9},{metric_date:'2024-10-05',count:7},{metric_date:'2024-11-01',count:'1000'},{metric_date:'2024-11-25',count:25}];
  const summary=summarize({expenses:[]},2024,0,{year:2024,month:0,days});
  const chartPoints=structuredClone(summary.points);
- assert.deepEqual(orderCountRows(summary,2024,0),[['Total Orders','1,041'],['January 2024','9'],['October 2024','7'],['November 2024','1,025']]);
+ assert.deepEqual(orderCountRows(summary,2024,0),[['January 2024','9'],['October 2024','7'],['November 2024','1,025'],['Total Orders','1,041']]);
  assert.equal(summary.points.reduce((total,p)=>total+p.count,0),summary.a.count);
  assert.deepEqual(summary.points,chartPoints,'opening the popup must not reorder chart data');
 });
@@ -27,9 +27,9 @@ test('yearly Total Orders details include every active month in a complete year'
  const days=Array.from({length:12},(_,i)=>({metric_date:'2026-'+String(i+1).padStart(2,'0')+'-01',count:i+1}));
  const summary=summarize(data,2026,0,metrics(0,days)),rows=orderCountRows(summary,2026,0);
  assert.equal(rows.length,13);
- assert.deepEqual(rows[0],['Total Orders','78']);
- assert.deepEqual(rows[1],['January 2026','1']);
- assert.deepEqual(rows[12],['December 2026','12']);
+ assert.deepEqual(rows[0],['January 2026','1']);
+ assert.deepEqual(rows[11],['December 2026','12']);
+ assert.deepEqual(rows[12],['Total Orders','78']);
 });
 test('empty full year shows a zero total without inventing month rows',()=>{
  const summary=summarize(data,2026,0,metrics(0,[]));

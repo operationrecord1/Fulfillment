@@ -23,7 +23,7 @@ function summarize(data,year,month,metrics){
 
 function orderCountRows({a,points},year,month){
  if(month)return [['Orders',num(a.count)],['Period',months[month-1]+' '+year]];
- return [['Total Orders',num(a.count)],...points.filter(p=>p.count>0).map(p=>[p.full,num(p.count)])];
+ return points.filter(p=>p.count>0).map(p=>[p.full,num(p.count)]).concat([['Total Orders',num(a.count)]]);
 }
 
 function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit'}).formatToParts(new Date()),currentYear=Number(today.find(p=>p.type==='year').value);let year=currentYear,month=Number(today.find(p=>p.type==='month').value),disposed=false,request=0,busy=false,signature='',imported=null;const cache=new Map();if(initial)cache.set(initial.year,initial);
