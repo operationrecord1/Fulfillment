@@ -69,3 +69,47 @@ test('reclassification and awaiting counts do not alter any existing financial c
  const empty=summarize(data,2026,12,metrics(12,[]));
  assert.deepEqual(financialDetailRows('revenue',empty,2026,12).slice(1),[['Processed Order Earnings','$0.00'],['Unprocessed Order Earnings','$0.00'],['Orders Awaiting Earnings','0'],['Total Gross Revenue','$0.00']]);
 });
+
+test('Gross Profit has four rows and counts recorded buying prices independently of earnings',()=>{
+ const days=[{...nov,count:5,gross:1200,profit_count:1,pending_cost:3,gross_cost_count:2,gross_pending_cost:1}];
+ const summary=summarize(data,2026,11,metrics(11,days));
+ assert.deepEqual(financialDetailRows('gross',summary,2026,11),[
+  ['Period','November 2026'],['Orders with Buying Price','2'],['Orders Awaiting Buying Price','1'],['Total Gross Profit','$12.00']
+ ]);
+ assert.equal(summary.a.profitCount,1,'an order awaiting earnings still belongs in the recorded-price count');
+ assert.equal(summary.a.pendingCost,3,'Product Cost keeps its own awaiting rule');
+});
+
+test('yearly Gross Profit counts include all selected days and retain the same four-row structure',()=>{
+ const days=[{...oct,gross_cost_count:'7',gross_pending_cost:2},{...nov,metric_date:'2026-11-30',gross_cost_count:3,gross_pending_cost:1}];
+ const summary=summarize(data,2026,0,metrics(0,days));
+ assert.deepEqual(financialDetailRows('gross',summary,2026,0),[
+  ['Period','Report of 2026'],['Orders with Buying Price','10'],['Orders Awaiting Buying Price','3'],['Total Gross Profit','$52.00']
+ ]);
+ for(const month of [0,12]){
+  const empty=summarize(data,2026,month,metrics(month,[]));
+  assert.deepEqual(financialDetailRows('gross',empty,2026,month).slice(1),[['Orders with Buying Price','0'],['Orders Awaiting Buying Price','0'],['Total Gross Profit','$0.00']]);
+ }
+});
+
+test('Gross Profit count updates leave every existing amount, Product Cost count and Net Profit result unchanged',()=>{
+ const original=summarize(data,2026,11,metrics(11,[{...nov,pending_cost:4}]));
+ const changed=summarize(data,2026,11,metrics(11,[{...nov,pending_cost:4,gross_cost_count:3,gross_pending_cost:1}]));
+ const {grossCostCount,grossPendingCost,...remaining}=changed.a;
+ const {grossCostCount:oldCount,grossPendingCost:oldPending,...baseline}=original.a;
+ assert.equal(grossCostCount,3);assert.equal(grossPendingCost,1);
+ assert.deepEqual(remaining,baseline);
+ assert.deepEqual(changed.points,original.points);
+ assert.deepEqual(changed.expenses,original.expenses);
+});
+
+test('recorded losses reduce positive totals and may make monthly or yearly Gross Profit negative',()=>{
+ for(const month of [11,0])for(const [prior,expected,label] of [[2000,1000,'$10.00'],[500,-500,'-$5.00']]){
+  const summary=summarize({expenses:[]},2026,month,metrics(month,[
+   {...nov,gross:prior,gross_cost_count:1,gross_pending_cost:0},
+   {...nov,metric_date:'2026-11-30',gross:-1000,gross_cost_count:0,gross_pending_cost:0}
+  ]));
+  assert.equal(summary.a.gross,expected);
+  assert.deepEqual(financialDetailRows('gross',summary,2026,month)[3],['Total Gross Profit',label]);
+ }
+});

@@ -1,6 +1,7 @@
 -- Existing earnings source and profit formulas are unchanged; summary amounts are cents.
 -- Split known earnings by processing state; pending counts include only eligible orders.
 -- A Buy ID or any recorded buying/shipping/additional cost makes known earnings processed.
+-- Gross Profit price counts exclude terminal orders; actual profit/loss amounts are unchanged.
 CREATE OR REPLACE FUNCTION public.ebay_orders_period_page(target uuid, kind text DEFAULT 'orders'::text, query_text text DEFAULT ''::text, status_filter text DEFAULT ''::text, page_number integer DEFAULT 1, page_size integer DEFAULT 25, period_year integer DEFAULT 2026, period_month integer DEFAULT 1)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -77,6 +78,8 @@ begin
  coalesce(sum(round(shipping*100)),0) shipping,coalesce(sum(round(additional*100)),0) additional,
  coalesce(sum(profit_cents),0) gross,count(*) filter(where earning is null and not cancelled) pending_earnings,
  count(*) filter(where cost is null and not cancelled and not (not has_buy_id and coalesce(metric_status='Refunded',false))) pending_cost,
+ count(*) filter(where cost is not null and not cancelled and not coalesce(metric_status='Refunded',false)) gross_cost_count,
+ count(*) filter(where cost is null and not cancelled and not coalesce(metric_status='Refunded',false)) gross_pending_cost,
  count(*) filter(where profit_cents is not null) profit_count,
  count(*) filter(where profit_cents is not null and earning<>0) margin_count,
  coalesce(sum(greatest(-100,least(100,profit_cents/nullif(earning,0)))) filter(where profit_cents is not null and earning<>0),0) margin_sum

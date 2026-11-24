@@ -11,7 +11,7 @@ function summarize(data,year,month,metrics){
  const sum=k=>days.reduce((n,d)=>n+Number(d[k]||0),0),rate=Number(data.options?.tax_percentage??15),taxRate=Number.isFinite(rate)?Math.max(0,rate):15;
  const expense=expenses.reduce((n,e)=>n+root.OrderCore.cents(e.amount),0),gross=sum('gross'),count=sum('count'),revenue=sum('revenue'),marginCount=sum('margin_count');
  const tax=Math.round(Math.max(0,gross-expense)*taxRate/100);
- const a={count,revenue,processedRevenue:sum('processed_revenue'),unprocessedRevenue:sum('unprocessed_revenue'),baseCost:sum('cost'),cost:sum('cost')+sum('shipping')+sum('additional'),shipping:sum('shipping'),additional:sum('additional'),gross,expense,tax,net:gross-expense-tax,margin:marginCount?sum('margin_sum')/marginCount:0,marginCount,avgOrder:count?Math.round(revenue/count):0,avgProfit:count?Math.round(gross/count):0,pendingEarnings:sum('pending_earnings'),pendingCost:sum('pending_cost'),profitCount:sum('profit_count'),sizes:['Small','Medium','Large'].map((name,index)=>{const s=(metrics.sizes||[]).find(x=>x.index===index);return {name,count:Number(s?.count||0),profit:Number(s?.profit||0)};})};
+ const a={count,revenue,processedRevenue:sum('processed_revenue'),unprocessedRevenue:sum('unprocessed_revenue'),baseCost:sum('cost'),cost:sum('cost')+sum('shipping')+sum('additional'),shipping:sum('shipping'),additional:sum('additional'),gross,expense,tax,net:gross-expense-tax,margin:marginCount?sum('margin_sum')/marginCount:0,marginCount,avgOrder:count?Math.round(revenue/count):0,avgProfit:count?Math.round(gross/count):0,pendingEarnings:sum('pending_earnings'),pendingCost:sum('pending_cost'),profitCount:sum('profit_count'),grossCostCount:sum('gross_cost_count'),grossPendingCost:sum('gross_pending_cost'),sizes:['Small','Medium','Large'].map((name,index)=>{const s=(metrics.sizes||[]).find(x=>x.index===index);return {name,count:Number(s?.count||0),profit:Number(s?.profit||0)};})};
  if(!month)a.taxableAmount=Math.max(0,gross-expense);
  const points=Array.from({length:month?new Date(Date.UTC(year,month,0)).getUTCDate():12},(_,i)=>{
  const selected=days.filter(d=>month?Number(d.metric_date.slice(8,10))===i+1:Number(d.metric_date.slice(5,7))===i+1),profit=selected.reduce((n,d)=>n+Number(d.gross||0),0),orders=selected.reduce((n,d)=>n+Number(d.count||0),0);
@@ -30,6 +30,7 @@ function financialDetailRows(key,{a},year,month){
  const periodLabel=month?months[month-1]+' '+year:'Report of '+year;
  if(key==='revenue')return [['Period',periodLabel],['Processed Order Earnings',money(a.processedRevenue)],['Unprocessed Order Earnings',money(a.unprocessedRevenue)],['Orders Awaiting Earnings',num(a.pendingEarnings)],['Total Gross Revenue',money(a.revenue)]];
  if(key==='cost')return [['Period',periodLabel],['Buying Price',money(a.baseCost)],['Shipping Cost',money(a.shipping)],['Additional Cost',money(a.additional)],['Total Buying Cost',money(a.cost)],['Orders Awaiting Buying Price',num(a.pendingCost)]];
+ if(key==='gross')return [['Period',periodLabel],['Orders with Buying Price',num(a.grossCostCount)],['Orders Awaiting Buying Price',num(a.grossPendingCost)],['Total Gross Profit',money(a.gross)]];
  return null;
 }
 
@@ -49,15 +50,15 @@ function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.Dat
  const chartResize=new ResizeObserver(()=>{drawDaily();fitTitles();});chartResize.observe($('.overview-charts'));chartResize.observe($('.overview-kpis'));
  function metricDetails(key,summary){
   if(!summary)return '<p>Loading selected period…</p>';
-  const {a,expenses,taxRate}=summary,periodLabel=month?months[month-1]+' '+year:'Report of '+year;
-  const items=financialDetailRows(key,summary,year,month)||{count:orderCountRows(summary,year,month),gross:[['Period',periodLabel],['Orders with Earnings and Buying Price',num(a.profitCount)],['Gross Profit',money(a.gross)],['Formula','Earnings − buying price − shipping − additional cost']],margin:[['Orders with Calculated Margin',num(a.marginCount)],['Average Profit Margin',num(a.margin)+'%']],avgDaily:[['Orders',num(a.count)],['Elapsed Calendar Days',num(imported.elapsedDays)],['Average Daily Orders',num(imported.averageDaily)]]}[key];
+  const {a,expenses,taxRate}=summary;
+  const items=financialDetailRows(key,summary,year,month)||{count:orderCountRows(summary,year,month),margin:[['Orders with Calculated Margin',num(a.marginCount)],['Average Profit Margin',num(a.margin)+'%']],avgDaily:[['Orders',num(a.count)],['Elapsed Calendar Days',num(imported.elapsedDays)],['Average Daily Orders',num(imported.averageDaily)]]}[key];
   return items?'<dl class="om-detail-pairs">'+items.map(([k,v])=>'<div><dt>'+k+'</dt><dd>'+v+'</dd></div>').join('')+'</dl>':root.DashboardInsights.details(key,a,[],expenses,false,taxRate);
  }
  function showMetricDetails(key,title,summary,update=false){
-  const card=$('[data-metric="'+key+'"]'),button=card.querySelector('button'),options=key==='revenue'||key==='cost'?{compactRows:true}:undefined;
+  const card=$('[data-metric="'+key+'"]'),button=card.querySelector('button'),options=key==='revenue'||key==='cost'||key==='gross'?{compactRows:true}:undefined;
   insights[update?'update':'open'](button,title,key==='count'&&month===0?null:card.querySelector('strong').textContent,metricDetails(key,summary),options);
  }
- function refreshFinancialDetails(summary){for(const [key,title] of definitions)if(key==='revenue'||key==='cost')showMetricDetails(key,title,summary,true);}
+ function refreshFinancialDetails(summary){for(const [key,title] of definitions)if(key==='revenue'||key==='cost'||key==='gross')showMetricDetails(key,title,summary,true);}
  for(const [key,title] of definitions){const card=$('[data-metric="'+key+'"]'),button=card.querySelector('button');button.onclick=()=>{const data=cache.get(year),summary=data&&summarize(data,year,month,imported?.metrics);showMetricDetails(key,title,summary);};}
 
  popup.setAttribute("popover","manual");popup.style.margin="0";

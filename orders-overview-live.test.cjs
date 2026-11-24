@@ -94,3 +94,45 @@ test('a popup opened during loading fills in after the period response arrives',
   assert.equal(f.popup.value,'$5.00');assert.match(f.popup.html,/<dt>Total Gross Revenue<\/dt><dd>\$5.00/);
  }finally{f.api.dispose();}
 });
+
+test('late earnings, saved prices and refunded losses refresh the open Gross Profit popup in place',()=>{
+ for(const month of [11,0]){
+  const f=fixture(month);try{
+   const day={metric_date:'2026-11-05',count:2,cost:500,gross:0,profit_count:0,gross_cost_count:1,gross_pending_cost:1};
+   f.receive([day]);f.click('gross');const anchor=f.popup.active;
+   assert.equal(f.popup.options.compactRows,true);assert.equal(f.popup.options.anchorTop,undefined);
+   assert.equal(f.popup.value,'$0.00');
+   assert.match(f.popup.html,/<dt>Orders with Buying Price<\/dt><dd>1/);
+   assert.match(f.popup.html,/<dt>Orders Awaiting Buying Price<\/dt><dd>1/);
+   assert.doesNotMatch(f.popup.html,/Formula|Orders with Earnings and Buying Price/);
+   assert.equal((f.popup.html.match(/<dt>/g)||[]).length,4);
+   assert.match(f.popup.html,new RegExp('<dt>Period</dt><dd>'+(month?'November 2026':'Report of 2026')));
+
+   f.receive([{...day,revenue:2000,gross:1500,profit_count:1}]);
+   assert.equal(f.popup.value,'$15.00');
+   assert.match(f.popup.html,/<dt>Orders with Buying Price<\/dt><dd>1/);
+
+   f.receive([{...day,revenue:2000,cost:1500,gross:1500,profit_count:1,gross_cost_count:2,gross_pending_cost:0}]);
+   assert.equal(f.popup.value,'$15.00','a saved price without earnings does not invent profit');
+   assert.match(f.popup.html,/<dt>Orders with Buying Price<\/dt><dd>2/);
+   assert.match(f.popup.html,/<dt>Orders Awaiting Buying Price<\/dt><dd>0/);
+
+   f.receive([{...day,revenue:-500,cost:1500,gross:-1000,profit_count:1,gross_cost_count:1,gross_pending_cost:0}]);
+   assert.equal(f.popup.value,'-$10.00');
+   assert.match(f.popup.html,/<dt>Orders with Buying Price<\/dt><dd>1/);
+   assert.match(f.popup.html,/<dt>Total Gross Profit<\/dt><dd>-\$10.00/);
+   assert.equal(f.cards.get('gross').querySelector('strong').textContent,'-$10.00');
+   assert.equal(f.popup.openCalls,1);assert.equal(f.popup.closeCalls,0);assert.equal(f.popup.updateCalls,3);assert.equal(f.popup.active,anchor);
+  }finally{f.api.dispose();}
+ }
+});
+
+test('Gross Profit opened while loading receives four rows when earnings metrics arrive',()=>{
+ const f=fixture();try{
+  f.click('gross');assert.match(f.popup.html,/Loading selected period/);
+  f.receive([{metric_date:'2026-11-30',count:1,gross:-500,gross_cost_count:1,gross_pending_cost:0}]);
+  assert.equal(f.popup.openCalls,1);assert.equal(f.popup.updateCalls,1);assert.equal(f.popup.value,'-$5.00');
+  assert.equal((f.popup.html.match(/<dt>/g)||[]).length,4);
+  assert.doesNotMatch(f.popup.html,/Formula/);
+ }finally{f.api.dispose();}
+});
