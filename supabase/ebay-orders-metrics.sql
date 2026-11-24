@@ -1,4 +1,5 @@
--- Existing earnings source is unchanged; summary amounts are cents.
+-- Existing earnings source and profit formulas are unchanged; summary amounts are cents.
+-- Split known earnings by processing state; pending counts include only eligible orders.
 CREATE OR REPLACE FUNCTION public.ebay_orders_period_page(target uuid, kind text DEFAULT 'orders'::text, query_text text DEFAULT ''::text, status_filter text DEFAULT ''::text, page_number integer DEFAULT 1, page_size integer DEFAULT 25, period_year integer DEFAULT 2026, period_month integer DEFAULT 1)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -35,11 +36,17 @@ begin
  select btrim(o.data->>'order_id') order_id,
  sum(case when o.data->>'product_cost' ~ '^-?[0-9]+([.][0-9]+)?$' then (o.data->>'product_cost')::numeric end) cost,
  sum(case when o.data->>'shipping_cost' ~ '^-?[0-9]+([.][0-9]+)?$' then (o.data->>'shipping_cost')::numeric end) shipping,
- sum(case when o.data->>'additional_cost' ~ '^-?[0-9]+([.][0-9]+)?$' then (o.data->>'additional_cost')::numeric end) additional
+ sum(case when o.data->>'additional_cost' ~ '^-?[0-9]+([.][0-9]+)?$' then (o.data->>'additional_cost')::numeric end) additional,
+ bool_or(coalesce(o.data->>'purchase_id','') ~ '[^[:space:]]') has_buy_id,
+ (array_agg(o.data->>'status' order by o.year,o.month,o.position) filter(where nullif(o.data->>'status','') is not null))[1] manual_status
  from fulfillment_private.order_rows o join records r on btrim(o.data->>'order_id')=r.external_id
  where o.store_id=target and o.deleted_at is null group by 1
  ), order_amounts as (
  select r.external_id,((r.created)::timestamptz at time zone zone)::date metric_date,
+ case when e.data ? 'purchase_id' then coalesce(e.data->>'purchase_id','') ~ '[^[:space:]]' else coalesce(w.has_buy_id,false) end has_buy_id,
+ case when e.data ? 'status' then e.data->>'status' else w.manual_status end manual_status,
+ r.data->>'orderPaymentStatus' payment_status,
+ coalesce(r.data#>>'{cancelStatus,cancelState}'='CANCELED',false) cancelled,
  case when f.currency='USD' then f.earning end earning,
  case when e.data ? 'buy_price' then nullif(e.data->>'buy_price','')::numeric else w.cost end cost,
  coalesce(case when e.data ? 'shipping_cost' then nullif(e.data->>'shipping_cost','')::numeric else w.shipping end,0) shipping,
@@ -48,14 +55,24 @@ begin
  from records r join financials f on f.external_id=r.external_id
  left join workspace_costs w on w.order_id=r.external_id
  left join fulfillment_private.ebay_order_edits e on e.store_id=target and e.order_id=r.external_id
+ ), order_classifications as (
+ select *,case when manual_status in ('Alert','OOS','Refunded') then manual_status
+  when payment_status='FULLY_REFUNDED' then 'Refunded'
+  when cancelled then 'Cancelled' end metric_status
+ from order_amounts
  ), order_metrics as (
  select *,round(earning*100) revenue_cents,round(cost*100) cost_cents,
- round((earning-cost-shipping-additional)*100) profit_cents from order_amounts
+ round((earning-cost-shipping-additional)*100) profit_cents,
+ earning is not null and (earning<=0 or has_buy_id or coalesce(metric_status='Refunded',false) or cancelled) is_processed
+ from order_classifications
  ), metric_days as (
- select metric_date,count(*) count,coalesce(sum(revenue_cents),0) revenue,coalesce(sum(cost_cents),0) cost,
+ select metric_date,count(*) count,coalesce(sum(revenue_cents),0) revenue,
+ coalesce(sum(revenue_cents) filter(where is_processed),0) processed_revenue,
+ coalesce(sum(revenue_cents) filter(where not is_processed),0) unprocessed_revenue,
+ coalesce(sum(cost_cents),0) cost,
  coalesce(sum(round(shipping*100)),0) shipping,coalesce(sum(round(additional*100)),0) additional,
- coalesce(sum(profit_cents),0) gross,count(*) filter(where earning is null) pending_earnings,
- count(*) filter(where cost is null) pending_cost,
+ coalesce(sum(profit_cents),0) gross,count(*) filter(where earning is null and not cancelled) pending_earnings,
+ count(*) filter(where cost is null and not cancelled and not (not has_buy_id and coalesce(metric_status='Refunded',false))) pending_cost,
  count(*) filter(where profit_cents is not null) profit_count,
  count(*) filter(where profit_cents is not null and earning<>0) margin_count,
  coalesce(sum(greatest(-100,least(100,profit_cents/nullif(earning,0)))) filter(where profit_cents is not null and earning<>0),0) margin_sum

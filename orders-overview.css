@@ -201,3 +201,10 @@ body.order-workspace .om>.om-head{border-bottom:0;box-shadow:none}
 .commerce-status{position:relative;text-align:left}.commerce-status summary{cursor:pointer;white-space:nowrap}.commerce-status>div{position:absolute;right:0;top:100%;z-index:6;width:220px;padding:12px;background:white;border:1px solid #e1e7e4;border-radius:8px;box-shadow:0 5px 20px #0002}.commerce-profit.gain{color:#23764f}.commerce-profit.loss{color:#b94646}
 
 .om .commerce-orders .ebay-table{width:1540px}.om .commerce-listings .ebay-table{width:1420px}.om .ebay-workspace .ebay-product>div{flex:0 0 216px;width:216px;min-width:0}.om .ebay-workspace .ebay-table th:first-child .commerce-select-all{position:absolute;left:0;top:50%;transform:translateY(-50%);margin:0}
+
+/* Orders revenue/cost details keep labels and values readable on one line. */
+.om-kpi-details.om-orders-finance-details .om-detail-pairs{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+.om-kpi-details.om-orders-finance-details .om-detail-pairs>div{flex-wrap:nowrap}
+.om-kpi-details.om-orders-finance-details .om-detail-pairs dt,.om-kpi-details.om-orders-finance-details .om-detail-pairs dd{white-space:nowrap;overflow-wrap:normal;font-size:inherit}
+.om-kpi-details.om-orders-finance-details .om-detail-pairs dt{flex:1 0 auto;min-width:max-content}
+.om-kpi-details.om-orders-finance-details .om-detail-pairs dd{flex:0 0 auto;max-width:none}

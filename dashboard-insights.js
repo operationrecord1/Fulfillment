@@ -31,9 +31,22 @@ function details(key,a,rows,expenses,investor,tax){
  return pairs([['Calculated Order Groups',a.groups.filter(g=>g.margin!==null).length],['Average Group Profit Margin',pct(a.margin)]]);
 }
 function bind(host,{bounds=null,scroller=null}={}){
- const pop=document.createElement('div');pop.className='om-kpi-details';pop.setAttribute('popover','auto');pop.setAttribute('role','dialog');pop.setAttribute('aria-label','Metric details');host.append(pop);let anchor=null,frame=0,observer=null,destroyed=false;
+ const pop=document.createElement('div');pop.className='om-kpi-details';pop.setAttribute('popover','auto');pop.setAttribute('role','dialog');pop.setAttribute('aria-label','Metric details');host.append(pop);let anchor=null,frame=0,observer=null,destroyed=false,activeOptions={};
  const stopTracking=()=>{if(frame){window.cancelAnimationFrame(frame);frame=0;}observer?.disconnect();observer=null;};
  const close=()=>{if(bounds)stopTracking();if(pop.matches(':popover-open'))pop.hidePopover();};
+ // Keep finance labels and values on one line; grow first, then reduce both together.
+ const fitRows=(cardWidth,limit)=>{
+  const pairs=pop.querySelector('.om-detail-pairs');
+  if(!pairs)return;
+  pairs.style.fontSize='';
+  const base=parseFloat(window.getComputedStyle(pairs).fontSize)||13,min=Math.min(base,11);
+  const style=window.getComputedStyle(pop),chrome=pop.offsetWidth-pop.clientWidth+(parseFloat(style.paddingLeft)||0)+(parseFloat(style.paddingRight)||0);
+  pop.style.width=Math.min(limit,Math.max(cardWidth,Math.ceil(pairs.scrollWidth+chrome)))+'px';
+  let size=base;
+  while(pairs.scrollWidth>pairs.clientWidth+1&&size>min){size=Math.max(min,size-1);pairs.style.fontSize=size+'px';}
+  // At unusually narrow widths the body can scroll horizontally without shrinking
+  // below a readable size or changing the heading and its total.
+ };
  // Orders popups stay inside the visible KPI band, even when the viewport is wider.
  const positionInBounds=()=>{
   const card=anchor.closest('.om-kpi');
@@ -47,16 +60,18 @@ function bind(host,{bounds=null,scroller=null}={}){
   const limit=right-left;
   if(limit<=0||r.right<=left||r.left>=right||r.bottom<=viewportTop||r.top>=viewportBottom){close();return;}
   const compact=window.innerWidth<600,gutter=compact?16:8,top=viewportTop+gutter,bottom=viewportBottom-gutter,scrollTop=pop.scrollTop;
-  pop.style.maxWidth=limit+'px';pop.style.maxHeight=Math.max(0,bottom-top)+'px';
-  pop.style.width=(compact?limit:Math.min(r.width,limit))+'px';
-  if(!compact){
+  const anchored=!!activeOptions.anchorTop,finance=!!activeOptions.compactRows,anchorTop=Math.max(top,r.top);
+  pop.style.maxWidth=limit+'px';pop.style.maxHeight=Math.max(0,bottom-(anchored?anchorTop:top))+'px';
+  pop.style.width=(compact&&!finance?limit:Math.min(r.width,limit))+'px';
+  if(finance)fitRows(r.width,limit);
+  else if(!compact){
    const content=pop.querySelector('.om-status-details');
    const needed=Math.max(r.width,content?Math.max(336,content.scrollWidth+26):pop.scrollWidth+2);
    pop.style.width=Math.min(needed,limit)+'px';
   }
-  const x=compact?left:r.left+pop.offsetWidth<=right?r.left:r.right-pop.offsetWidth;
+  const x=compact&&!anchored?left:r.left+pop.offsetWidth<=right?r.left:r.right-pop.offsetWidth;
   pop.style.left=Math.max(left,Math.min(x,right-pop.offsetWidth))+'px';
-  pop.style.top=Math.max(top,Math.min(compact?viewportTop+(viewportBottom-viewportTop-pop.offsetHeight)/2:r.top,bottom-pop.offsetHeight))+'px';
+  pop.style.top=(anchored?anchorTop:Math.max(top,Math.min(compact?viewportTop+(viewportBottom-viewportTop-pop.offsetHeight)/2:r.top,bottom-pop.offsetHeight)))+'px';
   pop.scrollTop=scrollTop;
  };
  const position=()=>{if(destroyed||!anchor||!pop.matches(':popover-open'))return;if(bounds){positionInBounds();return;}const r=anchor.closest('.om-kpi').getBoundingClientRect(),limit=window.innerWidth-16;if(window.innerWidth<600){pop.style.width=limit+'px';pop.style.left='8px';pop.style.top=Math.max(8,(window.innerHeight-pop.offsetHeight)/2)+'px';return;}pop.style.width=Math.min(r.width,limit)+'px';const content=pop.querySelector('.om-status-details');const needed=Math.max(r.width,content?Math.max(336,content.scrollWidth+26):pop.scrollWidth+2);pop.style.width=Math.min(needed,limit)+'px';pop.style.left=Math.max(8,Math.min(r.left,window.innerWidth-pop.offsetWidth-8))+'px';pop.style.top=Math.max(8,Math.min(r.top,window.innerHeight-pop.offsetHeight-8))+'px';};
@@ -71,10 +86,31 @@ function bind(host,{bounds=null,scroller=null}={}){
   schedule();
  };
  pop.addEventListener('beforetoggle',e=>{if(e.newState==='closed'){if(bounds)stopTracking();anchor?.setAttribute('aria-expanded','false');anchor=null;}});
- const open=(button,title,value,html)=>{if(anchor===button&&pop.matches(':popover-open')){close();return;}close();anchor=button;pop.innerHTML='<div class="om-details-heading"><div><h3>'+esc(title)+'</h3>'+(value===null?'':'<strong>'+esc(value)+'</strong>')+'</div><button type="button" aria-label="Close details">×</button></div>'+html;pop.setAttribute('aria-label',title+' details');pop.querySelector('button').onclick=()=>{const old=anchor;close();old?.focus({preventScroll:true});};button.setAttribute('aria-expanded','true');pop.showPopover();position();track();pop.querySelector('button').focus({preventScroll:true});};
+ const render=(title,value,html,options)=>{
+  activeOptions=options||{};
+  pop.className='om-kpi-details'+(bounds&&activeOptions.compactRows?' om-orders-finance-details':'');
+  pop.innerHTML='<div class="om-details-heading"><div><h3>'+esc(title)+'</h3>'+(value===null?'':'<strong>'+esc(value)+'</strong>')+'</div><button type="button" aria-label="Close details">×</button></div>'+html;
+  pop.setAttribute('aria-label',title+' details');
+  pop.querySelector('button').onclick=()=>{const old=anchor;close();old?.focus({preventScroll:true});};
+ };
+ const open=(button,title,value,html,options={})=>{
+  if(anchor===button&&pop.matches(':popover-open')){close();return;}
+  close();anchor=button;render(title,value,html,options);button.setAttribute('aria-expanded','true');
+  pop.showPopover();position();track();pop.querySelector('button').focus({preventScroll:true});
+ };
+ const update=(button,title,value,html,options=activeOptions)=>{
+  if(destroyed||anchor!==button||!pop.matches(':popover-open'))return false;
+  const scrollTop=pop.scrollTop,pairsScroll=pop.querySelector('.om-detail-pairs')?.scrollLeft||0,focused=document.activeElement===pop.querySelector('button');
+  render(title,value,html,options);position();
+  if(focused)pop.querySelector('button').focus({preventScroll:true});
+  pop.scrollTop=scrollTop;
+  const pairs=pop.querySelector('.om-detail-pairs');if(pairs)pairs.scrollLeft=pairsScroll;
+  if(bounds)schedule();
+  return true;
+ };
  const resize=bounds?schedule:position,scroll=e=>{if(!pop.contains(e.target)){if(bounds)schedule();else close();}},scrollTarget=bounds?window:host,viewport=bounds?window.visualViewport:null;
  window.addEventListener('resize',resize);scrollTarget.addEventListener('scroll',scroll,true);viewport?.addEventListener('resize',schedule);viewport?.addEventListener('scroll',schedule);
- return {open,close,destroy(){destroyed=true;close();window.removeEventListener('resize',resize);scrollTarget.removeEventListener('scroll',scroll,true);viewport?.removeEventListener('resize',schedule);viewport?.removeEventListener('scroll',schedule);pop.remove();}};
+ return {open,update,close,destroy(){destroyed=true;close();window.removeEventListener('resize',resize);scrollTarget.removeEventListener('scroll',scroll,true);viewport?.removeEventListener('resize',schedule);viewport?.removeEventListener('scroll',schedule);pop.remove();}};
 }
 const api={shares,progress,statusBreakdown,details,bind};root.DashboardInsights=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

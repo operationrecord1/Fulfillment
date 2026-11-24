@@ -11,7 +11,7 @@ function summarize(data,year,month,metrics){
  const sum=k=>days.reduce((n,d)=>n+Number(d[k]||0),0),rate=Number(data.options?.tax_percentage??15),taxRate=Number.isFinite(rate)?Math.max(0,rate):15;
  const expense=expenses.reduce((n,e)=>n+root.OrderCore.cents(e.amount),0),gross=sum('gross'),count=sum('count'),revenue=sum('revenue'),marginCount=sum('margin_count');
  const tax=Math.round(Math.max(0,gross-expense)*taxRate/100);
- const a={count,revenue,baseCost:sum('cost'),cost:sum('cost')+sum('shipping')+sum('additional'),shipping:sum('shipping'),additional:sum('additional'),gross,expense,tax,net:gross-expense-tax,margin:marginCount?sum('margin_sum')/marginCount:0,marginCount,avgOrder:count?Math.round(revenue/count):0,avgProfit:count?Math.round(gross/count):0,pendingEarnings:sum('pending_earnings'),pendingCost:sum('pending_cost'),profitCount:sum('profit_count'),sizes:['Small','Medium','Large'].map((name,index)=>{const s=(metrics.sizes||[]).find(x=>x.index===index);return {name,count:Number(s?.count||0),profit:Number(s?.profit||0)};})};
+ const a={count,revenue,processedRevenue:sum('processed_revenue'),unprocessedRevenue:sum('unprocessed_revenue'),baseCost:sum('cost'),cost:sum('cost')+sum('shipping')+sum('additional'),shipping:sum('shipping'),additional:sum('additional'),gross,expense,tax,net:gross-expense-tax,margin:marginCount?sum('margin_sum')/marginCount:0,marginCount,avgOrder:count?Math.round(revenue/count):0,avgProfit:count?Math.round(gross/count):0,pendingEarnings:sum('pending_earnings'),pendingCost:sum('pending_cost'),profitCount:sum('profit_count'),sizes:['Small','Medium','Large'].map((name,index)=>{const s=(metrics.sizes||[]).find(x=>x.index===index);return {name,count:Number(s?.count||0),profit:Number(s?.profit||0)};})};
  if(!month)a.taxableAmount=Math.max(0,gross-expense);
  const points=Array.from({length:month?new Date(Date.UTC(year,month,0)).getUTCDate():12},(_,i)=>{
  const selected=days.filter(d=>month?Number(d.metric_date.slice(8,10))===i+1:Number(d.metric_date.slice(5,7))===i+1),profit=selected.reduce((n,d)=>n+Number(d.gross||0),0),orders=selected.reduce((n,d)=>n+Number(d.count||0),0);
@@ -24,6 +24,13 @@ function summarize(data,year,month,metrics){
 function orderCountRows({a,points},year,month){
  if(month)return [['Orders',num(a.count)],['Period',months[month-1]+' '+year]];
  return points.filter(p=>p.count>0).map(p=>[p.full,num(p.count)]).concat([['Total Orders',num(a.count)]]);
+}
+
+function financialDetailRows(key,{a},year,month){
+ const periodLabel=month?months[month-1]+' '+year:'Report of '+year;
+ if(key==='revenue')return [['Period',periodLabel],['Processed Order Earnings',money(a.processedRevenue)],['Unprocessed Order Earnings',money(a.unprocessedRevenue)],['Orders Awaiting Earnings',num(a.pendingEarnings)],['Total Gross Revenue',money(a.revenue)]];
+ if(key==='cost')return [['Period',periodLabel],['Buying Price',money(a.baseCost)],['Shipping Cost',money(a.shipping)],['Additional Cost',money(a.additional)],['Total Buying Cost',money(a.cost)],['Orders Awaiting Buying Price',num(a.pendingCost)]];
+ return null;
 }
 
 function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit'}).formatToParts(new Date()),currentYear=Number(today.find(p=>p.type==='year').value);let year=currentYear,month=Number(today.find(p=>p.type==='month').value),disposed=false,request=0,busy=false,signature='',imported=null;const cache=new Map();if(initial)cache.set(initial.year,initial);
@@ -40,11 +47,18 @@ function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.Dat
  function uniqueChart(html){return html.replace(/id="([^"]+)"/g,'id="orders-$1"').replace(/url\(#([^)]*)\)/g,'url(#orders-$1)');}
  function fitTitles(){for(const el of host.querySelectorAll('.om-kpi-title>span')){el.style.fontSize='13px';if(el.scrollWidth>el.clientWidth)el.style.fontSize=Math.max(10,13*el.clientWidth/el.scrollWidth)+'px';}}
  const chartResize=new ResizeObserver(()=>{drawDaily();fitTitles();});chartResize.observe($('.overview-charts'));chartResize.observe($('.overview-kpis'));
- for(const [key,title] of definitions){const card=$('[data-metric="'+key+'"]'),button=card.querySelector('button');button.onclick=()=>{const data=cache.get(year),summary=data&&summarize(data,year,month,imported?.metrics),pairs=items=>'<dl class="om-detail-pairs">'+items.map(([k,v])=>'<div><dt>'+k+'</dt><dd>'+v+'</dd></div>').join('')+'</dl>';let html='<p>Loading selected period…</p>';
- if(summary){const {a,expenses,taxRate}=summary,periodLabel=month?months[month-1]+' '+year:'Report of '+year;
- const items={count:orderCountRows(summary,year,month),revenue:[['Period',periodLabel],['Recorded Order Earnings',money(a.revenue)],['Orders Awaiting Earnings',num(a.pendingEarnings)]],cost:[['Period',periodLabel],['Buying Price',money(a.baseCost)],['Shipping Cost',money(a.shipping)],['Additional Cost',money(a.additional)],['Total Buying Cost',money(a.cost)],['Orders Awaiting Buying Price',num(a.pendingCost)]],gross:[['Period',periodLabel],['Orders with Earnings and Buying Price',num(a.profitCount)],['Gross Profit',money(a.gross)],['Formula','Earnings − buying price − shipping − additional cost']],margin:[['Orders with Calculated Margin',num(a.marginCount)],['Average Profit Margin',num(a.margin)+'%']],avgDaily:[['Orders',num(a.count)],['Elapsed Calendar Days',num(imported.elapsedDays)],['Average Daily Orders',num(imported.averageDaily)]]};
- html=items[key]?pairs(items[key]):root.DashboardInsights.details(key,a,[],expenses,false,taxRate);
- }insights.open(button,title,key==='count'&&month===0?null:card.querySelector('strong').textContent,html);};}
+ function metricDetails(key,summary){
+  if(!summary)return '<p>Loading selected period…</p>';
+  const {a,expenses,taxRate}=summary,periodLabel=month?months[month-1]+' '+year:'Report of '+year;
+  const items=financialDetailRows(key,summary,year,month)||{count:orderCountRows(summary,year,month),gross:[['Period',periodLabel],['Orders with Earnings and Buying Price',num(a.profitCount)],['Gross Profit',money(a.gross)],['Formula','Earnings − buying price − shipping − additional cost']],margin:[['Orders with Calculated Margin',num(a.marginCount)],['Average Profit Margin',num(a.margin)+'%']],avgDaily:[['Orders',num(a.count)],['Elapsed Calendar Days',num(imported.elapsedDays)],['Average Daily Orders',num(imported.averageDaily)]]}[key];
+  return items?'<dl class="om-detail-pairs">'+items.map(([k,v])=>'<div><dt>'+k+'</dt><dd>'+v+'</dd></div>').join('')+'</dl>':root.DashboardInsights.details(key,a,[],expenses,false,taxRate);
+ }
+ function showMetricDetails(key,title,summary,update=false){
+  const card=$('[data-metric="'+key+'"]'),button=card.querySelector('button'),options=key==='revenue'||key==='cost'?{compactRows:true,anchorTop:true}:undefined;
+  insights[update?'update':'open'](button,title,key==='count'&&month===0?null:card.querySelector('strong').textContent,metricDetails(key,summary),options);
+ }
+ function refreshFinancialDetails(summary){for(const [key,title] of definitions)if(key==='revenue'||key==='cost')showMetricDetails(key,title,summary,true);}
+ for(const [key,title] of definitions){const card=$('[data-metric="'+key+'"]'),button=card.querySelector('button');button.onclick=()=>{const data=cache.get(year),summary=data&&summarize(data,year,month,imported?.metrics);showMetricDetails(key,title,summary);};}
 
  popup.setAttribute("popover","manual");popup.style.margin="0";
  let choosingYear=false;
@@ -59,8 +73,8 @@ function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.Dat
  function keyboard(e){if(popup.hidden)return;if(e.key==='Escape'){e.preventDefault();if(choosingYear){showMonths();yearButton.focus()}else closePicker(true)}if(e.key==='Tab'){const controls=[...popup.querySelectorAll('button')].filter(b=>b.getClientRects().length),first=controls[0],last=controls[controls.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}}
  function reposition(e){if(!popup.hidden&&!popup.contains(e.target))positionPicker();}
  document.addEventListener('pointerdown',outside);popup.addEventListener('keydown',keyboard);root.addEventListener('resize',reposition);document.addEventListener('scroll',reposition,true);
- function paint(){syncPicker();const data=cache.get(year);const loading=!data||!imported?.metrics||imported.metrics.year!==year||imported.metrics.month!==month;host.dataset.loading=String(loading);host.setAttribute('aria-busy',String(loading));const caption=month?months[month-1]+' '+year:'Report of '+year;$('.orders-period-caption').textContent=caption;paintImported();if(loading){host.querySelectorAll('.overview-kpi:not([data-metric="count"]):not([data-metric="avgDaily"]) strong').forEach(el=>el.textContent='—');for(const selector of ['.orders-size-chart','.orders-profit-chart','.overview-trend-chart'])$(selector).textContent='Loading selected year…';return;}
- const {a,points}=summarize(data,year,month,imported.metrics);$('.orders-overview-notice').textContent=a.count>a.profitCount?(a.count-a.profitCount)+' orders are awaiting earnings or buying price. Their profit is not included yet.':'';const key=JSON.stringify([year,month,a,points,imported]);if(key===signature)return;signature=key;
+ function paint(){syncPicker();const data=cache.get(year);const loading=!data||!imported?.metrics||imported.metrics.year!==year||imported.metrics.month!==month;host.dataset.loading=String(loading);host.setAttribute('aria-busy',String(loading));const caption=month?months[month-1]+' '+year:'Report of '+year;$('.orders-period-caption').textContent=caption;paintImported();if(loading){signature='';host.querySelectorAll('.overview-kpi:not([data-metric="count"]):not([data-metric="avgDaily"]) strong').forEach(el=>el.textContent='—');for(const selector of ['.orders-size-chart','.orders-profit-chart','.overview-trend-chart'])$(selector).textContent='Loading selected year…';refreshFinancialDetails(null);return;}
+ const summary=summarize(data,year,month,imported.metrics),{a,points}=summary;$('.orders-overview-notice').textContent=a.count>a.profitCount?(a.count-a.profitCount)+' orders are awaiting earnings or buying price. Their profit is not included yet.':'';const key=JSON.stringify([year,month,a,points,imported]);if(key===signature)return;signature=key;
  for(const [k] of definitions){if(['count','avgDaily'].includes(k))continue;const el=$('[data-metric="'+k+'"] strong');el.textContent=k==='margin'?num(a[k])+'%':k==='count'?num(a[k]):k==='avgDaily'?num(root.DashboardSession.averageDaily(a[k])):money(a[k]);el.classList.toggle('negative',a[k]<0);}
  const distribution=imported?{...a,count:imported.count,sizes:a.sizes.map((g,i)=>({...g,count:imported.sizes[i]||0}))}:null;
  $('.orders-size-chart').innerHTML=distribution?uniqueChart(root.OrderCharts.roundChart(distribution,true)):'Loading eBay order distribution…';
@@ -72,7 +86,7 @@ function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.Dat
  dailyPoints=points;dailyYearly=!month;
  $('.overview-trend h2').textContent=month?'Daily Profit Analysis':'Yearly Profit Analysis';
  $('.overview-trend-caption').textContent=month?'All Calendar Days · '+caption:'January–December '+year+' · Monthly Net Profit';
- drawDaily();fitTitles();
+ drawDaily();fitTitles();refreshFinancialDetails(summary);
  }
  function paintImported(){
  $('[data-metric="count"] strong').textContent=imported?num(imported.count):'—';
@@ -83,5 +97,5 @@ function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.Dat
  function change(){try{root.localStorage.setItem(periodKey,JSON.stringify({year,month}));}catch{}insights.close();dailyKey='';imported=null;signature='';paint();onPeriod();refresh();}
  paint();if(!cache.has(year))refresh();return {setImported(value){imported=value;paint();},period:()=>({year,month}),refresh,dispose(){disposed=true;request++;chartResize.disconnect();insights.destroy();document.removeEventListener('pointerdown',outside);root.removeEventListener('resize',reposition);document.removeEventListener('scroll',reposition,true);closePicker();}};
 }
-root.OrdersOverview={mount,summarize};if(typeof module!=='undefined')module.exports={summarize,orderCountRows};
+root.OrdersOverview={mount,summarize};if(typeof module!=='undefined')module.exports={summarize,orderCountRows,financialDetailRows};
 })(typeof window==='undefined'?globalThis:window);

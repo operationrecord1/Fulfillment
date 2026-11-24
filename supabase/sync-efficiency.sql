@@ -39,7 +39,7 @@ end $$;
 revoke all on function fulfillment_private.schedule_delivery(uuid,text,boolean) from public,anon,authenticated;
 
 create function fulfillment_private.commerce_changed() returns trigger language plpgsql security definer set search_path='' as $$
-declare s uuid;oid text;v jsonb;prior jsonb;res text;meaningful boolean:=true;
+declare s uuid;oid text;v jsonb;prior jsonb;res text;meaningful boolean:=true;active_rows_changed boolean:=false;
 begin
  v=case when TG_OP='DELETE' then to_jsonb(old) else to_jsonb(new) end;
  prior=case when TG_OP='UPDATE' then to_jsonb(old) else null end;
@@ -57,12 +57,13 @@ begin
  elsif TG_TABLE_NAME='order_rows' then
   oid=btrim(v#>>'{data,order_id}');meaningful=prior is null or v->'data' is distinct from prior->'data';
   if meaningful and nullif(oid,'') is not null then perform fulfillment_private.schedule_delivery(s,oid);end if;
+  active_rows_changed=v->'deleted_at' is distinct from prior->'deleted_at';
  else
   meaningful=prior is null or (v-'updated_at') is distinct from (prior-'updated_at');
  end if;
- if meaningful then
+ if meaningful or active_rows_changed then
   insert into fulfillment_private.commerce_versions values(s,1) on conflict(store_id) do update set revision=commerce_versions.revision+1;
-  if nullif(oid,'') is not null then insert into fulfillment_private.refund_dirty values(s,oid,now()) on conflict(store_id,order_id) do update set changed_at=excluded.changed_at;end if;
+  if meaningful and nullif(oid,'') is not null then insert into fulfillment_private.refund_dirty values(s,oid,now()) on conflict(store_id,order_id) do update set changed_at=excluded.changed_at;end if;
  end if;
  return null;
 end $$;
