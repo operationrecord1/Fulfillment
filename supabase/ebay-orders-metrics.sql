@@ -1,5 +1,6 @@
 -- Existing earnings source and profit formulas are unchanged; summary amounts are cents.
 -- Split known earnings by processing state; pending counts include only eligible orders.
+-- A Buy ID or any recorded buying/shipping/additional cost makes known earnings processed.
 CREATE OR REPLACE FUNCTION public.ebay_orders_period_page(target uuid, kind text DEFAULT 'orders'::text, query_text text DEFAULT ''::text, status_filter text DEFAULT ''::text, page_number integer DEFAULT 1, page_size integer DEFAULT 25, period_year integer DEFAULT 2026, period_month integer DEFAULT 1)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -44,6 +45,9 @@ begin
  ), order_amounts as (
  select r.external_id,((r.created)::timestamptz at time zone zone)::date metric_date,
  case when e.data ? 'purchase_id' then coalesce(e.data->>'purchase_id','') ~ '[^[:space:]]' else coalesce(w.has_buy_id,false) end has_buy_id,
+ (case when e.data ? 'buy_price' then nullif(e.data->>'buy_price','')::numeric else w.cost end) is not null
+ or (case when e.data ? 'shipping_cost' then nullif(e.data->>'shipping_cost','')::numeric else w.shipping end) is not null
+ or (case when e.data ? 'additional_cost' then nullif(e.data->>'additional_cost','')::numeric else w.additional end) is not null has_recorded_cost,
  case when e.data ? 'status' then e.data->>'status' else w.manual_status end manual_status,
  r.data->>'orderPaymentStatus' payment_status,
  coalesce(r.data#>>'{cancelStatus,cancelState}'='CANCELED',false) cancelled,
@@ -63,7 +67,7 @@ begin
  ), order_metrics as (
  select *,round(earning*100) revenue_cents,round(cost*100) cost_cents,
  round((earning-cost-shipping-additional)*100) profit_cents,
- earning is not null and (earning<=0 or has_buy_id or coalesce(metric_status='Refunded',false) or cancelled) is_processed
+ earning is not null and (earning<=0 or has_buy_id or has_recorded_cost or coalesce(metric_status='Refunded',false) or cancelled) is_processed
  from order_classifications
  ), metric_days as (
  select metric_date,count(*) count,coalesce(sum(revenue_cents),0) revenue,
