@@ -54,7 +54,7 @@ function mount(host,{initial,read,onPeriod,onExpenses}){const today=new Intl.Dat
   return items?'<dl class="om-detail-pairs">'+items.map(([k,v])=>'<div><dt>'+k+'</dt><dd>'+v+'</dd></div>').join('')+'</dl>':root.DashboardInsights.details(key,a,[],expenses,false,taxRate);
  }
  function showMetricDetails(key,title,summary,update=false){
-  const card=$('[data-metric="'+key+'"]'),button=card.querySelector('button'),options=key==='revenue'||key==='cost'?{compactRows:true,anchorTop:true}:undefined;
+  const card=$('[data-metric="'+key+'"]'),button=card.querySelector('button'),options=key==='revenue'||key==='cost'?{compactRows:true}:undefined;
   insights[update?'update':'open'](button,title,key==='count'&&month===0?null:card.querySelector('strong').textContent,metricDetails(key,summary),options);
  }
  function refreshFinancialDetails(summary){for(const [key,title] of definitions)if(key==='revenue'||key==='cost')showMetricDetails(key,title,summary,true);}

@@ -173,22 +173,40 @@ test('default non-Orders binding retains viewport positioning and closes on host
  }finally{f.restore();}
 });
 
-const financeOptions={compactRows:true,anchorTop:true};
+const financeOptions={compactRows:true};
 const financeBody='<dl class="om-detail-pairs"><div><dt>Orders Awaiting Buying Price</dt><dd>42</dd></div></dl>';
 
-test('finance popups stay at the card top on desktop and mobile and scroll below it',()=>{
+test('finance popups match Total Orders opening geometry across responsive widths and viewport edges',()=>{
+ const frame=f=>Object.fromEntries(['width','left','top','maxWidth','maxHeight'].map(key=>[key,f.pop.style[key]]));
+ for(const width of [320,390,599,600,700,1099,1100,1101,2500]){
+  const f=fixture({width,height:640,contentWidth:364,rowsWidth:340,contentHeight:320});try{
+   f.band.rect=rect(12,80,Math.max(1100,width-24),220);
+   for(const nearRight of [false,true]){
+    const cardWidth=Math.min(300,Math.floor((width-36)/2)),left=nearRight?width-24-cardWidth:12;
+    f.card.rect=rect(left,490,cardWidth,100);
+    f.open();const reference=frame(f);f.api.close();f.open(financeOptions);
+    assert.deepEqual(frame(f),reference,'same opening frame at '+width+'px, '+(nearRight?'right':'left')+' card');
+    f.api.close();
+   }
+  }finally{f.restore();}
+ }
+});
+
+test('open finance popups follow Total Orders centering and full viewport height when resized',()=>{
  const f=fixture({contentHeight:600,scrollbarWidth:15});try{
   f.open(financeOptions);
   assert.equal(parseFloat(f.pop.style.top),190);
-  assert.equal(parseFloat(f.pop.style.maxHeight),702);
+  assert.equal(parseFloat(f.pop.style.maxHeight),884);
   f.resize(390,640);f.band.rect=rect(12,80,1100,220);f.card.rect=rect(12,430,181,100);f.notifyLayout();f.flush();
-  assert.equal(parseFloat(f.pop.style.top),430);
-  assert.equal(parseFloat(f.pop.style.maxHeight),194);
-  contained(f.pop,{left:12,right:375,top:430,bottom:624});
-  assert.ok(f.pop.scrollHeight>f.pop.offsetHeight,'tall details scroll rather than moving above the card');
+  assert.equal(parseFloat(f.pop.style.top),20);
+  assert.equal(parseFloat(f.pop.style.maxHeight),608);
+  assert.equal(f.pop.offsetWidth,363);
+  contained(f.pop,{left:12,right:375,top:16,bottom:624});
   f.viewport.offsetTop=30;f.viewport.fixedHeight=540;f.viewport.emit('resize');f.flush();
-  assert.equal(parseFloat(f.pop.style.top),430);
-  contained(f.pop,{left:12,right:375,top:430,bottom:554});
+  assert.equal(parseFloat(f.pop.style.top),46);
+  assert.equal(parseFloat(f.pop.style.maxHeight),508);
+  assert.ok(f.pop.scrollHeight>f.pop.offsetHeight,'overflow scrolls inside the same bounded frame as Total Orders');
+  contained(f.pop,{left:12,right:375,top:46,bottom:554});
  }finally{f.restore();}
 });
 
@@ -216,12 +234,12 @@ test('finance rows expand only to required width, then shrink labels and values 
 test('finance width includes vertical scrollbar space and falls back to body scrolling at the readable floor',()=>{
  const f=fixture({width:390,height:640,contentHeight:600,rowsWidth:310,scrollbarWidth:15});try{
   f.band.rect=rect(12,80,1100,220);f.card.rect=rect(12,190,180,100);f.open(financeOptions);
-  assert.equal(f.pop.offsetWidth,355,'measured rows include popup padding, border and scrollbar');
+  assert.equal(f.pop.offsetWidth,363,'mobile details use the same full visible band width as Total Orders');
   assert.equal(f.pairs.style.fontSize,'');assert.ok(f.pairs.scrollWidth<=f.pairs.clientWidth+1);
   f.resize(220);f.notifyLayout();f.flush();
   assert.equal(f.pairs.style.fontSize,'11px');
   assert.ok(f.pairs.scrollWidth>f.pairs.clientWidth,'extreme widths retain unbroken text with horizontal body scrolling');
-  contained(f.pop,{left:12,right:205,top:190,bottom:624});
+  contained(f.pop,{left:12,right:205,top:16,bottom:624});
  }finally{f.restore();}
 });
 
@@ -236,7 +254,7 @@ test('live finance refresh retains the open anchor, focus and scrolling while up
   assert.notEqual(f.closeButton,firstClose);assert.equal(f.doc.activeElement,f.closeButton);
   assert.equal(f.pop.scrollTop,96);assert.equal(f.pairs.scrollLeft,20);
   assert.equal(f.button.getAttribute('aria-expanded'),'true');
-  assert.equal(parseFloat(f.pop.style.top),190);assert.equal(f.pairs.style.fontSize,'11px');
+  assert.equal(parseFloat(f.pop.style.top),16);assert.equal(f.pairs.style.fontSize,'11px');
   f.button.focus();f.api.update(f.button,'Product Cost','$1,043.00',financeBody);f.flush();
   assert.equal(f.doc.activeElement,f.button,'a refresh must not steal outside focus');
   const html=f.pop.innerHTML;

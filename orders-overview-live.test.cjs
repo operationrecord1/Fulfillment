@@ -52,7 +52,7 @@ test('new server earnings refresh the open Gross Revenue breakdown and total in 
    const day={metric_date:'2026-11-05',count:3,revenue:3000,processed_revenue:1000,unprocessed_revenue:2000,pending_earnings:1,cost:500,gross:500,profit_count:1};
    f.receive([day]);f.click('revenue');
    assert.equal(f.popup.value,'$30.00');assert.match(f.popup.html,/<dt>Processed Order Earnings<\/dt><dd>\$10.00/);
-   assert.equal(f.popup.options.compactRows,true);assert.equal(f.popup.options.anchorTop,true);
+   assert.equal(f.popup.options.compactRows,true);assert.equal(f.popup.options.anchorTop,undefined);
    const anchor=f.popup.active;
    f.receive([{...day,revenue:1800,processed_revenue:1800,unprocessed_revenue:0,pending_earnings:0}]);
    assert.equal(f.popup.openCalls,1);assert.equal(f.popup.closeCalls,0);assert.equal(f.popup.active,anchor);assert.equal(f.popup.updateCalls,1);

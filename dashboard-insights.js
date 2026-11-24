@@ -60,18 +60,18 @@ function bind(host,{bounds=null,scroller=null}={}){
   const limit=right-left;
   if(limit<=0||r.right<=left||r.left>=right||r.bottom<=viewportTop||r.top>=viewportBottom){close();return;}
   const compact=window.innerWidth<600,gutter=compact?16:8,top=viewportTop+gutter,bottom=viewportBottom-gutter,scrollTop=pop.scrollTop;
-  const anchored=!!activeOptions.anchorTop,finance=!!activeOptions.compactRows,anchorTop=Math.max(top,r.top);
-  pop.style.maxWidth=limit+'px';pop.style.maxHeight=Math.max(0,bottom-(anchored?anchorTop:top))+'px';
-  pop.style.width=(compact&&!finance?limit:Math.min(r.width,limit))+'px';
-  if(finance)fitRows(r.width,limit);
+  const finance=!!activeOptions.compactRows;
+  pop.style.maxWidth=limit+'px';pop.style.maxHeight=Math.max(0,bottom-top)+'px';
+  pop.style.width=(compact?limit:Math.min(r.width,limit))+'px';
+  if(finance)fitRows(compact?limit:r.width,limit);
   else if(!compact){
    const content=pop.querySelector('.om-status-details');
    const needed=Math.max(r.width,content?Math.max(336,content.scrollWidth+26):pop.scrollWidth+2);
    pop.style.width=Math.min(needed,limit)+'px';
   }
-  const x=compact&&!anchored?left:r.left+pop.offsetWidth<=right?r.left:r.right-pop.offsetWidth;
+  const x=compact?left:r.left+pop.offsetWidth<=right?r.left:r.right-pop.offsetWidth;
   pop.style.left=Math.max(left,Math.min(x,right-pop.offsetWidth))+'px';
-  pop.style.top=(anchored?anchorTop:Math.max(top,Math.min(compact?viewportTop+(viewportBottom-viewportTop-pop.offsetHeight)/2:r.top,bottom-pop.offsetHeight)))+'px';
+  pop.style.top=Math.max(top,Math.min(compact?viewportTop+(viewportBottom-viewportTop-pop.offsetHeight)/2:r.top,bottom-pop.offsetHeight))+'px';
   pop.scrollTop=scrollTop;
  };
  const position=()=>{if(destroyed||!anchor||!pop.matches(':popover-open'))return;if(bounds){positionInBounds();return;}const r=anchor.closest('.om-kpi').getBoundingClientRect(),limit=window.innerWidth-16;if(window.innerWidth<600){pop.style.width=limit+'px';pop.style.left='8px';pop.style.top=Math.max(8,(window.innerHeight-pop.offsetHeight)/2)+'px';return;}pop.style.width=Math.min(r.width,limit)+'px';const content=pop.querySelector('.om-status-details');const needed=Math.max(r.width,content?Math.max(336,content.scrollWidth+26):pop.scrollWidth+2);pop.style.width=Math.min(needed,limit)+'px';pop.style.left=Math.max(8,Math.min(r.left,window.innerWidth-pop.offsetWidth-8))+'px';pop.style.top=Math.max(8,Math.min(r.top,window.innerHeight-pop.offsetHeight-8))+'px';};
