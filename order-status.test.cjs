@@ -50,7 +50,8 @@ r.delivery={source:'ebay_get_orders',deliveredAt:'2026-11-20T00:00:00Z'};
 r.returns=[{state:'OPEN',tracking:{active:true,labelDate:{value:'2026-11-18'}}}];
 assert.equal(orderStatus(r),'Due Refund');
 r.data.cancelStatus={cancelState:'CANCELED'};assert.equal(orderStatus(r),'Cancelled');
-r.data.orderPaymentStatus='FULLY_REFUNDED';assert.equal(orderStatus(r),'Refunded');
+r.data.orderPaymentStatus='FULLY_REFUNDED';assert.equal(orderStatus(r),'Cancelled');
+delete r.data.cancelStatus;assert.equal(orderStatus(r),'Refunded');
 });
 test('normal overrides resolve to buy ID or Pending without modifying earnings',()=>{
 for(const status of ['Ordered','Shipped','Delivered','Cancelled','Label Created']){
@@ -61,3 +62,11 @@ r.edit.data.purchase_id='buy';assert.equal(orderStatus(r),'Ordered');
 });
 
 test('FBA and arbitrary nonempty buy IDs start ordering without overriding exceptions',()=>{for(const purchase_id of ['FBA Order','fba order','Custom Reference']){assert.equal(orderStatus(row('Pending',{}, {purchase_id})),'Ordered');for(const s of ['Alert','OOS','Refunded','Due Refund'])assert.equal(orderStatus(row(s,{}, {purchase_id})),s);}assert.equal(orderStatus(row('Pending',{}, {purchase_id:'   '})),'Pending');});
+
+test('completed eBay cancellation takes precedence over its refund without changing money',()=>{
+ for(const status of ['Pending','Ordered','Shipped','Delivered','Label Created','Due Refund','Cancelled','']){
+ const r=row(status,{orderPaymentStatus:'FULLY_REFUNDED',cancelStatus:{cancelState:'CANCELED'}},{buy_price:12,shipping_cost:2,additional_cost:1});r.earnings={value:0};
+ const before=JSON.stringify(r);assert.equal(orderStatus(r),'Cancelled');assert.equal(JSON.stringify(r),before);
+ }
+ for(const cancelState of ['IN_PROGRESS','NONE_REQUESTED','REJECTED'])assert.equal(orderStatus(row('',{orderPaymentStatus:'FULLY_REFUNDED',cancelStatus:{cancelState}})),'Refunded');
+});
