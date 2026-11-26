@@ -47,3 +47,18 @@ test('negative buying price stays pending until order earnings become available'
  assert.equal(P.order(r).cost,-5);assert.equal(P.order(r).gross,null);
  r.earnings.value=10;assert.equal(P.order(r).totalCost,-2);assert.equal(P.order(r).gross,12);
 });
+
+test('status menu has no blank choice and arbitrary buy IDs survive saving',async()=>{
+ for(const value of ['0','ABCD','FBA Order','1']){
+  const h=editorHarness({id:'order-a',data:{},edit:{data:{},revision:1}});
+  const status=h.dialog.markup.match(/<select aria-label="Status"[\s\S]*?<\/select>/)[0];assert.doesNotMatch(status,/<option value="">/);
+  h.elements.purchase_id.value=value;h.fire('purchase_id','input');await h.submit();
+  assert.equal(h.calls[0].args.changes.purchase_id,value);assert.equal(P.orderStatus(h.saved[0]),'Ordered');
+ }
+});
+test('saving each buying amount advances status without persisting a derived override',async()=>{
+ for(const key of ['buy_price','shipping_cost','additional_cost']){
+  const h=editorHarness({id:'order-a',data:{},edit:{data:{},revision:1}});h.elements[key].value='0';await h.submit();
+  assert.equal(h.calls[0].args.changes[key],0);assert.equal(Object.hasOwn(h.calls[0].args.changes,'status'),false);assert.equal(P.orderStatus(h.saved[0]),'Ordered');
+ }
+});

@@ -2,12 +2,12 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {orderStatus}=require('./ebay-presentation.js');
 const row=(status,data={},extra={})=>({data,edit:{data:{status,...extra}}});
-test('buy ID advances pending, price alone does not',()=>{
+test('buy ID and buying price advance pending',()=>{
  assert.equal(orderStatus(row('Pending',{}, {purchase_id:'114-1234567-1234567'})),'Ordered');
- assert.equal(orderStatus(row('Pending',{}, {buy_price:3})),'Pending');
+ assert.equal(orderStatus(row('Pending',{}, {buy_price:3})),'Ordered');
 });
 test('hard lock exceptions block every imported event',()=>{
- for(const status of ['Alert','OOS','Refunded'])for(const data of [{orderFulfillmentStatus:'FULFILLED'},{cancelStatus:{cancelState:'CANCELED'}}])
+ for(const status of ['Alert','OOS'])for(const data of [{orderFulfillmentStatus:'FULFILLED'},{cancelStatus:{cancelState:'CANCELED'}}])
  assert.equal(orderStatus(row(status,data,{purchase_id:'buy'})),status);
 });
 test('clearing an exception resumes the current imported state',()=>{
@@ -35,7 +35,7 @@ test('confirmed full refund supersedes delivery and return stages while preservi
  r.returns=[{state:'ITEM_SHIPPED',tracking:{active:true,deliveryStatus:'DELIVERED'}}];
  assert.equal(orderStatus(r),'Refunded');
  }
- for(const status of ['Alert','OOS','Refunded'])assert.equal(orderStatus(row(status,{orderPaymentStatus:'FULLY_REFUNDED'})),status);
+ for(const status of ['Alert','OOS'])assert.equal(orderStatus(row(status,{orderPaymentStatus:'FULLY_REFUNDED'})),status);
 });
 test('partial, pending or failed refunds and zero earnings do not imply a full refund',()=>{
  for(const payment of ['PARTIALLY_REFUNDED','REFUND_PENDING','FAILED','PAID']){
@@ -61,7 +61,7 @@ r.edit.data.purchase_id='buy';assert.equal(orderStatus(r),'Ordered');
 }
 });
 
-test('FBA and arbitrary nonempty buy IDs start ordering without overriding exceptions',()=>{for(const purchase_id of ['FBA Order','fba order','Custom Reference']){assert.equal(orderStatus(row('Pending',{}, {purchase_id})),'Ordered');for(const s of ['Alert','OOS','Refunded','Due Refund'])assert.equal(orderStatus(row(s,{}, {purchase_id})),s);}assert.equal(orderStatus(row('Pending',{}, {purchase_id:'   '})),'Pending');});
+test('FBA and arbitrary nonempty buy IDs start ordering without overriding exceptions',()=>{for(const purchase_id of ['FBA Order','fba order','Custom Reference']){assert.equal(orderStatus(row('Pending',{}, {purchase_id})),'Ordered');for(const s of ['Alert','OOS','Due Refund'])assert.equal(orderStatus(row(s,{}, {purchase_id})),s);}assert.equal(orderStatus(row('Pending',{}, {purchase_id:'   '})),'Pending');});
 
 test('completed eBay cancellation takes precedence over its refund without changing money',()=>{
  for(const status of ['Pending','Ordered','Shipped','Delivered','Label Created','Due Refund','Cancelled','']){
@@ -69,4 +69,33 @@ test('completed eBay cancellation takes precedence over its refund without chang
  const before=JSON.stringify(r);assert.equal(orderStatus(r),'Cancelled');assert.equal(JSON.stringify(r),before);
  }
  for(const cancelState of ['IN_PROGRESS','NONE_REQUESTED','REJECTED'])assert.equal(orderStatus(row('',{orderPaymentStatus:'FULLY_REFUNDED',cancelStatus:{cancelState}})),'Refunded');
+});
+
+test('every nonblank buy ID including numeric zero is valid',()=>{
+ for(const purchase_id of ['0',0,'1','ABCD','FBA Order','custom reference !'])assert.equal(orderStatus(row('',{}, {purchase_id})),'Ordered');
+ for(const purchase_id of ['',null,undefined,'  '])assert.equal(orderStatus(row('',{}, {purchase_id})),'Pending');
+});
+test('each cost independently activates Ordered, including explicit zero; removed overrides stay removed',()=>{
+ for(const [key,legacy] of [['buy_price','product_cost'],['shipping_cost','shipping_cost'],['additional_cost','additional_cost']]){
+  for(const value of [0,'0',2.50,'2.50']){
+   assert.equal(orderStatus(row('Pending',{}, {[key]:value})),'Ordered');
+   assert.equal(orderStatus({workspace_rows:[{data:{[legacy]:value}}]}),'Ordered');
+  }
+  for(const value of [null,'','  ',true,'invalid',Infinity]){
+   assert.equal(orderStatus({edit:{data:{[key]:value}},workspace_rows:[{data:{[legacy]:5}}]}),'Pending');
+  }
+ }
+});
+test('unrelated edits never activate Ordered and later status wins over buying inputs',()=>{
+ assert.equal(orderStatus(row('Pending',{}, {buyer_account:'Amazon',note:'test',tracking:'123',carrier:'UPS'})),'Pending');
+ for(const status of ['Alert','OOS','Due Refund'])assert.equal(orderStatus(row(status,{}, {shipping_cost:0})),status);
+ assert.equal(orderStatus(row('',{orderFulfillmentStatus:'FULFILLED'},{shipping_cost:0})),'Shipped');
+ assert.equal(orderStatus(row('Refunded',{},{})),'Pending');
+});
+test('return request alone is not a label; confirmed label precedes outbound delivery',()=>{
+ const r=row('',{orderFulfillmentStatus:'FULFILLED'});r.delivery={source:'ebay_get_orders',deliveredAt:'2026-11-20T00:00:00Z'};
+ r.returns=[{state:'RETURN_REQUESTED',tracking:{active:true}}];assert.equal(orderStatus(r),'Delivered');
+ r.returns[0].tracking.labelDate={value:'2026-11-21T00:00:00Z'};assert.equal(orderStatus(r),'Label Created');
+ r.returns[0].tracking.markAsReceived=true;assert.equal(orderStatus(r),'Due Refund');
+ r.data.orderPaymentStatus='FULLY_REFUNDED';assert.equal(orderStatus(r),'Refunded');
 });

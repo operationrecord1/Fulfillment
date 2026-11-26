@@ -8,7 +8,7 @@ const sum=(rows,key)=>{const ns=rows.map(r=>number(r.data?.[key])).filter(x=>x!=
 function orderStatus(row){
  const edit=row.edit?.data||{},records=row.workspace_rows||[],d=row.data||{};
  const manual=Object.hasOwn(edit,'status')?edit.status:values(records,'status')[0];
- if(['Alert','OOS','Refunded'].includes(manual))return manual;
+ if(['Alert','OOS'].includes(manual))return manual;
  // A completed cancellation stays Cancelled even when its payment was refunded.
  if(d.cancelStatus?.cancelState==='CANCELED')return 'Cancelled';
  // Full refund is an explicit eBay payment state, never inferred from holds or zero earnings.
@@ -21,7 +21,11 @@ function orderStatus(row){
  if(row.delivery?.source==='ebay_get_orders'&&row.delivery.deliveredAt&&Number.isFinite(Date.parse(row.delivery.deliveredAt)))return 'Delivered';
  if(d.orderFulfillmentStatus==='FULFILLED'||(row.delivery?.source==='ebay_get_orders'&&row.delivery.hasTracking===true))return 'Shipped';
  const purchase=Object.hasOwn(edit,'purchase_id')?edit.purchase_id:values(records,'purchase_id').join('');
- if(String(purchase||'').trim())return 'Ordered';
+ if(String(purchase??'').trim())return 'Ordered';
+ const validAmount=value=>typeof value!=='boolean'&&value!==null&&value!==undefined&&String(value).trim()!==''&&Number.isFinite(Number(value));
+ for(const [key,legacy] of [['buy_price','product_cost'],['shipping_cost','shipping_cost'],['additional_cost','additional_cost']]){
+  if(Object.hasOwn(edit,key)?validAmount(edit[key]):records.some(r=>validAmount(r.data?.[legacy])))return 'Ordered';
+ }
  return 'Pending';
 }
 function order(row){const d=row.data||{},records=row.workspace_rows||[],items=d.lineItems||[],earning=number(row.earnings?.value),cost=Object.hasOwn(row.edit?.data||{},'buy_price')?number(row.edit.data.buy_price):sum(records,'product_cost'),shipping=Object.hasOwn(row.edit?.data||{},'shipping_cost')?number(row.edit.data.shipping_cost):sum(records,'shipping_cost'),extra=Object.hasOwn(row.edit?.data||{},'additional_cost')?number(row.edit.data.additional_cost):sum(records,'additional_cost');const gross=earning!==null&&cost!==null&&(row.earnings?.currency||'USD')==='USD'?Math.round((earning-cost-(shipping??0)-(extra??0))*100)/100:null;
