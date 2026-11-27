@@ -11,7 +11,7 @@
 - Fixed-price, nonvariation listing price/quantity updates with seller verification and read-back. Unknown results block another write until confirmed by Check listing.
 - Manual Sandbox buyer messaging tied to the API order buyer and item. Same message/order deduplicated. API acceptance is not proof of receipt.
 - OAuth config, one-use state callback and refresh-token implementation. Sandbox Client Secret is in Vault. Sandbox RuName accepted URL points to the Sandbox callback.
-- Current active connection uses a temporary developer token. Refreshable OAuth is NOT yet verified: user must finish Sandbox sign-in in the pending browser tab.
+- Active connection now uses refreshable OAuth. The website Verify token refresh action successfully exchanged the refresh token and verified the resulting Sandbox seller identity on 2026-11-27.
 - API activity log (50 latest events), no request bodies/tokens in logs; authenticated active staff/admin only, per-user Sandbox ownership.
 - Workflow Tests: tracking simulations plus shared production status/calculation rules. Simulations are explicitly labeled and do not contact eBay.
 
@@ -24,8 +24,9 @@
 - New schema security advisor findings are informational RLS-without-policy notices for intentionally server-only private tables. Existing unrelated security warnings remain outside this change.
 
 ## Still needs real end-to-end verification
-- Complete refreshable OAuth sign-in; verify refresh and expiry recovery.
+- Forced refresh and seller read-back are verified. Automatic expiry/401 recovery still needs a controlled integration test.
 - Create a Sandbox listing and buy it using a separate Sandbox buyer. This seller currently has no orders. Never copy production customer data into fixtures.
+- 2026-11-27: attempted to save a clearly labeled test notebook draft in the Sandbox listing UI (9.99 USD, quantity 5, Unbranded). eBay redirected to /sh/lst/drafts and displayed its own "It's not you, it's us" server error. Draft persistence is unconfirmed; nothing was published.
 - Verify listing changes on that actual listing, tracking submission/read-back on a paid test order, and receipt in test buyer inbox. These writes have NOT been claimed successful.
 - Automatic message scheduling/delivery/Due Refund triggers are NOT enabled. Current messaging is manual test-buyer-only.
 - Return label / carrier delivery / received returns require provider-supported Sandbox events; shared-rule simulation does not prove real carrier tracking or payouts.
