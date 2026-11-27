@@ -382,3 +382,8 @@
 .om .commerce-orders .commerce-choice-menu .sheet-chip{display:block;min-width:0;max-width:none;height:auto;margin:0;flex:0 1 auto;font:inherit;white-space:normal;overflow:visible;overflow-wrap:anywhere;text-overflow:clip}
 .om .commerce-orders .commerce-choice-menu .status-symbol{width:14px;height:14px;min-width:14px;flex:0 0 14px}
 .om .commerce-orders .commerce-choice-menu input{min-width:0;box-sizing:border-box}
+
+.om .commerce-orders .commerce-platform-edit{position:relative;width:max-content;min-width:150px;max-width:295px;padding:4px 28px;justify-content:center;overflow:visible}
+.om .commerce-orders .commerce-platform-edit>span:first-child{display:block;max-width:239px;text-align:center}
+.commerce-platform-edit[data-account-tooltip]:not([data-account-tooltip=""]):hover::after{content:attr(data-account-tooltip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:#090e35;color:#fff;font:400 11px/18px CommerceInter,Inter,sans-serif;padding:5px 8px;border-radius:4px;white-space:nowrap;z-index:10000;pointer-events:none}
+.commerce-platform-edit[data-account-tooltip]:not([data-account-tooltip=""]):hover::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;width:8px;height:8px;background:#090e35;transform:translateX(-50%) rotate(45deg);z-index:10000;pointer-events:none}
