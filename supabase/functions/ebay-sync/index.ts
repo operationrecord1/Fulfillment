@@ -1,3 +1,4 @@
+import {readCatalog,readMissingImages} from './catalog.mjs';
 import {refreshAccess,readPage,ProviderError} from './provider.mjs';
 import {XMLParser} from 'npm:fast-xml-parser@4.5.3';
 import {readDelivery} from './delivery.mjs';
@@ -30,9 +31,10 @@ Deno.serve(async(req:Request)=>{
     };
     if(Date.parse(job.access_expires_at)<=Date.now()+60000)await renew();
     let page;
-    const read=()=>job.resource==='delivery_tracking'?readDelivery(job,token,fetch,xml=>deliveryParser.parse(xml)):readPage(job,token);
+    const read=()=>job.resource==='listings'?readCatalog(job,token,fetch,xml=>deliveryParser.parse(xml)):job.resource==='delivery_tracking'?readDelivery(job,token,fetch,xml=>deliveryParser.parse(xml)):readPage(job,token);
     try{page=await read();}catch(e){if(e instanceof ProviderError&&e.status===401&&!refreshed){await renew();page=await read();}else throw e;}
     await work('commit',{...identity,...page});completed++;
+    if(job.resource==='orders'&&job.image_ids?.length){try{const images=await readMissingImages(job,token,fetch,xml=>deliveryParser.parse(xml));await rpc('ebay_catalog_images_commit',{target:job.store_id,records:images,attempted:job.image_ids});}catch(e){console.warn('Image recovery delayed');}}
    }catch(e){
     const known=e instanceof ProviderError;
     await work('fail',{...identity,error:known?e.message:'Temporary sync failure; saved data retained',retry_after:known?e.retryAfter:60});failed++;
