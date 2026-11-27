@@ -121,3 +121,10 @@
 .order-edit-dialog::backdrop{backdrop-filter:none;-webkit-backdrop-filter:none}
 body:has(.order-edit-dialog[open]) .om-main,body:has(.order-edit-dialog[open]) .om-main *{scrollbar-color:transparent transparent}
 body:has(.order-edit-dialog[open]) .om-main::-webkit-scrollbar-thumb,body:has(.order-edit-dialog[open]) .om-main ::-webkit-scrollbar-thumb{background:transparent;border-color:transparent}
+
+/* Place the scroll rail in the dialog padding, outside the field columns. */
+.om .order-edit-dialog #edit-panel-Order[data-extra-tracking="true"]{width:calc(100% + 14px);margin-right:-14px;padding-right:8px;scrollbar-gutter:stable;scrollbar-width:auto;scrollbar-color:#aeb6bf transparent}
+.om .order-edit-dialog #edit-panel-Order[data-extra-tracking="true"]::-webkit-scrollbar{display:block;width:8px;height:8px}
+.om .order-edit-dialog #edit-panel-Order[data-extra-tracking="true"]::-webkit-scrollbar-track{background:transparent}
+.om .order-edit-dialog #edit-panel-Order[data-extra-tracking="true"]::-webkit-scrollbar-thumb{background:#aeb6bf;border:2px solid #fff;border-radius:8px}
+.om .order-edit-dialog #edit-panel-Order[data-extra-tracking="true"]::-webkit-scrollbar-thumb:hover{background:#87939f}
