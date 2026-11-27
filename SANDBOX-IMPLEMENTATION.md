@@ -15,7 +15,7 @@
 - API activity log (50 latest events), no request bodies/tokens in logs; authenticated active staff/admin only, per-user Sandbox ownership.
 - Workflow Tests: tracking simulations plus shared production status/calculation rules. Simulations are explicitly labeled and do not contact eBay.
 
-## Verified
+## Initial checks (superseded by dated follow-ups below)
 - Real GetUser identified testuser_crestonglobaltest; real Orders response total 0.
 - Real GetMyeBaySelling returned Success without ActiveList; total is unavailable.
 - 51 automated provider/tracking/rule tests passed.
@@ -65,3 +65,10 @@
 - Legacy AddMemberMessageAAQToPartner returned error 16202. Official documentation explicitly states Sandbox testing is unsupported. Replaced Sandbox messaging with Commerce Message API send_message, binding recipient and listing to the fetched order. New API acceptance and buyer receipt still require verification.
 - 56 focused automated tests pass, including mixed tracking HTTP 400 and modern message recipient isolation.
 - Sources: https://developer.ebay.com/devzone/xml/docs/reference/ebay/AddMemberMessageAAQToPartner.html ; https://developer.ebay.com/develop/api/spec/message_api.json
+
+- Modern message read-back succeeded: conversation 5000174303, message 1160778010. Exact body, sender testuser_crestonglobaltest, recipient testuser_crestonglobalbuyer and listing 110591981581 matched. API reported readStatus true. Buyer browser inbox was not independently inspected because My eBay returned a loading error.
+- Repeating the same send was blocked before transmission. Read-back reconciled the prior unknown action to confirmed. Conversation read-back uses recipientUsername; handler now accepts both documented response field variants. The original send-response mismatch cause was not captured, so it is not claimed as confirmed.
+- Added read-only Trading GetOrders shipment evidence alongside REST fulfillment evidence for uncertain tracking reconciliation.
+
+- A second fixture purchase was committed: legacy order 110591981585-2259812353. CompleteSale Paid marker returned success and GetOrders read-back became Completed/Paid. REST Fulfillment initially still returned only the first order; a Paid marker alone is not being claimed to complete managed checkout.
+- First order diagnostics: Trading order Completed, shipped_time null, transaction shipping_details null; REST shipments empty. Completed is payment/order state, not delivered/shipped proof.
