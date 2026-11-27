@@ -94,7 +94,11 @@ Deno.serve(async(req:Request)=>{
    target=body.order_id;if(typeof target!=='string'||!target||target.length>100)throw Error('Invalid order ID');kind='tracking';
    let live=await read(()=>checkTracking(target,token));const previous=await rpc(actor,'action',{kind,target});
    if(previous.state==='unknown'&&live.shipments.some((x:any)=>x.tracking===previous.requested?.tracking&&x.carrier.toLowerCase()===previous.requested?.carrier?.toLowerCase()))await rpc(actor,'finish',{kind,target,attempt:previous.attempt,state:'confirmed'});
-   if(action==='tracking_check')result={...live,order:undefined,blocked:live.blocked||['unknown','confirmed'].includes(previous.state),reason:live.reason||(['unknown','confirmed'].includes(previous.state)?'Previous submission is recorded; additional tracking is blocked.':'')};
+   if(action==='tracking_check'){
+    const evidence=await read(()=>trading('GetOrders','<OrderIDArray><OrderID>'+xmlEscape(target)+'</OrderID></OrderIDArray><DetailLevel>ReturnAll</DetailLevel>',token,parse));
+    const tradingOrder=[].concat(evidence.OrderArray?.Order||[]).find((o:any)=>o.OrderID===target);
+    result={...live,order:undefined,trading_evidence:tradingOrder?{order_id:tradingOrder.OrderID,status:tradingOrder.OrderStatus,shipped_time:tradingOrder.ShippedTime||null,shipping_details:tradingOrder.ShippingDetails||null,transactions:[].concat(tradingOrder.TransactionArray?.Transaction||[]).map((t:any)=>({item_id:t.Item?.ItemID,shipping_details:t.ShippingDetails||null,shipped_time:t.ShippedTime||null}))}:null,blocked:live.blocked||['unknown','confirmed'].includes(previous.state),reason:live.reason||(['unknown','confirmed'].includes(previous.state)?'Previous submission is recorded; additional tracking is blocked.':'')};
+   }
    else{
     if(live.blocked)throw Error(live.reason);const values=validateTracking(body.tracking,body.carrier);const claim=await rpc(actor,'claim',{kind,target,requested:values});if(!claim.claimed)throw Error('Existing or uncertain tracking submission blocks another send');attempt=claim.attempt;
     // Claim persists unknown BEFORE the only external POST. A crash cannot cause a blind retry.
