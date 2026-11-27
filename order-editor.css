@@ -58,3 +58,20 @@
 .order-edit-dialog .order-extra-trackings:empty{display:none}
 @media(max-width:699.98px){.order-edit-dialog .order-meta-id{display:none}}
 .order-edit-dialog .order-add-tracking[hidden]{display:inline-block!important;visibility:hidden!important}
+
+/* Four tabs share one stable frame; content scrolls inside the frame. */
+.order-edit-dialog [role=tabpanel]{overflow-y:auto;overflow-x:hidden;min-height:0;padding-bottom:8px}
+.order-edit-dialog nav{--editor-tab-width:min(92px,25%)}
+.order-edit-dialog [role=tab]{width:var(--editor-tab-width);flex:0 0 var(--editor-tab-width)}
+.order-edit-dialog .order-tab-indicator{width:var(--editor-tab-width);transform:translateX(calc(var(--tab-index)*100%))}
+.order-edit-dialog .action-order{font-size:12px;margin:0 0 16px;overflow-wrap:anywhere;color:#69727b}
+.action-tracking-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.order-edit-dialog .action-buttons,.action-variables{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.order-edit-dialog .action-buttons button,.order-edit-dialog .action-save-draft,.order-edit-dialog .action-variables button{border:1px solid #dce3e9;border-radius:4px;background:#fff;padding:9px 12px;color:#515455;font:inherit;cursor:pointer}
+.order-edit-dialog .action-buttons .action-send{background:#1a73e8;color:#fff;border-color:#1a73e8}
+.order-edit-dialog .action-buttons button:disabled,.order-edit-dialog .action-save-draft:disabled{opacity:.5;cursor:not-allowed}
+.action-status,.action-help,.action-carrier-help,.action-message>p{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.action-status{min-height:36px}.action-shipments p{padding:10px;background:#f3f6fa;overflow-wrap:anywhere}
+.action-messages{border-top:1px solid #e0e4e8;margin-top:18px;padding-top:12px}.action-messages summary{cursor:pointer;font-weight:600;padding:10px 0}
+.action-message{border-top:1px solid #e8ebee}.order-edit-dialog .action-message textarea{height:100px;min-height:100px}.action-preview{white-space:pre-wrap;background:#f8f9fb;padding:10px}.order-edit-dialog .action-variables button{padding:5px 8px;font-size:11px}
+@media(max-width:480px){.action-tracking-grid{grid-template-columns:1fr;gap:10px}}
