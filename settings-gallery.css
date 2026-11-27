@@ -169,3 +169,5 @@ body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
 .platform-account-name:empty{display:none}
 
 .om-platform-option{align-items:center;gap:10px}.om-platform-option .platform-edit,.om-platform-option .platform-remove{flex:0 0 auto;margin:0}.om-platform-option .platform-option-label{flex:0 1 auto;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.om-platform-option .platform-account-name{flex:1;min-width:0;color:#5f6368;font-size:13px;overflow-wrap:anywhere}
+
+.om-platform-option .platform-edit{margin-left:auto}.om-platform-option .platform-account-name{flex:0 1 auto}.om-platform-option .platform-remove{margin-left:0}

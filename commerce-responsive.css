@@ -389,3 +389,5 @@
 .commerce-platform-edit[data-account-tooltip]:not([data-account-tooltip=""]):hover::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;width:8px;height:8px;background:#090e35;transform:translateX(-50%) rotate(45deg);z-index:10000;pointer-events:none}
 
 .om .commerce-orders .commerce-platform-edit .sheet-chip-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);margin:0;flex:none}
+
+.om .commerce-orders .commerce-platform-edit{border:1px solid #b8bec5;min-height:30px;box-sizing:border-box}.om .commerce-orders .commerce-platform-edit:hover{border-color:#78848f}.om .commerce-orders .commerce-platform-edit:focus-visible{outline:2px solid #4285f4;outline-offset:2px}
