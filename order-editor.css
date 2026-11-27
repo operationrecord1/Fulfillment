@@ -100,3 +100,14 @@
 
 @media(max-width:700px){.om .order-edit-dialog #edit-panel-Order{overflow:visible!important}.om .order-edit-dialog #edit-panel-Order[data-extra-tracking="true"]{overflow-y:auto!important;overflow-x:hidden!important}.om .order-edit-dialog #edit-panel-Order .order-edit-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 8px}.om .order-edit-dialog #edit-panel-Order .order-edit-three{align-items:end}.om .order-edit-dialog #edit-panel-Order .order-edit-three label{justify-content:flex-end}.om .order-edit-dialog #edit-panel-Order .order-edit-grid:has(>.order-earnings-field){grid-template-columns:1fr}}
 @media(max-height:600px){.om .order-edit-dialog #edit-panel-Order{overflow:auto!important}}
+
+/* Each internal tracking number keeps its own equal-width carrier. */
+.order-edit-dialog .order-tracking-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.order-edit-dialog .order-extra-trackings{gap:8px}
+.order-edit-dialog .order-tracking-editor{gap:4px}
+.order-tracking-input-wrap{position:relative;display:block;min-width:0}
+.order-edit-dialog .order-tracking-input-wrap input{padding-right:34px}
+.order-edit-dialog .order-tracking-input-wrap .order-remove-tracking{position:absolute;right:4px;top:5px;margin:0;width:30px;height:30px;border:0;background:transparent;font-size:20px}
+.order-edit-dialog #edit-panel-Order{overflow-anchor:none;scrollbar-width:none}
+.order-edit-dialog #edit-panel-Order::-webkit-scrollbar{display:none}
+@media(max-width:700px){.order-edit-dialog .order-tracking-pair{gap:8px}}
