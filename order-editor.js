@@ -32,7 +32,7 @@ const api={carrier,trackingFormat,trackingList,supplierUrl,phoneDisplay,mount({c
  dialog.querySelectorAll('input[readonly]').forEach(el=>{el.title='Read Only — Select Text to Copy';el.setAttribute('aria-readonly','true');});
 
  const pickers={};
- for(const native of form.querySelectorAll('select')){
+ function mountPicker(native,onChange){
   const isStatus=native.name==='status',label=native.getAttribute('aria-label'),wrap=document.createElement('div');native.hidden=true;wrap.className='order-status-picker'+(isStatus?' editor-status-colors':'');native.after(wrap);
   const id='editor-options-'+native.name;
   wrap.innerHTML='<button type="button" class="order-status-trigger" role="combobox" aria-label="'+esc(label)+'" aria-haspopup="listbox" aria-expanded="false" aria-controls="'+id+'"></button><div id="'+id+'" role="listbox" aria-label="'+esc(label)+' options" hidden></div>';
@@ -43,15 +43,17 @@ const api={carrier,trackingFormat,trackingList,supplierUrl,phoneDisplay,mount({c
   const toggle=open=>{if(open)Object.values(pickers).forEach(p=>p.close());menu.hidden=!open;trigger.setAttribute('aria-expanded',String(open));if(open){const bounds=dialog.getBoundingClientRect(),r=trigger.getBoundingClientRect();menu.style.top='calc(100% + 4px)';menu.style.bottom='auto';if(r.bottom+menu.offsetHeight+4>bounds.bottom-12&&r.top-menu.offsetHeight-4>=bounds.top+12){menu.style.top='auto';menu.style.bottom='calc(100% + 4px)';}}};
   pickers[native.name]={render,close:()=>toggle(false)};render();trigger.onclick=()=>toggle(menu.hidden);
   trigger.onkeydown=e=>{if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();toggle(true);(menu.querySelector('[aria-selected=true]')||menu.firstElementChild).focus();}if(e.key==='Escape'){e.preventDefault();e.stopPropagation();toggle(false);}};
-  menu.onclick=e=>{const option=e.target.closest('[role=option]');if(!option)return;native.value=isStatus?(option.dataset.value||'Pending'):option.dataset.value;if(native.name==='supplier')normalizeProduct();dirty=true;render();toggle(false);trigger.focus();};
+  menu.onclick=e=>{const option=e.target.closest('[role=option]');if(!option)return;native.value=isStatus?(option.dataset.value||'Pending'):option.dataset.value;if(native.name==='supplier')normalizeProduct();dirty=true;render();toggle(false);trigger.focus();onChange?.();};
   menu.onkeydown=e=>{const opts=Array.from(menu.children),i=opts.indexOf(document.activeElement);if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();opts[e.key==='Home'?0:e.key==='End'?opts.length-1:(i+(e.key==='ArrowDown'?1:opts.length-1))%opts.length].focus();}if(e.key==='Escape'){e.preventDefault();e.stopPropagation();toggle(false);trigger.focus();}if(e.key==='Tab')toggle(false);};
   form.addEventListener('click',e=>{if(!wrap.contains(e.target))toggle(false);});form.addEventListener('focusin',e=>{if(!wrap.contains(e.target))toggle(false);});
+ return {render,close:()=>toggle(false),setDisabled:value=>{trigger.disabled=value;if(value)toggle(false);}};
  }
+ for(const native of form.querySelectorAll('select'))mountPicker(native);
  dialog.querySelector('.order-copy-button').onclick=async e=>{const b=e.currentTarget;try{await navigator.clipboard.writeText(r.id);b.dataset.tip='Copied';setTimeout(()=>{b.dataset.tip='Copy to Clipboard';},1500);}catch{const input=dialog.querySelector('.order-copy-field input');input.focus();input.select();b.dataset.tip='Press Ctrl+C to Copy';}};
  function updateProfit(){const raw=form.elements.buy_price.value;const cost=raw===''?null:Number(raw);const value=cost!==null&&Number.isFinite(cost)&&m.earning!==null&&m.currency==='USD'?m.earning-cost-Number(form.elements.shipping_cost.value||0)-Number(form.elements.additional_cost.value||0):null;form.elements.profit_preview.value=value===null?'Not Recorded':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(value);dialog.querySelector('.order-edit-profit strong').textContent=form.elements.profit_preview.value;}
  updateProfit();for(const key of ['buy_price','shipping_cost','additional_cost'])form.elements[key].addEventListener('input',updateProfit);
  form.elements.buy_price.addEventListener('blur',()=>{const el=form.elements.buy_price;if(el.value!==''&&Number.isFinite(Number(el.value)))el.value=Number(el.value).toFixed(2);});
- actions=root.OrderActions?.mount({host:dialog.querySelector('#edit-panel-Actions'),client,storeId,row:r})||null;
+ actions=root.OrderActions?.mount({host:dialog.querySelector('#edit-panel-Actions'),client,storeId,row:r,mountPicker})||null;
  function tab(name){dialog.querySelector('nav').style.setProperty('--tab-index',['Order','Product','Buyer','Actions'].indexOf(name));dialog.querySelectorAll('[data-tab]').forEach(b=>{b.setAttribute('aria-selected',b.dataset.tab===name);b.tabIndex=b.dataset.tab===name?0:-1;});dialog.querySelectorAll('[role=tabpanel]').forEach(p=>p.hidden=p.id!=='edit-panel-'+name);dialog.querySelector('footer').hidden=name==='Actions';if(name==='Actions')actions?.activate();}
  dialog.querySelectorAll('[data-tab]').forEach((b,i)=>{b.onclick=()=>tab(b.dataset.tab);b.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?3:(i+(e.key==='ArrowRight'?1:3))%4;const target=dialog.querySelectorAll('[data-tab]')[n];tab(target.dataset.tab);target.focus();}};});tab(startTab==='Actions'?'Actions':'Order');
  const close=()=>{if(!busy&&!actions?.isBusy()){actions?.dispose();dialog.close();}};dialog.querySelector('.order-edit-close').onclick=close;dialog.oncancel=e=>{e.preventDefault();close();};form.oninput=()=>{dirty=true;};form.onchange=()=>{dirty=true;};

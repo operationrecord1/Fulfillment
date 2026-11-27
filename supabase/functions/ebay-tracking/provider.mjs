@@ -15,10 +15,8 @@ export async function inspectOrder(id,token,fetcher=fetch){
  if(!Array.isArray(d.fulfillments))throw new TrackingError('Invalid eBay fulfillment response; submission blocked');
  const shipments=d.fulfillments.map(x=>({id:x.fulfillmentId||'',tracking:x.shipmentTrackingNumber||'',carrier:x.shippingCarrierCode||'',shippedDate:x.shippedDate||null}));
  let reason='';
- if(shipments.length)reason='Tracking or a shipment already exists on eBay. Adding or replacing tracking is blocked.';
- else if(order.cancelStatus?.cancelState&&order.cancelStatus.cancelState!=='NONE_REQUESTED')reason='Cancellation is in progress or complete. Tracking cannot be added.';
- else if(order.orderPaymentStatus!=='PAID')reason='This order is not eligible for tracking submission.';
- else if(order.lineItems.some(x=>!x.lineItemId||!Number.isInteger(x.quantity)||x.quantity<1||x.lineItemFulfillmentStatus!=='NOT_STARTED'))reason='Order fulfillment has already started or item information is incomplete.';
+ if(shipments.some(x=>String(x.tracking).trim()))reason='Tracking already exists on eBay. Adding or replacing tracking is blocked.';
+ else if(['CANCELED','CANCELLED'].includes(order.cancelStatus?.cancelState))reason='This order is cancelled. Tracking cannot be added.';
  return {order,shipments,blocked:!!reason,reason,checked_at:new Date().toISOString()};
 }
 export function validateTracking(tracking,carrier){
