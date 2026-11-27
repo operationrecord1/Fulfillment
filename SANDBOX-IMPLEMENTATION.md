@@ -56,3 +56,4 @@
 - Re-running slot 1 returned the existing listing; Create remained disabled, no duplicate created.
 - 54 automated tests passed before the live writes. Deployed browser simulations: 7 tracking + 26 status/calculation checks passed.
 - Corrected audit text for non-list actions and initial loading/error states; mobile fixture controls constrained to container width.
+- Final browser checks: two active records imported; item page 110591981581 visibly shows USD 10.49 and 7 available with the test image. Loaded-category form has no document/workspace horizontal overflow at 300px, 390px, and 1100px; viewport reset.
