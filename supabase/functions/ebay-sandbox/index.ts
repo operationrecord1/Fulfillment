@@ -57,7 +57,8 @@ Deno.serve(async(req:Request)=>{
   if(ctx.tokens.expires_at&&ctx.tokens.expires_at<Date.now()+60000)await refresh();
   const read=async(fn:any)=>{try{return await fn();}catch(e){if(e.status===401){await refresh();return fn();}throw e;}};
   let result:any;
-  if(action==='orders')result=await read(()=>orders(token,body.offset??0));
+  if(action==='refresh_verify'){await refresh();const verified=await seller(token);if(verified.toLowerCase()!==ctx.username.toLowerCase())throw Error('Refreshed token identity mismatch');result={verified:true,username:verified,message:'Token refresh and Sandbox seller identity verified'};}
+  else if(action==='orders')result=await read(()=>orders(token,body.offset??0));
   else if(action==='listings')result=await read(()=>listings(token,body.page??1,parse));
   else if(['tracking_check','tracking_submit'].includes(action)){
    target=body.order_id;if(typeof target!=='string'||!target||target.length>100)throw Error('Invalid order ID');kind='tracking';
