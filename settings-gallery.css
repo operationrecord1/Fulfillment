@@ -167,3 +167,5 @@ body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
 @media(max-width:540px){.om .settings-redesign .settings-add{height:auto;flex-wrap:wrap}.om .settings-redesign .settings-add>input{flex:1 1 40%;width:0}.om .settings-redesign .settings-add .platform-new-colors{margin-left:auto}}
 
 .platform-account-name:empty{display:none}
+
+.om-platform-option{align-items:center;gap:10px}.om-platform-option .platform-edit,.om-platform-option .platform-remove{flex:0 0 auto;margin:0}.om-platform-option .platform-option-label{flex:0 1 auto;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.om-platform-option .platform-account-name{flex:1;min-width:0;color:#5f6368;font-size:13px;overflow-wrap:anywhere}
