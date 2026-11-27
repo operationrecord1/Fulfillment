@@ -75,3 +75,13 @@
 
 - API activity history failed with PostgreSQL 42702 because action was both an RPC parameter and an unqualified column. Qualified event columns; database returned 50 entries and browser activity history rendered successfully. anon/authenticated remain unable to execute the private worker.
 - The second fixture managed checkout returned eBay’s own "We ran into a problem. Please try again." after its test Paid marker. Cause is not established. A separate clean checkout is being used for the next tracking test.
+
+- A separate clean checkout (no test Paid marker) succeeded for order 00-46754-69313, USD 11.25 total. Website REST Orders now imports both paid checkout orders (2 total). Second tracking test uses a new synthetic Sandbox-only number.
+
+## Successful tracking integration and final verified results
+- Clean paid order 00-46754-69313 accepted a new synthetic Sandbox tracking number 9400112026112700000187 (USPS). Trading GetOrders confirmed the exact number and shipped timestamp.
+- Found a real mapping bug: createShippingFulfillment request uses trackingNumber but GET ShippingFulfillment response uses shipmentTrackingNumber. The shared reader had used the request field name. Corrected reader and simulation fixture, added a regression test using the actual response contract.
+- Deployed Sandbox function v13. Check eBay status now returns the exact tracking number; reconciliation confirms the action; the Send button remains blocked. Buyer order detail independently shows Tracking available completed and the same number. This proves Sandbox shipment/tracking upload, not physical delivery.
+- 57 focused tests pass. The first order’s duplicate-number response remains unknown/locked; it is not labeled successful. The payment-marker-only fixture remains separate from the two paid managed-checkout orders.
+- Production Edge Functions were not redeployed and no production orders were changed. Shared provider source fix is committed for future production deployment review.
+- Source contract: https://developer.ebay.com/develop/api/spec/fulfillment_api.json

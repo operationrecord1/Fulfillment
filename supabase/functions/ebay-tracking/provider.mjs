@@ -13,7 +13,7 @@ export async function inspectOrder(id,token,fetcher=fetch){
  if(order.orderId!==id||!Array.isArray(order.lineItems)||!order.lineItems.length)throw new TrackingError('Order identity could not be verified');
  const d=await read(endpoint(id)+'/shipping_fulfillment',token,fetcher);
  if(!Array.isArray(d.fulfillments))throw new TrackingError('Invalid eBay fulfillment response; submission blocked');
- const shipments=d.fulfillments.map(x=>({id:x.fulfillmentId||'',tracking:x.trackingNumber||'',carrier:x.shippingCarrierCode||'',shippedDate:x.shippedDate||null}));
+ const shipments=d.fulfillments.map(x=>({id:x.fulfillmentId||'',tracking:x.shipmentTrackingNumber||'',carrier:x.shippingCarrierCode||'',shippedDate:x.shippedDate||null}));
  let reason='';
  if(shipments.length)reason='Tracking or a shipment already exists on eBay. Adding or replacing tracking is blocked.';
  else if(order.cancelStatus?.cancelState&&order.cancelStatus.cancelState!=='NONE_REQUESTED')reason='Cancellation is in progress or complete. Tracking cannot be added.';
