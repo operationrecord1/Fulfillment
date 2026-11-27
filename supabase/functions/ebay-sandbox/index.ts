@@ -1,6 +1,6 @@
 import {categoryOptions,fixture,fixtureLookup} from './fixtures.mjs';
 import {XMLParser,XMLValidator} from 'npm:fast-xml-parser@5.12.1';
-import {orders,listings,jsonRequest,trading,ownItem,listingChange,checkTracking,sendTracking,validateTracking,SandboxError,TrackingError,xmlEscape} from './provider.mjs';
+import {messagePayload,orders,listings,jsonRequest,trading,ownItem,listingChange,checkTracking,sendTracking,validateTracking,SandboxError,TrackingError,xmlEscape} from './provider.mjs';
 import {newState,hashState} from '../ebay-connect/oauth.mjs';
 const backend=Deno.env.get('SUPABASE_URL')!;
 const key=JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')||'{}').default||Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'';
@@ -121,14 +121,13 @@ Deno.serve(async(req:Request)=>{
    }
   }else if(action==='message_send'){
    const id=body.order_id;if(typeof id!=='string'||!id||id.length>100)throw Error('Invalid order ID');
-   if(typeof body.message!=='string'||!body.message.trim()||body.message.length>2000||/[<>]/.test(body.message))throw Error('Enter a plain-text message of up to 2000 characters');
    const order=await read(()=>jsonRequest('/sell/fulfillment/v1/order/'+encodeURIComponent(id),token));
-   const recipient=order.buyer?.username,item=order.lineItems?.[0]?.legacyItemId;
-   if(order.orderId!==id||typeof recipient!=='string'||!recipient.toUpperCase().startsWith('TESTUSER_')||!item)throw Error('Verified Sandbox buyer and listing required');
-   kind='message';target=id+':'+await hashState(body.message.trim());const claim=await rpc(actor,'claim',{kind,target,requested:{order_id:id}});
+   if(order.orderId!==id)throw Error('Order identity mismatch');const payload=messagePayload(order,body.message);
+   kind='message';target=id+':'+await hashState(payload.messageText);const claim=await rpc(actor,'claim',{kind,target,requested:{order_id:id}});
    if(!claim.claimed)throw Error('This message was already submitted or its outcome is unknown. Duplicate blocked.');attempt=claim.attempt;sent=true;
-   await trading('AddMemberMessageAAQToPartner','<ItemID>'+xmlEscape(item)+'</ItemID><MemberMessage><Subject>About your test order '+xmlEscape(id)+'</Subject><Body>'+xmlEscape(body.message.trim())+'</Body><QuestionType>General</QuestionType><RecipientID>'+xmlEscape(recipient)+'</RecipientID><EmailCopyToSender>false</EmailCopyToSender></MemberMessage>',token,parse);accepted=true;
-   await rpc(actor,'finish',{kind,target,attempt,state:'confirmed'});result={accepted:true,recipient,message:'eBay Sandbox accepted the message. Receipt must be checked in the test buyer inbox.'};
+   const receipt=await jsonRequest('/commerce/message/v1/send_message',token,{method:'POST',body:payload});accepted=true;
+   if(!receipt.messageId||receipt.messageBody!==payload.messageText||String(receipt.recipientUserName).toLowerCase()!==payload.otherPartyUsername.toLowerCase())throw new SandboxError('Message accepted but response identity is unverified. Do not resend.',0,true);
+   await rpc(actor,'finish',{kind,target,attempt,state:'confirmed'});result={accepted:true,recipient:payload.otherPartyUsername,message_id:receipt.messageId,message:'eBay Sandbox accepted message '+receipt.messageId+'. Buyer inbox receipt remains a separate check.'};
   }else throw Error('Unsupported Sandbox action');
   await rpc(actor,'event',{name:action,outcome:'confirmed',detail:target||result.message||(Array.isArray(result.rows)?('API response verified; '+result.rows.length+' records on this page'+(result.total===null?'; total unavailable':'')):'API response verified')});
   return response(result);

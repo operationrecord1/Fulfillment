@@ -9,14 +9,22 @@ export function sandboxTransport(fetcher=fetch){return async(url,options={})=>{
 };}
 export class SandboxError extends Error {constructor(message,status=0,uncertain=false){super(message);this.status=status;this.uncertain=uncertain;}}
 export async function jsonRequest(path,token,{method='GET',body}={},fetcher=fetch){
- if(!path.startsWith('/sell/fulfillment/v1/order'))throw Error('Unsupported Sandbox API path');
+ if(!path.startsWith('/sell/fulfillment/v1/order')&&!(path==='/commerce/message/v1/send_message'&&method==='POST'))throw Error('Unsupported Sandbox API path');
  let r;try{r=await sandboxTransport(fetcher)(API+path,{method,headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(20000)});}catch{throw new SandboxError('Sandbox API could not be reached',0,method!=='GET');}
  const data=await r.json().catch(()=>null);
  if(!r.ok||data?.errors?.length)throw new SandboxError('eBay Sandbox '+r.status+': '+(data?.errors?.map(x=>x.message).join('; ')||'Request failed'),r.status,method!=='GET'&&(r.status>=500||r.status===408||r.status===429));
  if(!data||typeof data!=='object')throw new SandboxError('Invalid Sandbox response');return data;
 }
 export const checkTracking=(id,token,fetcher=fetch)=>inspectOrder(id,token,sandboxTransport(fetcher));
-export const sendTracking=(id,order,tracking,carrier,token,fetcher=fetch)=>publishTracking(id,order,tracking,carrier,token,sandboxTransport(fetcher));
+export async function sendTracking(id,order,tracking,carrier,token,fetcher=fetch){
+ try{return await publishTracking(id,order,tracking,carrier,token,sandboxTransport(fetcher));}
+ catch(e){
+  // Sandbox can return HTTP 400 while reporting an external shipment side effect.
+  // Keep the claim locked until matching shipment evidence is read back.
+  if(/tracking number already exists|fulfillment has been marked as shipped/i.test(e.message))throw new TrackingError(e.message+' Shipment outcome requires reconciliation; another send is blocked.',e.status,true);
+  throw e;
+ }
+}
 export function xmlEscape(value){return String(value).replace(/[<>&"']/g,x=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[x]));}
 export async function trading(call,body,token,parse,fetcher=fetch){
  if(!['GetUser','GetMyeBaySelling','GetItem','ReviseInventoryStatus','AddMemberMessageAAQToPartner','VerifyAddFixedPriceItem','AddFixedPriceItem','GeteBayDetails','GetOrders','CompleteSale'].includes(call))throw Error('Unsupported Sandbox Trading call');
@@ -50,4 +58,11 @@ export async function ownItem(id,token,username,parse,fetcher=fetch){
 export function listingChange(price,quantity){
  if(typeof price!=='string'||!/^\d{1,7}(\.\d{1,2})?$/.test(price)||Number(price)<=0||!Number.isInteger(quantity)||quantity<0||quantity>100000)throw Error('Enter a positive price and a whole quantity from 0 to 100000');
  return {price:Number(price).toFixed(2),quantity};
+}
+
+export function messagePayload(order,message){
+ const recipient=order.buyer?.username,item=order.lineItems?.[0]?.legacyItemId;
+ if(typeof recipient!=='string'||!recipient.toUpperCase().startsWith('TESTUSER_')||!/^\d+$/.test(String(item)))throw Error('Verified Sandbox buyer and listing required');
+ if(typeof message!=='string'||!message.trim()||message.length>2000||/[<>]/.test(message))throw Error('Enter a plain-text message of up to 2000 characters');
+ return {otherPartyUsername:recipient,messageText:message.trim(),emailCopyToSender:false,reference:{referenceType:'LISTING',referenceId:String(item)}};
 }

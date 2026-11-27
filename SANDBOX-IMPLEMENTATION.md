@@ -25,7 +25,7 @@
 
 ## Still needs real end-to-end verification
 - Forced refresh and seller read-back are verified. Automatic expiry/401 recovery still needs a controlled integration test.
-- Create a paid Sandbox order using a separate test buyer. Seller now has two confirmed test listings, but no orders. Buyer TESTUSER_crestonglobalbuyer is registered and signed in. Checkout is at the Commit to buy confirmation step; purchase is not yet submitted. Never copy production customer data into fixtures.
+- Paid Sandbox order creation is now verified: 00-46596-09601, test buyer TESTUSER_crestonglobalbuyer, notebook 110591981581, item USD 10.49 + test tax 0.76 = 11.25. Sandbox checkout with a synthetic test card succeeded; CompleteSale Paid marking was NOT used. Website REST Orders returned this order. Shipping details are synthetic test data.
 - 2026-11-27: attempted to save a clearly labeled test notebook draft in the Sandbox listing UI (9.99 USD, quantity 5, Unbranded). eBay redirected to /sh/lst/drafts and displayed its own "It's not you, it's us" server error. Draft persistence is unconfirmed; nothing was published.
 - Verify tracking submission/read-back on a paid test order, and receipt in test buyer inbox. These writes have NOT been claimed successful. Listing writes are verified below.
 - Automatic message scheduling/delivery/Due Refund triggers are NOT enabled. Current messaging is manual test-buyer-only.
@@ -57,3 +57,11 @@
 - 54 automated tests passed before the live writes. Deployed browser simulations: 7 tracking + 26 status/calculation checks passed.
 - Corrected audit text for non-list actions and initial loading/error states; mobile fixture controls constrained to container width.
 - Final browser checks: two active records imported; item page 110591981581 visibly shows USD 10.49 and 7 available with the test image. Loaded-category form has no document/workspace horizontal overflow at 300px, 390px, and 1100px; viewport reset.
+
+## Paid-order integration test and observed provider failures
+- 2026-11-27: checkout, buyer order detail payment, and website order sync verified for 00-46596-09601.
+- Tracking POST returned HTTP 400: "Tracking number already exists. However the fulfillment has been marked as shipped." Subsequent fulfillment read returned no shipment and buyer view still showed tracking as an upcoming step. This is NOT verified success.
+- Sandbox mixed write response now stays unknown and blocks another send. Existing test action was corrected from rejected to unknown, and browser Check eBay status confirmed the Send button remains disabled. No production behavior changed.
+- Legacy AddMemberMessageAAQToPartner returned error 16202. Official documentation explicitly states Sandbox testing is unsupported. Replaced Sandbox messaging with Commerce Message API send_message, binding recipient and listing to the fetched order. New API acceptance and buyer receipt still require verification.
+- 56 focused automated tests pass, including mixed tracking HTTP 400 and modern message recipient isolation.
+- Sources: https://developer.ebay.com/devzone/xml/docs/reference/ebay/AddMemberMessageAAQToPartner.html ; https://developer.ebay.com/develop/api/spec/message_api.json
