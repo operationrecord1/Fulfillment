@@ -72,3 +72,6 @@
 
 - A second fixture purchase was committed: legacy order 110591981585-2259812353. CompleteSale Paid marker returned success and GetOrders read-back became Completed/Paid. REST Fulfillment initially still returned only the first order; a Paid marker alone is not being claimed to complete managed checkout.
 - First order diagnostics: Trading order Completed, shipped_time null, transaction shipping_details null; REST shipments empty. Completed is payment/order state, not delivered/shipped proof.
+
+- API activity history failed with PostgreSQL 42702 because action was both an RPC parameter and an unqualified column. Qualified event columns; database returned 50 entries and browser activity history rendered successfully. anon/authenticated remain unable to execute the private worker.
+- The second fixture managed checkout returned eBay’s own "We ran into a problem. Please try again." after its test Paid marker. Cause is not established. A separate clean checkout is being used for the next tracking test.

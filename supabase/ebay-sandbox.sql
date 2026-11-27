@@ -60,7 +60,7 @@ begin
   if c.actor is null then raise exception 'Sandbox connection required'; end if;
   return jsonb_build_object('username',c.username,'tokens',(select decrypted_secret::jsonb from vault.decrypted_secrets where id=c.secret_id));
  elsif action='events' then
-  return coalesce((select jsonb_agg(x order by x.created_at desc) from (select id,action,outcome,detail,created_at from fulfillment_private.ebay_sandbox_events where actor=uid order by created_at desc limit 50)x),'[]');
+  return coalesce((select jsonb_agg(x order by x.created_at desc) from (select e.id,e.action,e.outcome,e.detail,e.created_at from fulfillment_private.ebay_sandbox_events e where e.actor=uid order by e.created_at desc limit 50)x),'[]');
  elsif action='event' then
   insert into fulfillment_private.ebay_sandbox_events(actor,action,outcome,detail) values(uid,left(payload->>'name',60),left(payload->>'outcome',40),left(payload->>'detail',600)); return '{}';
  elsif action='claim' then
