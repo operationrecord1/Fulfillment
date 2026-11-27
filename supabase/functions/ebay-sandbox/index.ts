@@ -76,6 +76,18 @@ Deno.serve(async(req:Request)=>{
     }
    }
   }
+  else if(['test_orders','test_paid'].includes(action)){
+   const getTestOrders=()=>trading('GetOrders','<NumberOfDays>30</NumberOfDays><OrderRole>Seller</OrderRole><OrderStatus>All</OrderStatus><Pagination><EntriesPerPage>100</EntriesPerPage><PageNumber>1</PageNumber></Pagination><DetailLevel>ReturnAll</DetailLevel>',token,parse);
+   const rawOrders=await read(getTestOrders);const candidates=[].concat(rawOrders.OrderArray?.Order||[]).filter((o:any)=>String(o.BuyerUserID).toUpperCase().startsWith('TESTUSER_')&&[].concat(o.TransactionArray?.Transaction||[]).length===1&&String([].concat(o.TransactionArray?.Transaction||[])[0]?.Item?.SKU).startsWith('CRESTON-SANDBOX-'));
+   if(action==='test_orders')result={orders:candidates.map((o:any)=>({order_id:o.OrderID,buyer:o.BuyerUserID,status:o.OrderStatus,paid_time:o.PaidTime||null,item:[].concat(o.TransactionArray.Transaction)[0].Item.ItemID})),message:'Trading API test orders; payment marking simulates receipt, not a card settlement'};
+   else{
+    const selected=candidates.find((o:any)=>o.OrderID===body.order_id);if(!selected)throw Error('Owned single-item Sandbox fixture order required');const itemId=String([].concat(selected.TransactionArray.Transaction)[0].Item.ItemID);await ownItem(itemId,token,ctx.username,parse);
+    if(selected.PaidTime)result={already_paid:true,message:'Test order already marked paid'};
+    else{kind='test_paid';target=selected.OrderID;const claim=await rpc(actor,'claim',{kind,target,requested:{item_id:itemId}});if(!claim.claimed)throw Error('Previous payment-state request must be checked before retry');attempt=claim.attempt;sent=true;
+     await trading('CompleteSale','<OrderID>'+xmlEscape(target)+'</OrderID><Paid>true</Paid>',token,parse);accepted=true;await rpc(actor,'finish',{kind,target,attempt,state:'confirmed'});result={accepted:true,message:'eBay accepted the test Paid marker. Refresh Orders to verify visibility. This is not a card-payment test.'};
+    }
+   }
+  }
   else if(action==='orders')result=await read(()=>orders(token,body.offset??0));
   else if(action==='listings')result=await read(()=>listings(token,body.page??1,parse));
   else if(['tracking_check','tracking_submit'].includes(action)){

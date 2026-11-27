@@ -19,8 +19,8 @@ export const checkTracking=(id,token,fetcher=fetch)=>inspectOrder(id,token,sandb
 export const sendTracking=(id,order,tracking,carrier,token,fetcher=fetch)=>publishTracking(id,order,tracking,carrier,token,sandboxTransport(fetcher));
 export function xmlEscape(value){return String(value).replace(/[<>&"']/g,x=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[x]));}
 export async function trading(call,body,token,parse,fetcher=fetch){
- if(!['GetUser','GetMyeBaySelling','GetItem','ReviseInventoryStatus','AddMemberMessageAAQToPartner','VerifyAddFixedPriceItem','AddFixedPriceItem','GeteBayDetails'].includes(call))throw Error('Unsupported Sandbox Trading call');
- const writing=['ReviseInventoryStatus','AddMemberMessageAAQToPartner','AddFixedPriceItem'].includes(call);let r;
+ if(!['GetUser','GetMyeBaySelling','GetItem','ReviseInventoryStatus','AddMemberMessageAAQToPartner','VerifyAddFixedPriceItem','AddFixedPriceItem','GeteBayDetails','GetOrders','CompleteSale'].includes(call))throw Error('Unsupported Sandbox Trading call');
+ const writing=['ReviseInventoryStatus','AddMemberMessageAAQToPartner','AddFixedPriceItem','CompleteSale'].includes(call);let r;
  try{r=await sandboxTransport(fetcher)(API+'/ws/api.dll',{method:'POST',headers:{'X-EBAY-API-CALL-NAME':call,'X-EBAY-API-SITEID':'0','X-EBAY-API-COMPATIBILITY-LEVEL':'1489','X-EBAY-API-IAF-TOKEN':token,'Content-Type':'text/xml'},body:'<?xml version="1.0" encoding="utf-8"?><'+call+'Request xmlns="urn:ebay:apis:eBLBaseComponents">'+body+'</'+call+'Request>',signal:AbortSignal.timeout(20000)});}catch{throw new SandboxError('Sandbox Trading API could not be reached',0,writing);}
  const raw=await r.text();if(raw.length>4000000||/<!DOCTYPE|<!ENTITY/i.test(raw))throw new SandboxError('Invalid XML response',r.status,writing);
  let d;try{d=parse(raw)[call+'Response'];}catch{throw new SandboxError('Invalid XML response',r.status,writing);}

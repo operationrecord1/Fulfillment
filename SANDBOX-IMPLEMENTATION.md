@@ -25,7 +25,7 @@
 
 ## Still needs real end-to-end verification
 - Forced refresh and seller read-back are verified. Automatic expiry/401 recovery still needs a controlled integration test.
-- Create a paid Sandbox order using a separate test buyer. Seller now has two confirmed test listings, but no orders. Buyer registration is prepared and requires the user to choose a password and submit the agreement. Never copy production customer data into fixtures.
+- Create a paid Sandbox order using a separate test buyer. Seller now has two confirmed test listings, but no orders. Buyer TESTUSER_crestonglobalbuyer is registered and signed in. Checkout is at the Commit to buy confirmation step; purchase is not yet submitted. Never copy production customer data into fixtures.
 - 2026-11-27: attempted to save a clearly labeled test notebook draft in the Sandbox listing UI (9.99 USD, quantity 5, Unbranded). eBay redirected to /sh/lst/drafts and displayed its own "It's not you, it's us" server error. Draft persistence is unconfirmed; nothing was published.
 - Verify tracking submission/read-back on a paid test order, and receipt in test buyer inbox. These writes have NOT been claimed successful. Listing writes are verified below.
 - Automatic message scheduling/delivery/Due Refund triggers are NOT enabled. Current messaging is manual test-buyer-only.
