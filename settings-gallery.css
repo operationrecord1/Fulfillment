@@ -159,3 +159,9 @@ body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
 .om .settings-redesign .settings-add .platform-color-control i{bottom:4px;left:6px;right:6px}
 .om .settings-redesign .settings-add>[data-add]{height:36px!important;min-height:36px!important;min-width:70px;padding:0 12px!important;margin:0;border-radius:5px;border:1px solid #dce0e5!important;background:linear-gradient(#fff,#f0f3f6);box-shadow:0 1px 2px #25304412;flex:none}
 @media(max-width:480px){.om .settings-redesign .settings-add{gap:4px}.om .settings-redesign .settings-add>input{font-size:13px;padding-inline:6px}.om .settings-redesign .settings-add .platform-new-colors{gap:4px}.om .settings-redesign .settings-add>[data-add]{min-width:56px;padding-inline:8px!important;gap:4px}}
+
+.om .settings-redesign .settings-add #settings-account-name{border-left:1px solid #e3e7eb;border-radius:0}
+.om .settings-redesign .platform-account-name{flex:1;min-width:60px;color:#737b85;font-size:12px;overflow-wrap:anywhere}
+.om .settings-redesign .platform-edit{border:0;background:transparent;color:#515455;padding:6px 8px;cursor:pointer;font:inherit}
+.om .settings-redesign .om-platform-option .platform-remove{margin-left:0}
+@media(max-width:540px){.om .settings-redesign .settings-add{height:auto;flex-wrap:wrap}.om .settings-redesign .settings-add>input{flex:1 1 40%;width:0}.om .settings-redesign .settings-add .platform-new-colors{margin-left:auto}}
