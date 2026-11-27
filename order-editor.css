@@ -87,7 +87,7 @@
 /* One tracking fits the base frame; additional rows opt into scrolling. */
 .order-edit-dialog #edit-panel-Order{overflow:visible;padding-bottom:0}
 .order-edit-dialog #edit-panel-Order[data-extra-tracking="true"]{overflow-y:auto;overflow-x:hidden;padding-bottom:8px}
-.order-edit-dialog #edit-panel-Order .order-edit-grid{row-gap:10px}
+.order-edit-dialog #edit-panel-Order .order-edit-grid{row-gap:6px}
 .order-edit-dialog .order-purchase-grid{margin-top:12px}
 .order-edit-dialog .order-tracking-editor{gap:4px;align-content:start}
 .order-edit-dialog .order-extra-trackings{gap:8px}
