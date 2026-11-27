@@ -83,3 +83,17 @@
 .order-edit-dialog .action-tracking-grid .action-buttons{margin:22px 0 0;flex-wrap:nowrap;gap:8px}.order-edit-dialog .action-tracking-grid .action-buttons button{height:40px;padding:8px 10px;white-space:nowrap;font-size:12px}
 @media(max-width:760px){.action-tracking-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.order-edit-dialog .action-tracking-grid .action-buttons{grid-column:1/-1;margin:0}.order-edit-dialog .action-tracking-grid .action-buttons button{flex:1}}
 @media(max-width:380px){.action-tracking-grid{grid-template-columns:minmax(0,1fr);padding:10px}.order-edit-dialog .action-tracking-grid .action-buttons{flex-wrap:wrap}.order-edit-dialog .action-tracking-grid .action-buttons button{white-space:normal}}
+
+/* One tracking fits the base frame; additional rows opt into scrolling. */
+.order-edit-dialog #edit-panel-Order{overflow:visible;padding-bottom:0}
+.order-edit-dialog #edit-panel-Order[data-extra-tracking="true"]{overflow-y:auto;overflow-x:hidden;padding-bottom:8px}
+.order-edit-dialog #edit-panel-Order .order-edit-grid{row-gap:10px}
+.order-edit-dialog .order-purchase-grid{margin-top:12px}
+.order-edit-dialog .order-tracking-editor{gap:4px;align-content:start}
+.order-edit-dialog .order-extra-trackings{gap:8px}
+.order-edit-dialog .order-add-tracking,.order-edit-dialog .order-add-tracking[hidden]{width:max-content;max-width:100%;min-height:26px;height:26px;margin-top:0;padding:3px 8px;font-size:11px;line-height:18px}
+.order-tracking-row{display:grid;grid-template-columns:minmax(0,1fr) 30px;align-items:end;gap:6px}
+.order-edit-dialog .order-remove-tracking{width:30px;height:30px;margin-bottom:5px;padding:0;border:1px solid #d9dde1;border-radius:4px;background:#fff;color:#515455;font-size:20px;cursor:pointer}
+.order-edit-dialog .order-remove-tracking:hover{background:#fff2f2;color:#b42318}
+@media(max-width:700px){.order-edit-dialog #edit-panel-Order .order-edit-three{grid-template-columns:repeat(3,minmax(0,1fr))!important}.order-edit-dialog #edit-panel-Order .order-edit-three label{overflow-wrap:anywhere}.order-edit-dialog #edit-panel-Order .order-edit-three input{min-width:0}}
+@media(max-height:600px){.order-edit-dialog #edit-panel-Order{overflow-y:auto;overflow-x:hidden}}
