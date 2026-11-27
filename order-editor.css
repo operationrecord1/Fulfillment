@@ -111,3 +111,13 @@
 .order-edit-dialog #edit-panel-Order{overflow-anchor:none;scrollbar-width:none}
 .order-edit-dialog #edit-panel-Order::-webkit-scrollbar{display:none}
 @media(max-width:700px){.order-edit-dialog .order-tracking-pair{gap:8px}}
+
+/* Extra rows end at the divider without an invisible action slot. */
+.order-edit-dialog #edit-panel-Order[data-extra-tracking="true"]{padding-bottom:0}
+.order-edit-dialog #edit-panel-Order[data-extra-tracking="true"] .order-add-tracking[hidden]{display:none!important}
+.order-edit-dialog #edit-panel-Order[data-extra-tracking="true"] .order-carrier-hint{display:none}
+.order-edit-dialog:has(#edit-panel-Order[data-extra-tracking="true"]:not([hidden])) footer{margin-top:7px}
+/* Avoid backdrop-filter repaint seams over the scrolling workspace. */
+.order-edit-dialog::backdrop{backdrop-filter:none;-webkit-backdrop-filter:none}
+body:has(.order-edit-dialog[open]) .om-main,body:has(.order-edit-dialog[open]) .om-main *{scrollbar-color:transparent transparent}
+body:has(.order-edit-dialog[open]) .om-main::-webkit-scrollbar-thumb,body:has(.order-edit-dialog[open]) .om-main ::-webkit-scrollbar-thumb{background:transparent;border-color:transparent}
