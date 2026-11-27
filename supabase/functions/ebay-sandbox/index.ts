@@ -119,6 +119,16 @@ Deno.serve(async(req:Request)=>{
     if(Number(verified.SellingStatus?.CurrentPrice?.['#text'])!==Number(values.price)||available!==values.quantity)throw new SandboxError('Listing update accepted; read-back differs or is pending',0,true);
     await rpc(actor,'finish',{kind,target,attempt,state:'confirmed'});result={item:verified,confirmed:true,checked_at:new Date().toISOString()};
    }
+  }else if(action==='message_check'){
+   const id=body.order_id;if(typeof id!=='string'||!id||id.length>100)throw Error('Invalid order ID');
+   const order=await read(()=>jsonRequest('/sell/fulfillment/v1/order/'+encodeURIComponent(id),token));if(order.orderId!==id)throw Error('Order identity mismatch');const payload=messagePayload(order,body.message);
+   const q=new URLSearchParams({conversation_type:'FROM_MEMBERS',other_party_username:payload.otherPartyUsername,reference_type:'LISTING',reference_id:payload.reference.referenceId,limit:'50'});
+   const list=await read(()=>jsonRequest('/commerce/message/v1/conversation?'+q,token));
+   if(!Array.isArray(list.conversations))throw Error('Conversation response is invalid');
+   const match=list.conversations.find((c:any)=>c.referenceId===payload.reference.referenceId&&c.latestMessage?.messageBody===payload.messageText&&String(c.latestMessage?.recipientUsername||c.latestMessage?.recipientUserName).toLowerCase()===payload.otherPartyUsername.toLowerCase()&&String(c.latestMessage?.senderUsername||c.latestMessage?.senderUserName).toLowerCase()===ctx.username.toLowerCase());
+   kind='message';target=id+':'+await hashState(payload.messageText);const previous=await rpc(actor,'action',{kind,target});
+   if(match&&previous.state==='unknown')await rpc(actor,'finish',{kind,target,attempt:previous.attempt,state:'confirmed'});
+   result={confirmed:!!match,conversations:list.conversations,message:match?'Matching message verified in eBay conversation; buyer read status: '+String(match.latestMessage.readStatus):'No matching message returned yet. Do not resend an uncertain submission.'};
   }else if(action==='message_send'){
    const id=body.order_id;if(typeof id!=='string'||!id||id.length>100)throw Error('Invalid order ID');
    const order=await read(()=>jsonRequest('/sell/fulfillment/v1/order/'+encodeURIComponent(id),token));
@@ -126,7 +136,7 @@ Deno.serve(async(req:Request)=>{
    kind='message';target=id+':'+await hashState(payload.messageText);const claim=await rpc(actor,'claim',{kind,target,requested:{order_id:id}});
    if(!claim.claimed)throw Error('This message was already submitted or its outcome is unknown. Duplicate blocked.');attempt=claim.attempt;sent=true;
    const receipt=await jsonRequest('/commerce/message/v1/send_message',token,{method:'POST',body:payload});accepted=true;
-   if(!receipt.messageId||receipt.messageBody!==payload.messageText||String(receipt.recipientUserName).toLowerCase()!==payload.otherPartyUsername.toLowerCase())throw new SandboxError('Message accepted but response identity is unverified. Do not resend.',0,true);
+   if(!receipt.messageId||receipt.messageBody!==payload.messageText||String(receipt.recipientUserName||receipt.recipientUsername).toLowerCase()!==payload.otherPartyUsername.toLowerCase())throw new SandboxError('Message accepted but response identity is unverified. Do not resend.',0,true);
    await rpc(actor,'finish',{kind,target,attempt,state:'confirmed'});result={accepted:true,recipient:payload.otherPartyUsername,message_id:receipt.messageId,message:'eBay Sandbox accepted message '+receipt.messageId+'. Buyer inbox receipt remains a separate check.'};
   }else throw Error('Unsupported Sandbox action');
   await rpc(actor,'event',{name:action,outcome:'confirmed',detail:target||result.message||(Array.isArray(result.rows)?('API response verified; '+result.rows.length+' records on this page'+(result.total===null?'; total unavailable':'')):'API response verified')});

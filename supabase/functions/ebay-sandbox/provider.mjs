@@ -9,7 +9,7 @@ export function sandboxTransport(fetcher=fetch){return async(url,options={})=>{
 };}
 export class SandboxError extends Error {constructor(message,status=0,uncertain=false){super(message);this.status=status;this.uncertain=uncertain;}}
 export async function jsonRequest(path,token,{method='GET',body}={},fetcher=fetch){
- if(!path.startsWith('/sell/fulfillment/v1/order')&&!(path==='/commerce/message/v1/send_message'&&method==='POST'))throw Error('Unsupported Sandbox API path');
+ if(!path.startsWith('/sell/fulfillment/v1/order')&&!(path==='/commerce/message/v1/send_message'&&method==='POST')&&!(path.startsWith('/commerce/message/v1/conversation?')&&method==='GET'))throw Error('Unsupported Sandbox API path');
  let r;try{r=await sandboxTransport(fetcher)(API+path,{method,headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(20000)});}catch{throw new SandboxError('Sandbox API could not be reached',0,method!=='GET');}
  const data=await r.json().catch(()=>null);
  if(!r.ok||data?.errors?.length)throw new SandboxError('eBay Sandbox '+r.status+': '+(data?.errors?.map(x=>x.message).join('; ')||'Request failed'),r.status,method!=='GET'&&(r.status>=500||r.status===408||r.status===429));
