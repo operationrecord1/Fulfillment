@@ -1,3 +1,4 @@
+import {categoryOptions,fixture,fixtureLookup} from './fixtures.mjs';
 import {XMLParser,XMLValidator} from 'npm:fast-xml-parser@5.12.1';
 import {orders,listings,jsonRequest,trading,ownItem,listingChange,checkTracking,sendTracking,validateTracking,SandboxError,TrackingError,xmlEscape} from './provider.mjs';
 import {newState,hashState} from '../ebay-connect/oauth.mjs';
@@ -58,6 +59,23 @@ Deno.serve(async(req:Request)=>{
   const read=async(fn:any)=>{try{return await fn();}catch(e){if(e.status===401){await refresh();return fn();}throw e;}};
   let result:any;
   if(action==='refresh_verify'){await refresh();const verified=await seller(token);if(verified.toLowerCase()!==ctx.username.toLowerCase())throw Error('Refreshed token identity mismatch');result={verified:true,username:verified,message:'Token refresh and Sandbox seller identity verified'};}
+  else if(action==='fixture_categories'){const config=await rpc(actor,'credentials');const app=await oauth(config,{grant_type:'client_credentials',scope:'https://api.ebay.com/oauth/api_scope'});result={categories:await categoryOptions(app.access_token)};}
+  else if(['fixture_verify','fixture_create'].includes(action)){
+   const uuid=(await hashState(actor+':creston-fixture-v1:'+body.slot)).slice(0,32).toUpperCase();const f=fixture(body.slot,body.category,uuid);kind='fixture';target=f.sku;
+   let existing:any=null;
+   try{existing=(await read(()=>trading('GetItem',fixtureLookup(f.sku),token,parse))).Item;}catch(e){if(!String(e.message).includes('21916270'))throw e;}
+   if(existing){if(String(existing.Seller?.UserID).toLowerCase()!==ctx.username.toLowerCase()||existing.SKU!==f.sku)throw Error('Fixture ownership mismatch');const old=await rpc(actor,'action',{kind,target});if(old.state==='unknown')await rpc(actor,'finish',{kind,target,attempt:old.attempt,state:'confirmed'});result={existing:true,item:existing,message:'Existing Sandbox fixture found; no duplicate created'};}
+   else{
+    const checked=await read(()=>trading('VerifyAddFixedPriceItem',f.xml,token,parse));
+    if(action==='fixture_verify')result={verified:true,title:f.title,sku:f.sku,warnings:checked.Errors||[],message:'eBay validated this test listing. It has not been published.'};
+    else{const claim=await rpc(actor,'claim',{kind,target,requested:{category:body.category,slot:body.slot,sku:f.sku}});if(!claim.claimed)throw Error('Previous fixture creation needs reconciliation; duplicate blocked');attempt=claim.attempt;sent=true;
+     const created=await trading('AddFixedPriceItem',f.xml,token,parse);accepted=true;
+     if(!/^\d+$/.test(String(created.ItemID)))throw new SandboxError('Listing accepted but ID unavailable',0,true);
+     const item=await ownItem(String(created.ItemID),token,ctx.username,parse);if(item.SKU!==f.sku)throw new SandboxError('Fixture read-back mismatch',0,true);
+     await rpc(actor,'finish',{kind,target,attempt,state:'confirmed'});result={item,confirmed:true,message:'Test listing created and verified on eBay Sandbox'};
+    }
+   }
+  }
   else if(action==='orders')result=await read(()=>orders(token,body.offset??0));
   else if(action==='listings')result=await read(()=>listings(token,body.page??1,parse));
   else if(['tracking_check','tracking_submit'].includes(action)){
@@ -100,7 +118,7 @@ Deno.serve(async(req:Request)=>{
    await trading('AddMemberMessageAAQToPartner','<ItemID>'+xmlEscape(item)+'</ItemID><MemberMessage><Subject>About your test order '+xmlEscape(id)+'</Subject><Body>'+xmlEscape(body.message.trim())+'</Body><QuestionType>General</QuestionType><RecipientID>'+xmlEscape(recipient)+'</RecipientID><EmailCopyToSender>false</EmailCopyToSender></MemberMessage>',token,parse);accepted=true;
    await rpc(actor,'finish',{kind,target,attempt,state:'confirmed'});result={accepted:true,recipient,message:'eBay Sandbox accepted the message. Receipt must be checked in the test buyer inbox.'};
   }else throw Error('Unsupported Sandbox action');
-  await rpc(actor,'event',{name:action,outcome:'confirmed',detail:target||('API response verified; '+(result.rows?.length??0)+' records on this page')});
+  await rpc(actor,'event',{name:action,outcome:'confirmed',detail:target||result.message||(Array.isArray(result.rows)?('API response verified; '+result.rows.length+' records on this page'+(result.total===null?'; total unavailable':'')):'API response verified')});
   return response(result);
  }catch(e){
   const uncertain=sent&&(accepted||!(e instanceof SandboxError||e instanceof TrackingError)||e.uncertain||!e.status);
