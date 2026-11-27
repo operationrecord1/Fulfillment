@@ -391,3 +391,5 @@
 .om .commerce-orders .commerce-platform-edit .sheet-chip-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);margin:0;flex:none}
 
 .om .commerce-orders .commerce-platform-edit{border:1px solid #b8bec5;min-height:30px;box-sizing:border-box}.om .commerce-orders .commerce-platform-edit:hover{border-color:#78848f}.om .commerce-orders .commerce-platform-edit:focus-visible{outline:2px solid #4285f4;outline-offset:2px}
+
+.om .commerce-orders .ebay-table thead th:nth-child(9){text-align:center;padding-left:12px;padding-right:12px}.om .commerce-orders .ebay-table thead th:nth-child(9) .commerce-header-label{display:block;width:100%;text-align:center}
