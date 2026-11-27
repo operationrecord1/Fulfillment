@@ -150,4 +150,4 @@ end $function$
 ;
 create index if not exists ebay_missing_image_item on fulfillment_private.ebay_records(store_id,(data#>>'{lineItems,0,legacyItemId}')) where resource='orders' and nullif(data#>>'{_orderSnapshot,image}','') is null;
 
-create trigger commerce_changed after insert or update or delete on fulfillment_private.ebay_supplier_products for each row execute function fulfillment_private.commerce_changed();
+-- Existing commerce_changed trigger on supplier products already updates shared workspace revisions.
