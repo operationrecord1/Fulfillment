@@ -26,7 +26,7 @@ Deno.serve(async(req:Request)=>{
   if(Date.parse(context.access_expires_at)<=Date.now()+60000)await renew();
   const inspect=async()=>{try{return await inspectOrder(body.order_id,token);}catch(e){if(e.status===401){await renew();return inspectOrder(body.order_id,token);}throw e;}};
   if(body.action==='check'){
-   const live=await inspect();const current=await work('observed',{shipments:live.shipments});
+   const live=await inspect();const current=await work('observed',{shipments:live.shipments.filter(x=>String(x.tracking).trim())});
    const pending=['unknown','confirmed'].includes(current.submission?.state)||(current.submission?.state==='checking'&&Date.parse(current.submission.updated_at)>Date.now()-120000);
    return response({...current,shipments:live.shipments,checked_at:live.checked_at,blocked:live.blocked||pending,reason:live.reason||(pending?'A previous submission is recorded or awaiting verification. Adding tracking is blocked.':'')});
   }
