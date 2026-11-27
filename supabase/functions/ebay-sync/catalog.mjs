@@ -14,7 +14,7 @@ export async function readCatalog(job,token,fetcher,parseXML,now=Date.now()){
  const d=parseXML(await response.text())?.GetMyeBaySellingResponse;
  if(!response.ok||!['Success','Warning'].includes(d?.Ack))throw new ProviderError('eBay catalog request failed: '+array(d?.Errors).filter(e=>e.SeverityCode==='Error').map(e=>e.ErrorCode).join(','),response.status,300);
  const active=d.ActiveList,total=Number(active?.PaginationResult?.TotalNumberOfEntries),pages=Number(active?.PaginationResult?.TotalNumberOfPages),items=array(active?.ItemArray?.Item);
- if(!Number.isInteger(total)||total<0||!Number.isInteger(pages)||pages>10000||page>Math.max(1,pages)||items.length===0&&total>0)throw new ProviderError('Invalid or incomplete eBay catalog page');
+ if(!Number.isInteger(total)||total<0||!Number.isInteger(pages)||pages>10000||page>Math.max(1,pages)||items.length===0&&total>0)throw new ProviderError('Incomplete catalog page '+page+'/'+pages+' total '+total+' items '+items.length);
  if(c.total!==undefined&&c.total!==total)throw new ProviderError('Catalog count changed during scan ('+c.total+' to '+total+'); restarting safely');
  const records=items.map(x=>listingRecord(x,end)),done=page>=pages;
  return {records,done,cursor:done?{}:{source:'trading',page:page+1,total,end},watermark:end,snapshot:{id:end,totals:{active:total}},...(done?{reconcile_active_before:end}:{})};
