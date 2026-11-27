@@ -133,3 +133,6 @@ body:has(.order-edit-dialog[open]) .om-main::-webkit-scrollbar-thumb,body:has(.o
 .order-edit-dialog .account-menu [role=listbox]{position:static;box-shadow:none;border:0;padding:0;width:100%}
 .order-edit-dialog .account-menu button{display:block;width:100%;text-align:left;background:#fff;border:0;padding:8px;font:inherit;cursor:pointer}
 .order-edit-dialog .account-menu button:hover,.order-edit-dialog .account-menu button:focus-visible{background:#f3f6fb}
+
+.account-picker .account-menu{min-width:200px;max-width:calc(100vw - 64px)}
+.account-picker .account-menu [role=option] .sheet-chip{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
