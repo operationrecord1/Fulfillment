@@ -95,7 +95,7 @@
  .om .order-edit-dialog [role=tabpanel]{overflow:auto!important;min-height:0;overscroll-behavior:contain}
  .om .order-edit-dialog nav{width:100%;min-width:0}
  .om .order-edit-dialog [role=tab]{width:33.333%;padding:12px 0}
- .om .order-edit-dialog .order-tab-indicator{width:33.333%}
+ .om .order-edit-dialog .order-tab-indicator{width:var(--editor-tab-width)}
  .om .order-edit-dialog footer{padding:8px 0 0;min-height:0;gap:6px}
  .om .order-edit-dialog footer>span{font-size:9px}
 }
