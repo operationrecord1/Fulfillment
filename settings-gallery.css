@@ -165,3 +165,5 @@ body.order-workspace .om[data-surface=settings]>.om-head{display:none!important}
 .om .settings-redesign .platform-edit{border:0;background:transparent;color:#515455;padding:6px 8px;cursor:pointer;font:inherit}
 .om .settings-redesign .om-platform-option .platform-remove{margin-left:0}
 @media(max-width:540px){.om .settings-redesign .settings-add{height:auto;flex-wrap:wrap}.om .settings-redesign .settings-add>input{flex:1 1 40%;width:0}.om .settings-redesign .settings-add .platform-new-colors{margin-left:auto}}
+
+.platform-account-name:empty{display:none}
