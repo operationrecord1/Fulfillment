@@ -7,3 +7,5 @@
 .sandbox-rule-result{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
 
 .om .sandbox-workspace .sandbox-inner>header{position:static;inset:auto;display:block;height:auto;min-height:0;padding:0;background:transparent;box-shadow:none;border:0;z-index:auto}.sandbox-badge{display:inline-block}.om .sandbox-modal>header{position:static;inset:auto;height:auto;min-height:0;box-sizing:border-box}.om .sandbox-workspace{padding-bottom:80px}@media(max-width:700px){.sandbox-table-wrap{scrollbar-width:none}.sandbox-table-wrap::-webkit-scrollbar{display:none}}
+
+.sandbox-card select{width:100%;min-width:0;max-width:100%;box-sizing:border-box}.sandbox-card pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;font-size:12px}.sandbox-form>*{min-width:0;max-width:100%}

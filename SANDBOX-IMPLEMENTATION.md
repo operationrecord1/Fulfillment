@@ -25,9 +25,9 @@
 
 ## Still needs real end-to-end verification
 - Forced refresh and seller read-back are verified. Automatic expiry/401 recovery still needs a controlled integration test.
-- Create a Sandbox listing and buy it using a separate Sandbox buyer. This seller currently has no orders. Never copy production customer data into fixtures.
+- Create a paid Sandbox order using a separate test buyer. Seller now has two confirmed test listings, but no orders. Buyer registration is prepared and requires the user to choose a password and submit the agreement. Never copy production customer data into fixtures.
 - 2026-11-27: attempted to save a clearly labeled test notebook draft in the Sandbox listing UI (9.99 USD, quantity 5, Unbranded). eBay redirected to /sh/lst/drafts and displayed its own "It's not you, it's us" server error. Draft persistence is unconfirmed; nothing was published.
-- Verify listing changes on that actual listing, tracking submission/read-back on a paid test order, and receipt in test buyer inbox. These writes have NOT been claimed successful.
+- Verify tracking submission/read-back on a paid test order, and receipt in test buyer inbox. These writes have NOT been claimed successful. Listing writes are verified below.
 - Automatic message scheduling/delivery/Due Refund triggers are NOT enabled. Current messaging is manual test-buyer-only.
 - Return label / carrier delivery / received returns require provider-supported Sandbox events; shared-rule simulation does not prove real carrier tracking or payouts.
 - Full production KPI/chart/editor design parity, store expense/tax/earnings API parity, image enrichment, all ended/scheduled listings, and full admin monitoring are NOT implemented by this Sandbox increment.
@@ -46,3 +46,13 @@
 - https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/AddMemberMessageAAQToPartner.html
 - https://developer.ebay.com/develop/guides/sell/authorization
 - https://supabase.com/docs/guides/database/vault
+
+## 2026-11-27 follow-up: actual fixture verification
+- Root blockers: no test orders; web seller draft flow returned an eBay server error; USPSGroundAdvantage was rejected by the Sandbox Trading listing validator.
+- Added reusable API fixture setup in Workflow Tests: category lookup, validation, two slots, stable SKU/UUID, atomic claim, owner read-back and duplicate recovery.
+- Sandbox taxonomy returned Notebooks & Binders category 102950. GeteBayDetails confirmed USPSPriority. VerifyAddFixedPriceItem accepted the corrected definition.
+- Created and read back real Sandbox listings 110591981581 and 110591981585. Website active listing import confirmed the first record.
+- Listing 110591981581 price changed from USD 9.99 to 10.49 and available quantity from 5 to 7; GetItem read-back confirmed both. These test values remain for further tests.
+- Re-running slot 1 returned the existing listing; Create remained disabled, no duplicate created.
+- 54 automated tests passed before the live writes. Deployed browser simulations: 7 tracking + 26 status/calculation checks passed.
+- Corrected audit text for non-list actions and initial loading/error states; mobile fixture controls constrained to container width.
