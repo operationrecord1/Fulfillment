@@ -1,36 +1,47 @@
-# Sandbox implementation contract
+# eBay Sandbox workspace
 
-## Current verified state
-Sandbox navigation includes Orders, Listings, Workflow Tests and Connection. Orders and Listings show a disconnected state; no records or totals are invented. Workflow tests use the production tracking provider with an injected simulated transport and never call eBay. Message preview uses sample data only.
+## Implemented and deployed
+- Orders, Listings, Workflow Tests, Connection routes; selected subpage survives reload.
+- Real authenticated Sandbox API gateway, isolated private tables and encrypted Vault credentials. No production token/data fallback.
+- Seller identity verified with Sandbox Trading GetUser. Connected seller: testuser_crestonglobaltest.
+- Fulfillment Orders reads with 50-record pages and confirmed API total (default last 90 days).
+- Active listings via GetMyeBaySelling with 50-record pages. An omitted ActiveList is shown as records absent/count unavailable, not invented zero.
+- On-screen 30-second refresh while visible, explicit manual refresh and last-check timestamp. This is polling, not a webhook delivery guarantee.
+- Order-specific tracking: fresh check, one shipment only, cancellation/payment eligibility, atomic duplicate lock, uncertain writes block retry, read-back confirms tracking.
+- Fixed-price, nonvariation listing price/quantity updates with seller verification and read-back. Unknown results block another write until confirmed by Check listing.
+- Manual Sandbox buyer messaging tied to the API order buyer and item. Same message/order deduplicated. API acceptance is not proof of receipt.
+- OAuth config, one-use state callback and refresh-token implementation. Sandbox Client Secret is in Vault. Sandbox RuName accepted URL points to the Sandbox callback.
+- Current active connection uses a temporary developer token. Refreshable OAuth is NOT yet verified: user must finish Sandbox sign-in in the pending browser tab.
+- API activity log (50 latest events), no request bodies/tokens in logs; authenticated active staff/admin only, per-user Sandbox ownership.
+- Workflow Tests: tracking simulations plus shared production status/calculation rules. Simulations are explicitly labeled and do not contact eBay.
 
-## Required connection work (not implemented or verified yet)
-- Separate Sandbox application credentials, redirect configuration, seller OAuth consent and test buyer account.
-- Server-only encrypted token storage scoped to Sandbox and workspace; no fallback to Production credentials.
-- Explicit allowlist of verified Sandbox API hosts; reject arbitrary URLs and Production hosts.
-- Independent records, sync cursors, action locks, drafts, audit events and reminders. Never reuse Production store records.
-- Inspect permissions and API availability before enabling an action; report missing scopes and provider errors visibly.
+## Verified
+- Real GetUser identified testuser_crestonglobaltest; real Orders response total 0.
+- Real GetMyeBaySelling returned Success without ActiveList; total is unavailable.
+- 51 automated provider/tracking/rule tests passed.
+- Server rejects unauthenticated calls (401). Database worker executable only by service_role; private tables use RLS and no client grants.
+- Database duplicate claim and one-use OAuth actor binding tested in rolled-back transactions.
+- New schema security advisor findings are informational RLS-without-policy notices for intentionally server-only private tables. Existing unrelated security warnings remain outside this change.
 
-## Orders parity requirements retained from the agreed design
-- Reuse Dashboard KPI/chart layout, period selection and existing financial formulas. Persist selected month/year and page size independently in Sandbox.
-- Buying cost = entered buy price + shipping + additional cost. Order profit = verified order earnings minus buying cost. Removed costs must stop contributing. Missing authoritative earnings remain unavailable.
-- Keep cancelled orders in counts. Confirmed cancellation takes precedence over cancellation-related refund; partial refund does not mean Refunded.
-- Any nonblank Buy Order ID or explicit valid cost input (including zero) qualifies for Ordered. Account selection, notes and internal tracking do not qualify.
-- Shipped/Delivered require confirmed eBay evidence. Return Label Created requires provided-label evidence. Return receipt triggers automatic Due Refund. Preserve manual Due Refund and Out of Stock/Alert locks according to existing rules.
-- Same Order/Product/Buyer/Actions popup, stable size and responsive layout. Edit Product remains deferred.
-- Separate internal tracking from eBay tracking. One eBay tracking per order; fresh check before submission; block existing shipment, concurrent requests and uncertain automatic retries. Read back before claiming success.
-- Message templates: purchase, delivered, manual Due Refund delivery. One expanded panel. Do not send without a configured template and verified recipient/event. Persist deduplication and delivery result separately from internal reminder email.
+## Still needs real end-to-end verification
+- Complete refreshable OAuth sign-in; verify refresh and expiry recovery.
+- Create a Sandbox listing and buy it using a separate Sandbox buyer. This seller currently has no orders. Never copy production customer data into fixtures.
+- Verify listing changes on that actual listing, tracking submission/read-back on a paid test order, and receipt in test buyer inbox. These writes have NOT been claimed successful.
+- Automatic message scheduling/delivery/Due Refund triggers are NOT enabled. Current messaging is manual test-buyer-only.
+- Return label / carrier delivery / received returns require provider-supported Sandbox events; shared-rule simulation does not prove real carrier tracking or payouts.
+- Full production KPI/chart/editor design parity, store expense/tax/earnings API parity, image enrichment, all ended/scheduled listings, and full admin monitoring are NOT implemented by this Sandbox increment.
+- Profit/tax/margin production formulas are unchanged. API buyer total is not substituted for order earnings; unavailable financial fields show a dash.
 
-## Listings parity requirements
-- Active, ended and scheduled results must be distinguishable; paginate all supported results and verify totals instead of counting cached history.
-- Verify exact Sandbox listing ownership before edits. Read back title, price, quantity and status after API writes.
-- Keep missing images, failed syncs and unavailable analytics visible; no fabricated metrics.
+## Key files
+- sandbox-live.js: actual API connection, pages, actions and refresh.
+- sandbox-rules.js / sandbox-scenarios.mjs: clearly separate simulations.
+- supabase/functions/ebay-sandbox: Sandbox-only API and OAuth.
+- supabase/ebay-sandbox.sql: isolated state, encrypted secrets, atomic claims and audit.
 
-## Verification gates
-1. Sandbox seller authorization succeeds and identity is verified.
-2. Actual test orders and listings load with source, timestamp, pagination and errors.
-3. Tracking write/read-back, existing-shipment block and unknown-result reconciliation pass on Sandbox orders.
-4. Listing edit/read-back passes; refresh and navigation preserve the chosen view.
-5. Customer messaging passes against a test buyer. API support for return labels/delivery events is verified separately; simulations are explicitly labelled.
-6. Responsive checks at 300, 390, 700, 1100 and large desktop widths; no Production data writes during any test.
-
-Sandbox success is not proof of real carrier delivery, payout release, Production permissions or zero downtime.
+## Sources verified during implementation
+- https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/GetUser.html
+- https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/GetMyeBaySelling.html
+- https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/ReviseInventoryStatus.html
+- https://developer.ebay.com/Devzone/XML/docs/Reference/eBay/AddMemberMessageAAQToPartner.html
+- https://developer.ebay.com/develop/guides/sell/authorization
+- https://supabase.com/docs/guides/database/vault

@@ -61,19 +61,24 @@ Deno.serve(async(req:Request)=>{
   else if(action==='listings')result=await read(()=>listings(token,body.page??1,parse));
   else if(['tracking_check','tracking_submit'].includes(action)){
    target=body.order_id;if(typeof target!=='string'||!target||target.length>100)throw Error('Invalid order ID');kind='tracking';
-   const live=await read(()=>checkTracking(target,token));const previous=await rpc(actor,'action',{kind,target});
+   let live=await read(()=>checkTracking(target,token));const previous=await rpc(actor,'action',{kind,target});
    if(previous.state==='unknown'&&live.shipments.some((x:any)=>x.tracking===previous.requested?.tracking&&x.carrier.toLowerCase()===previous.requested?.carrier?.toLowerCase()))await rpc(actor,'finish',{kind,target,attempt:previous.attempt,state:'confirmed'});
    if(action==='tracking_check')result={...live,order:undefined,blocked:live.blocked||['unknown','confirmed'].includes(previous.state),reason:live.reason||(['unknown','confirmed'].includes(previous.state)?'Previous submission is recorded; additional tracking is blocked.':'')};
    else{
     if(live.blocked)throw Error(live.reason);const values=validateTracking(body.tracking,body.carrier);const claim=await rpc(actor,'claim',{kind,target,requested:values});if(!claim.claimed)throw Error('Existing or uncertain tracking submission blocks another send');attempt=claim.attempt;
     // Claim persists unknown BEFORE the only external POST. A crash cannot cause a blind retry.
+    live=await checkTracking(target,token);if(live.blocked){await rpc(actor,'finish',{kind,target,attempt,state:'rejected'});throw Error(live.reason);}
     sent=true;await sendTracking(target,live.order,values.tracking,values.carrier,token);accepted=true;
     const verified=await checkTracking(target,token);if(!verified.shipments.some((x:any)=>x.tracking===values.tracking&&x.carrier.toLowerCase()===values.carrier.toLowerCase()))throw new SandboxError('Accepted by eBay; read-back confirmation pending',0,true);
     await rpc(actor,'finish',{kind,target,attempt,state:'confirmed'});result={...verified,order:undefined,blocked:true,reason:'Tracking confirmed on eBay Sandbox'};
    }
   }else if(['listing_read','listing_update'].includes(action)){
    target=String(body.item_id||'');kind='listing';const item=await read(()=>ownItem(target,token,ctx.username,parse));
-   if(action==='listing_read')result={item,checked_at:new Date().toISOString()};
+   if(action==='listing_read'){
+    const previous=await rpc(actor,'action',{kind,target});let confirmed=false;
+    if(previous.state==='unknown'&&Number(item.SellingStatus?.CurrentPrice?.['#text'])===Number(previous.requested?.price)&&Number(item.Quantity)-Number(item.SellingStatus?.QuantitySold||0)===previous.requested?.quantity){await rpc(actor,'finish',{kind,target,attempt:previous.attempt,state:'confirmed'});confirmed=true;}
+    result={item,confirmed,checked_at:new Date().toISOString()};
+   }
    else{
     if(item.ListingType!=='FixedPriceItem'||item.SellingStatus?.ListingStatus!=='Active'||item.Variations)throw Error('Only active single-variation fixed-price listings are supported for this test');
     const values=listingChange(body.price,body.quantity);const currency=item.SellingStatus?.CurrentPrice?.['@_currencyID'];if(!currency)throw Error('Listing currency is unavailable');

@@ -25,7 +25,7 @@ alter table fulfillment_private.ebay_sandbox_events enable row level security;
 revoke all on fulfillment_private.ebay_sandbox_connections,fulfillment_private.ebay_sandbox_actions,fulfillment_private.ebay_sandbox_events from public,anon,authenticated;
 create or replace function public.ebay_sandbox_worker(action text,payload jsonb default '{}') returns jsonb
 language plpgsql security definer set search_path='' as $$
-declare uid uuid=(payload->>'actor')::uuid; c fulfillment_private.ebay_sandbox_connections; a fulfillment_private.ebay_sandbox_actions; sid uuid; aid uuid;
+declare uid uuid=nullif(payload->>'actor','')::uuid; c fulfillment_private.ebay_sandbox_connections; a fulfillment_private.ebay_sandbox_actions; sid uuid; aid uuid;
 begin
  if action='consume' then
   delete from fulfillment_private.ebay_sandbox_oauth where state_hash=payload->>'hash' and expires_at>now() returning actor into uid;

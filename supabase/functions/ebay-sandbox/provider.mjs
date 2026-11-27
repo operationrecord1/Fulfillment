@@ -37,7 +37,7 @@ export async function orders(token,offset=0,fetcher=fetch){
 export async function listings(token,page,parse,fetcher=fetch){
  if(!Number.isInteger(page)||page<1||page>125)throw Error('Invalid listings page');
  const d=await trading('GetMyeBaySelling','<ActiveList><Include>true</Include><Pagination><EntriesPerPage>50</EntriesPerPage><PageNumber>'+page+'</PageNumber></Pagination></ActiveList>',token,parse,fetcher);
- const list=d.ActiveList,total=Number(list?.PaginationResult?.TotalNumberOfEntries);
+ const list=d.ActiveList;if(list===undefined&&d.Ack==='Success'&&d.Timestamp)return {rows:[],total:null,page,limit:50,checked_at:new Date().toISOString(),period:'Active listings',notice:'eBay returned no ActiveList container. No records returned; total count unavailable.'};const total=Number(list?.PaginationResult?.TotalNumberOfEntries);
  if(!list||!Number.isInteger(total)||total<0)throw new SandboxError('Listing total not confirmed by Sandbox API');
  const rows=[].concat(list.ItemArray?.Item||[]);if(rows.some(x=>!x.ItemID))throw new SandboxError('Invalid listing identity');
  return {rows,total,page,limit:50,checked_at:new Date().toISOString(),period:'Active listings'};

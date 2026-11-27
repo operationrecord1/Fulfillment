@@ -1,0 +1,1 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');const {run}=require('./sandbox-rules.js');const P=require('./ebay-presentation.js');for(const r of run(P))test(r.name,()=>assert.equal(r.actual,r.expected));
